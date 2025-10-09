@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* @import "tailwindcss";
-@import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *)); */
-
 /* Theme tokens via CSS variables */
 :root {
     /* Light Mode Colors */
@@ -67,11 +62,16 @@
 .dark {
     /* Updated dark mode colors to match project specifications */
     --color-primary: #10b981; /* emerald-500 */
-    --color-surface: #1c252e;
     --color-text-primary: #ffffff;
     --color-text-secondary: #9ca3af; /* gray-400 */
     --color-border: rgba(255, 255, 255, 0.1);
-    --background: #141a21;
+    --color-surface: #1c252e;
+
+    /* Background Color For Dark Mode */
+    /* --background: #141a21; */
+    --background: #1c252e; /* This is basically the surface color */
+    /* Background Color For Dark Mode */
+
     --foreground: oklch(0.95 0 0);
     --card: #1c252e;
     --card-foreground: oklch(0.95 0 0);

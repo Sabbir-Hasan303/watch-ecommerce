@@ -20,9 +20,14 @@ export default function Sidebar ({ collapsed, onToggle }) {
     const { url } = usePage()
     const [expandedItems, setExpandedItems] = useState([])
 
-    const menuItems = [{ icon: LayoutDashboard, label: 'Dashboard', href: '/' }]
+    const menuItems = [{ icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' }]
 
     const managementItems = [
+        {
+            icon: LayoutDashboard,
+            label: 'Dashboard',
+            href: '/dashboard'
+        },
         {
             icon: Package,
             label: 'Product',
@@ -143,7 +148,7 @@ export default function Sidebar ({ collapsed, onToggle }) {
         const buttonClasses = cn(
             'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group relative overflow-hidden',
             isActive
-                ? 'bg-sidebar-accent text-sidebar-primary shadow-lg shadow-sidebar-primary/20 border border-sidebar-primary/30'
+                ? 'bg-sidebar-accent text-primary shadow-lg shadow-sidebar-primary/20 border border-sidebar-primary/30'
                 : 'text-text-primary hover:text-text-primary hover:bg-sidebar-accent hover:shadow-md hover:scale-[1.02]',
             collapsed && 'justify-center px-2'
         )
@@ -154,18 +159,18 @@ export default function Sidebar ({ collapsed, onToggle }) {
                     <div className='absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-xl blur-xl -z-10' />
                 )}
 
-                {item.href ? (
+                {/* Single menu item with href - direct navigation */}
+                {item.href && !hasSubItems ? (
                     <Link href={item.href} className={buttonClasses}>
                         <div className='absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/5 to-teal-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500' />
                         <div className='relative z-10 flex items-center gap-3 w-full'>
                             {buttonContent}
                         </div>
                     </Link>
-                ) : (
+                ) : hasSubItems ? (
+                    /* Menu item with sub-items - expandable */
                     <button
-                        onClick={() =>
-                            hasSubItems && toggleExpanded(item.label)
-                        }
+                        onClick={() => toggleExpanded(item.label)}
                         className={buttonClasses}
                     >
                         <div className='absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/5 to-teal-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500' />
@@ -173,6 +178,14 @@ export default function Sidebar ({ collapsed, onToggle }) {
                             {buttonContent}
                         </div>
                     </button>
+                ) : (
+                    /* Fallback for items without href or subItems */
+                    <div className={buttonClasses}>
+                        <div className='absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/5 to-teal-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500' />
+                        <div className='relative z-10 flex items-center gap-3 w-full'>
+                            {buttonContent}
+                        </div>
+                    </div>
                 )}
 
                 {hasSubItems && isExpanded && !collapsed && (
@@ -186,18 +199,6 @@ export default function Sidebar ({ collapsed, onToggle }) {
                                     key={subIndex}
                                     className='relative group/sub'
                                 >
-                                    {/* <div className='absolute left-[22px] top-0 bottom-0 w-px'>
-                                        {!isLast && (
-                                            <div className='absolute top-0 bottom-0 w-px bg-gradient-to-b from-sidebar-border to-transparent' />
-                                        )}
-                                        <div className='absolute top-[18px] left-0 w-6 h-px bg-gradient-to-r from-sidebar-border to-transparent' />
-                                        <div
-                                            className='absolute top-0 left-0 w-6 h-[18px] border-l border-b border-sidebar-border rounded-bl-lg transition-colors duration-300 group-hover/sub:border-sidebar-primary/30'
-                                            style={{
-                                                borderWidth: '0 0 1px 1px'
-                                            }}
-                                        />
-                                    </div> */}
                                     <div
                                         className={`absolute left-5 w-px bg-sidebar-border ${
                                             isLast
@@ -220,15 +221,9 @@ export default function Sidebar ({ collapsed, onToggle }) {
                                                     : '!text-text-secondary hover:text-text-primary hover:!bg-gray-200 hover:dark:!bg-sidebar-accent hover:shadow-sm'
                                             )}
                                         >
-                                            {/* <div className='absolute inset-0 bg-gradient-to-r from-emerald-500/0 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-all duration-300' /> */}
                                             <span className='relative z-10 transition-all duration-300'>
                                                 {subItem.label}
                                             </span>
-                                            {/* {subItem.badge && (
-                                            <span className='relative z-10 px-2 py-0.5 text-xs font-medium bg-orange-500/20 text-orange-400 rounded-md animate-pulse'>
-                                                {subItem.badge}
-                                            </span>
-                                        )} */}
                                         </Button>
                                     </Link>
                                 </div>

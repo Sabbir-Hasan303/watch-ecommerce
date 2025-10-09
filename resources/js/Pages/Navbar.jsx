@@ -15,6 +15,7 @@ import {
     Badge,
     useMediaQuery
 } from '@mui/material'
+import ClearIcon from '@mui/icons-material/Clear';
 import {
     Search,
     Notifications,
@@ -26,6 +27,7 @@ import {
     Menu as MenuIcon
 } from '@mui/icons-material'
 import { useThemeContext } from '@/contexts/ThemeContext'
+import CustomTextField from '@/Components/CustomTextField'
 // import { HamburgerButton } from "@/components/hamburger-button"
 
 export default function Navbar ({
@@ -91,27 +93,26 @@ export default function Navbar ({
 
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     {showSearch && (
-                        <TextField
+                        <CustomTextField
                             placeholder='Search...'
                             size='small'
-                            sx={{
-                                display: { xs: 'none', md: 'block' },
-                                width: { md: 256 },
-                                '& .MuiOutlinedInput-root': {
-                                    '&:hover': {
-                                        width: 288
-                                    },
-                                    '&.Mui-focused': {
-                                        width: 288
-                                    }
-                                }
-                            }}
                             InputProps={{
                                 startAdornment: (
-                                    <InputAdornment position='start'>
-                                        <Search
-                                            sx={{ color: 'text.secondary' }}
-                                        />
+                                    <InputAdornment position="start">
+                                        <Search color="action" className="!text-text-secondary dark:text-dark-text-primary" />
+                                    </InputAdornment>
+                                ),
+                                endAdornment: true && (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => {
+                                                // setSearchTerm('');
+                                            }}
+                                            edge="end"
+                                            size="small"
+                                        >
+                                            <ClearIcon className="!text-text-secondary dark:text-dark-text-primary" />
+                                        </IconButton>
                                     </InputAdornment>
                                 )
                             }}
@@ -177,7 +178,7 @@ export default function Navbar ({
                                             sx={{
                                                 width: 8,
                                                 height: 8,
-                                                bgcolor: 'primary.main',
+                                                bgcolor: 'background.primary',
                                                 borderRadius: '50%',
                                                 mt: 0.5,
                                                 flexShrink: 0
