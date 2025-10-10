@@ -67,8 +67,8 @@ export default function Sidebar({ collapsed, onToggle }) {
       icon: ImageIcon,
       label: 'Content',
       subItems: [
-        { label: 'Newsletter', href: '/content/newsletter' },
-        { label: 'Contact List', href: '/content/contacts' },
+        { label: 'Newsletter', href: '/newsletters' },
+        { label: 'Contact List', href: '/contact-list' },
         { label: 'Banners', href: '/content/banners' },
         { label: 'Featured Products', href: '/content/featured' },
         { label: 'Tags', href: '/content/tags' },

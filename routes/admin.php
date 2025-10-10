@@ -38,6 +38,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return Inertia::render('Admin/Orders/List');
         })->name('admin.orders.index');
     });
+
+    // Contents
+    Route::get('/newsletters', function () {
+        return Inertia::render('Admin/Contents/Newsletters');
+    })->name('admin.contents.newsletters');
+
+    Route::get('/contact-list', function () {
+        return Inertia::render('Admin/Contents/ContactList');
+    })->name('admin.contents.contact-list');
 });
 
 require __DIR__ . '/auth.php';

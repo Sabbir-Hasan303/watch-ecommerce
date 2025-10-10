@@ -167,7 +167,7 @@ export default function ProductList() {
           <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Product Management</h2>
           <div>
             <Link href='/products/create'>
-              <Button variant='primary' size='md' startIcon={<Plus className='w-4 h-4' />}>
+              <Button variant='outlined' size='md' startIcon={<Plus className='w-4 h-4' />}>
                 Add Product
               </Button>
             </Link>
@@ -338,7 +338,7 @@ export default function ProductList() {
                 </div>
 
                 <Button
-                  variant='outline'
+                  variant='outlined'
                   size='icon'
                   onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                   disabled={currentPage === totalPages}>
