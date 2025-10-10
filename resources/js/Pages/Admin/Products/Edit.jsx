@@ -7,7 +7,7 @@ import { useState } from 'react'
 import CustomTextField from '@/Components/CustomTextField'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 
-export default function ProductCreate() {
+export default function ProductEdit() {
   const [images, setImages] = useState([])
   const [dragActive, setDragActive] = useState(false)
 
@@ -69,7 +69,7 @@ export default function ProductCreate() {
     <AuthenticatedLayout>
       <div className='py-4'>
         <div className='flex flex-col md:flex-row justify-between items-center mb-6'>
-          <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Create Product</h2>
+          <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Edit Product</h2>
           {/* Back button bar */}
           <div className=''>
             <Link href='/products'>
@@ -385,7 +385,7 @@ export default function ProductCreate() {
                     variant='primary'
                     size='md'
                     startIcon={<Save className='w-4 h-4' />}>
-                    Create Product
+                    Save
                   </Button>
                 </div>
               </div>

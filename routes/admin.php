@@ -11,6 +11,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
+    // Products
     Route::prefix('products')->group(function () {
         Route::get('/', function () {
             return Inertia::render('Admin/Products/List');
@@ -25,6 +26,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 'productId' => $id
             ]);
         })->name('admin.products.edit');
+
+        Route::get('/categories', function () {
+            return Inertia::render('Admin/Products/Categories');
+        })->name('admin.products.categories');
+    });
+
+    // Orders
+    Route::prefix('orders')->group(function () {
+        Route::get('/', function () {
+            return Inertia::render('Admin/Orders/List');
+        })->name('admin.orders.index');
     });
 });
 

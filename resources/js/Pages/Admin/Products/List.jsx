@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Filter, Plus, Edit, Trash2, Eye, ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react'
-import { Button, Input, Badge, Select, MenuItem, FormControl, InputLabel } from '@mui/material'
+import { Button, Badge, FormControl, InputAdornment } from '@mui/material'
 import { Link } from '@inertiajs/react'
 import { router } from '@inertiajs/react'
 import { useThemeContext } from '@/contexts/ThemeContext'
@@ -193,8 +193,14 @@ export default function ProductList() {
                   value={selectedCategory}
                   onChange={e => setSelectedCategory(e.target.value)}
                   label='Category'
-                  startAdornment={<Filter className='w-4 h-4 mr-2' />}
-                  options={categories.map(category => ({ value: category, label: category.charAt(0).toUpperCase() + category.slice(1) }))}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position='start'>
+                        <Filter className='w-4 h-4 mr-2' />
+                      </InputAdornment>
+                    )
+                  }}
+                  options={categories.map(category => ({ label: category.charAt(0).toUpperCase() + category.slice(1) }))}
                 />
               </FormControl>
 

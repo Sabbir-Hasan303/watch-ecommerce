@@ -117,17 +117,7 @@ export const ThemeContextProvider = ({ children }) => {
           styleOverrides: {
             root: {
               '& .MuiOutlinedInput-root': {
-                borderRadius: '12px',
-                backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
-                '& fieldset': {
-                  borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
-                },
-                '&:hover fieldset': {
-                  borderColor: mode === 'dark' ? 'rgba(245, 158, 11, 0.5)' : 'rgba(99, 102, 241, 0.5)'
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: mode === 'dark' ? '#f59e0b' : '#6366f1'
-                }
+                borderRadius: '12px'
               }
             }
           }
@@ -138,6 +128,7 @@ export const ThemeContextProvider = ({ children }) => {
               backgroundColor: mode === 'dark' ? '#1c252e' : '#ffffff',
               border: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)',
               borderRadius: '12px',
+              backgroundImage: 'none',
               boxShadow:
                 mode === 'dark'
                   ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
@@ -161,7 +152,7 @@ export const ThemeContextProvider = ({ children }) => {
         MuiAppBar: {
           styleOverrides: {
             root: {
-              backgroundColor: mode === 'dark' ? 'rgba(28, 37, 46, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+              backgroundColor: mode === 'dark' ? '#1c252e' : '#ffffff',
               backdropFilter: 'blur(20px)',
               borderBottom: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)',
               boxShadow:
