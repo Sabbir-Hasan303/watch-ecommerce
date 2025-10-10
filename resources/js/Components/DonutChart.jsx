@@ -98,8 +98,8 @@ export function DonutChart () {
 
                 <div className='absolute inset-0 flex items-center justify-center'>
                     <div className='text-center'>
-                        <p className='text-2xl font-bold text-white'>$45.2K</p>
-                        <p className='text-xs text-gray-500'>Total Sales</p>
+                        <p className='text-2xl font-bold text-text-primary'>$45.2K</p>
+                        <p className='text-xs text-text-secondary'>Total Sales</p>
                     </div>
                 </div>
             </div>

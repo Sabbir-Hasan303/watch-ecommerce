@@ -113,25 +113,19 @@ export default function Dashboard () {
     ]
 
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className='text-xl font-semibold leading-tight text-gray-800'>
-                    Dashboard
-                </h2>
-            }
-        >
+        <AuthenticatedLayout>
             <Head title='Dashboard' />
 
-            <div className='flex-1'>
-                <div className='p-4 md:p-6 lg:p-8 space-y-6'>
-                    <div className='flex items-center gap-3 p-1 bg-[#1C252E] rounded-xl border border-white/5 w-fit'>
+            <div className='py-4'>
+                <div className='space-y-6'>
+                    <div className='flex items-center gap-3 p-1 border border-border/40 rounded-xl w-fit'>
                         <button
                             onClick={() => setActiveSection('dashboard')}
                             className={cn(
                                 'px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300',
                                 activeSection === 'dashboard'
-                                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/20'
-                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-text-primary shadow-lg shadow-emerald-500/20'
+                                    : 'text-muted-foreground hover:text-text-primary hover:bg-foreground/5'
                             )}
                         >
                             Dashboard
@@ -141,8 +135,8 @@ export default function Dashboard () {
                             className={cn(
                                 'px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300',
                                 activeSection === 'inventory'
-                                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/20'
-                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-text-primary shadow-lg shadow-emerald-500/20'
+                                    : 'text-muted-foreground hover:text-text-primary hover:bg-foreground/5'
                             )}
                         >
                             Inventory Management
@@ -152,8 +146,8 @@ export default function Dashboard () {
                             className={cn(
                                 'px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300',
                                 activeSection === 'accounts'
-                                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/20'
-                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-text-primary shadow-lg shadow-emerald-500/20'
+                                    : 'text-muted-foreground hover:text-text-primary hover:bg-foreground/5'
                             )}
                         >
                             Accounts
@@ -170,7 +164,7 @@ export default function Dashboard () {
                                 {stats.map((stat, index) => (
                                     <Card
                                         key={index}
-                                        className='bg-[#1C252E] border-white/5 p-6 hover:border-emerald-500/30 transition-all duration-500 group animate-in fade-in slide-in-from-bottom-4 hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-1 cursor-pointer overflow-hidden relative'
+                                        className='bg-card border border-border/40 p-6 hover:border-emerald-500/30 transition-all duration-500 group animate-in fade-in slide-in-from-bottom-4 hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-1 cursor-pointer overflow-hidden relative'
                                         style={{
                                             animationDelay: `${index * 100}ms`
                                         }}
@@ -179,10 +173,10 @@ export default function Dashboard () {
 
                                         <div className='relative flex items-start justify-between'>
                                             <div className='flex-1'>
-                                                <p className='text-sm text-gray-500 mb-2 group-hover:text-gray-400 transition-colors'>
+                                                <p className='text-sm text-muted-foreground mb-2 group-hover:text-text-primary/70 transition-colors'>
                                                     {stat.title}
                                                 </p>
-                                                <h3 className='text-2xl md:text-3xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors'>
+                                                <h3 className='text-2xl md:text-3xl font-bold text-text-primary mb-2 group-hover:text-emerald-400 transition-colors'>
                                                     {stat.value}
                                                 </h3>
                                                 <div className='flex items-center gap-1'>
@@ -201,7 +195,7 @@ export default function Dashboard () {
                                                     >
                                                         {stat.change}
                                                     </span>
-                                                    <span className='text-sm text-gray-500'>
+                                                    <span className='text-sm text-muted-foreground'>
                                                         {stat.description}
                                                     </span>
                                                 </div>
@@ -219,7 +213,7 @@ export default function Dashboard () {
                                                         stat.color
                                                     )}
                                                 >
-                                                    <stat.icon className='w-6 h-6 text-white' />
+                                                    <stat.icon className='w-6 h-6 text-text-primary' />
                                                 </div>
                                             </div>
                                         </div>
@@ -232,15 +226,15 @@ export default function Dashboard () {
                             <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6'>
                                 {/* Recent Orders */}
                                 <Card
-                                    className='bg-[#1C252E] border-white/5 p-6 lg:col-span-2 animate-in fade-in slide-in-from-left-4 hover:border-emerald-500/20 transition-all duration-500'
+                                    className='bg-card border border-border/40 p-6 lg:col-span-2 animate-in fade-in slide-in-from-left-4 hover:border-emerald-500/20 transition-all duration-500'
                                     style={{ animationDelay: '400ms' }}
                                 >
                                     <div className='flex items-center justify-between mb-6'>
                                         <div>
-                                            <h3 className='text-lg font-semibold text-white'>
+                                            <h3 className='text-lg font-semibold text-text-primary'>
                                                 Recent Orders
                                             </h3>
-                                            <p className='text-sm text-gray-500 mt-1'>
+                                            <p className='text-sm text-muted-foreground mt-1'>
                                                 Latest customer transactions
                                             </p>
                                         </div>
@@ -252,7 +246,7 @@ export default function Dashboard () {
                                         {recentOrders.map((order, index) => (
                                             <div
                                                 key={order.id}
-                                                className='flex items-center justify-between p-4 bg-white/5 rounded-xl hover:bg-gradient-to-r hover:from-emerald-500/10 hover:to-teal-500/10 transition-all duration-300 group cursor-pointer border border-transparent hover:border-emerald-500/20'
+                                                className='flex items-center justify-between p-4 bg-foreground/5 rounded-xl hover:bg-gradient-to-r hover:from-emerald-500/10 hover:to-teal-500/10 transition-all duration-300 group cursor-pointer border border-transparent hover:border-emerald-500/20'
                                                 style={{
                                                     animationDelay: `${
                                                         (index + 5) * 100
@@ -267,17 +261,17 @@ export default function Dashboard () {
                                                         </div>
                                                     </div>
                                                     <div className='flex-1 min-w-0'>
-                                                        <p className='text-sm font-medium text-white group-hover:text-emerald-400 transition-colors truncate'>
+                                                        <p className='text-sm font-medium text-text-primary group-hover:text-emerald-400 transition-colors truncate'>
                                                             {order.customer}
                                                         </p>
-                                                        <p className='text-xs text-gray-500'>
+                                                        <p className='text-xs text-muted-foreground'>
                                                             Order #{order.id} •{' '}
                                                             {order.time}
                                                         </p>
                                                     </div>
                                                 </div>
                                                 <div className='text-right ml-4'>
-                                                    <p className='text-sm font-semibold text-white'>
+                                                    <p className='text-sm font-semibold text-text-primary'>
                                                         $
                                                         {order.amount.toFixed(
                                                             2
@@ -307,14 +301,14 @@ export default function Dashboard () {
 
                                 {/* Top Products */}
                                 <Card
-                                    className='bg-[#1C252E] border-white/5 p-6 animate-in fade-in slide-in-from-right-4 hover:border-emerald-500/20 transition-all duration-500'
+                                    className='bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-right-4 hover:border-emerald-500/20 transition-all duration-500'
                                     style={{ animationDelay: '500ms' }}
                                 >
                                     <div className='mb-6'>
-                                        <h3 className='text-lg font-semibold text-white'>
+                                        <h3 className='text-lg font-semibold text-text-primary'>
                                             Top Products
                                         </h3>
-                                        <p className='text-sm text-gray-500 mt-1'>
+                                        <p className='text-sm text-muted-foreground mt-1'>
                                             Best selling items
                                         </p>
                                     </div>
@@ -325,7 +319,7 @@ export default function Dashboard () {
                                                 className='group cursor-pointer'
                                             >
                                                 <div className='flex items-center justify-between mb-2'>
-                                                    <p className='text-sm font-medium text-white group-hover:text-emerald-400 transition-colors'>
+                                                    <p className='text-sm font-medium text-text-primary group-hover:text-emerald-400 transition-colors'>
                                                         {product.name}
                                                     </p>
                                                     <span className='text-xs text-emerald-400 font-medium'>
@@ -333,7 +327,7 @@ export default function Dashboard () {
                                                     </span>
                                                 </div>
                                                 <div className='flex items-center gap-3'>
-                                                    <div className='flex-1 h-2 bg-white/5 rounded-full overflow-hidden'>
+                                                    <div className='flex-1 h-2 bg-foreground/5 rounded-full overflow-hidden'>
                                                         <div
                                                             className='h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500 group-hover:shadow-lg group-hover:shadow-emerald-500/50'
                                                             style={{
@@ -345,11 +339,11 @@ export default function Dashboard () {
                                                             }}
                                                         />
                                                     </div>
-                                                    <span className='text-xs text-gray-500 min-w-[60px] text-right'>
+                                                    <span className='text-xs text-muted-foreground min-w-[60px] text-right'>
                                                         {product.sales} sales
                                                     </span>
                                                 </div>
-                                                <p className='text-xs text-gray-600 mt-1'>
+                                                <p className='text-xs text-muted-foreground mt-1'>
                                                     {product.revenue} revenue
                                                 </p>
                                             </div>
@@ -358,13 +352,13 @@ export default function Dashboard () {
                                 </Card>
                             </div>
 
-                            <div className='p-6 space-y-6'>
+                            <div className='space-y-6'>
                                 {/* Stats Grid */}
                                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
                                     {stats.map((stat, index) => (
                                         <Card
                                             key={index}
-                                            className='bg-[#1C252E] border-white/5 p-6 hover:border-emerald-500/30 transition-all duration-300 group animate-in fade-in slide-in-from-bottom-4'
+                                            className='bg-card border border-border/40 p-6 hover:border-emerald-500/30 transition-all duration-300 group animate-in fade-in slide-in-from-bottom-4'
                                             style={{
                                                 animationDelay: `${
                                                     index * 100
@@ -373,10 +367,10 @@ export default function Dashboard () {
                                         >
                                             <div className='flex items-start justify-between'>
                                                 <div className='flex-1'>
-                                                    <p className='text-sm text-gray-500 mb-2'>
+                                                    <p className='text-sm text-muted-foreground mb-2'>
                                                         {stat.title}
                                                     </p>
-                                                    <h3 className='text-3xl font-bold text-white mb-2'>
+                                                    <h3 className='text-3xl font-bold text-text-primary mb-2'>
                                                         {stat.value}
                                                     </h3>
                                                     <div className='flex items-center gap-1'>
@@ -396,7 +390,7 @@ export default function Dashboard () {
                                                         >
                                                             {stat.change}
                                                         </span>
-                                                        <span className='text-sm text-gray-500'>
+                                                        <span className='text-sm text-muted-foreground'>
                                                             vs last month
                                                         </span>
                                                     </div>
@@ -407,7 +401,7 @@ export default function Dashboard () {
                                                         stat.color
                                                     )}
                                                 >
-                                                    <stat.icon className='w-6 h-6 text-white' />
+                                                    <stat.icon className='w-6 h-6 text-text-primary' />
                                                 </div>
                                             </div>
                                         </Card>
@@ -417,19 +411,19 @@ export default function Dashboard () {
                                 {/* Charts Grid */}
                                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
                                     <Card
-                                        className='bg-[#1C252E] border-white/5 p-6 animate-in fade-in slide-in-from-bottom-4'
+                                        className='bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4'
                                         style={{ animationDelay: '400ms' }}
                                     >
                                         <div className='flex items-center justify-between mb-6'>
                                             <div>
-                                                <h3 className='text-lg font-semibold text-white'>
+                                                <h3 className='text-lg font-semibold text-text-primary'>
                                                     Revenue Overview
                                                 </h3>
-                                                <p className='text-sm text-gray-500 mt-1'>
+                                                <p className='text-sm text-muted-foreground mt-1'>
                                                     Monthly revenue trends
                                                 </p>
                                             </div>
-                                            <select className='px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50'>
+                                            <select className='px-3 py-1.5 bg-foreground/5 border border-border/40 rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-emerald-500/50'>
                                                 <option>Last 6 months</option>
                                                 <option>Last year</option>
                                             </select>
@@ -438,15 +432,15 @@ export default function Dashboard () {
                                     </Card>
 
                                     <Card
-                                        className='bg-[#1C252E] border-white/5 p-6 animate-in fade-in slide-in-from-bottom-4'
+                                        className='bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4'
                                         style={{ animationDelay: '500ms' }}
                                     >
                                         <div className='flex items-center justify-between mb-6'>
                                             <div>
-                                                <h3 className='text-lg font-semibold text-white'>
+                                                <h3 className='text-lg font-semibold text-text-primary'>
                                                     Product Sales
                                                 </h3>
-                                                <p className='text-sm text-gray-500 mt-1'>
+                                                <p className='text-sm text-muted-foreground mt-1'>
                                                     Sales by category
                                                 </p>
                                             </div>
@@ -458,34 +452,34 @@ export default function Dashboard () {
                                 {/* Bottom Grid */}
                                 <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
                                     <Card
-                                        className='bg-[#1C252E] border-white/5 p-6 lg:col-span-2 animate-in fade-in slide-in-from-bottom-4'
+                                        className='bg-card border border-border/40 p-6 lg:col-span-2 animate-in fade-in slide-in-from-bottom-4'
                                         style={{ animationDelay: '600ms' }}
                                     >
-                                        <h3 className='text-lg font-semibold text-white mb-6'>
+                                        <h3 className='text-lg font-semibold text-text-primary mb-6'>
                                             Recent Orders
                                         </h3>
                                         <div className='space-y-4'>
                                             {[1, 2, 3, 4, 5].map(item => (
                                                 <div
                                                     key={item}
-                                                    className='flex items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-300 group'
+                                                className='flex items-center justify-between p-4 bg-foreground/5 rounded-lg hover:bg-foreground/10 transition-all duration-300 group'
                                                 >
                                                     <div className='flex items-center gap-4'>
                                                         <div className='w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg flex items-center justify-center'>
                                                             <Package className='w-5 h-5 text-white' />
                                                         </div>
                                                         <div>
-                                                            <p className='text-sm font-medium text-white'>
+                                                            <p className='text-sm font-medium text-text-primary'>
                                                                 Order #
                                                                 {1000 + item}
                                                             </p>
-                                                            <p className='text-xs text-gray-500'>
+                                                            <p className='text-xs text-muted-foreground'>
                                                                 2 hours ago
                                                             </p>
                                                         </div>
                                                     </div>
                                                     <div className='text-right'>
-                                                        <p className='text-sm font-semibold text-white'>
+                                                        <p className='text-sm font-semibold text-text-primary'>
                                                             $
                                                             {(
                                                                 Math.random() *
@@ -503,10 +497,10 @@ export default function Dashboard () {
                                     </Card>
 
                                     <Card
-                                        className='bg-[#1C252E] border-white/5 p-6 animate-in fade-in slide-in-from-bottom-4'
+                                        className='bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4'
                                         style={{ animationDelay: '700ms' }}
                                     >
-                                        <h3 className='text-lg font-semibold text-white mb-6'>
+                                        <h3 className='text-lg font-semibold text-text-primary mb-6'>
                                             Sales Distribution
                                         </h3>
                                         <DonutChart />
@@ -544,11 +538,11 @@ export default function Dashboard () {
                                                                 item.color
                                                             )}
                                                         />
-                                                        <span className='text-sm text-gray-400'>
+                                                        <span className='text-sm text-muted-foreground'>
                                                             {item.label}
                                                         </span>
                                                     </div>
-                                                    <span className='text-sm font-medium text-white'>
+                                                    <span className='text-sm font-medium text-text-primary'>
                                                         {item.value}
                                                     </span>
                                                 </div>
@@ -559,13 +553,13 @@ export default function Dashboard () {
 
                                 <div className='grid gap-6 lg:grid-cols-2'>
                                     <div className='rounded-2xl border border-border/40 bg-card p-6 shadow-sm animate-in fade-in slide-in-from-left-4'>
-                                        <h3 className='mb-4 text-lg font-semibold text-foreground'>
+                                        <h3 className='mb-4 text-lg font-semibold text-text-primary'>
                                             Revenue Overview
                                         </h3>
                                         <NewAreaChart />
                                     </div>
                                     <div className='rounded-2xl border border-border/40 bg-card p-6 shadow-sm animate-in fade-in slide-in-from-right-4'>
-                                        <h3 className='mb-4 text-lg font-semibold text-foreground'>
+                                        <h3 className='mb-4 text-lg font-semibold text-text-primary'>
                                             Performance Trends
                                         </h3>
                                         <LineChart />
