@@ -5,24 +5,27 @@ import { ArrowLeft, Upload, X, Save, ImageIcon, Trash2, Package } from 'lucide-r
 import { Link } from '@inertiajs/react'
 import { useState } from 'react'
 import CustomTextField from '@/Components/CustomTextField'
+import CustomSelectField from '@/Components/CustomSelectField'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
+import { Head } from '@inertiajs/react'
 
-export default function ProductEdit({ productId }) {
+export default function CreateVariant({ productId }) {
   const [images, setImages] = useState([])
   const [dragActive, setDragActive] = useState(false)
 
   const [formData, setFormData] = useState({
     name: '',
-    description: '',
-    category: '',
+    sku: '',
     price: '',
     comparePrice: '',
     costPerItem: '',
-    sku: '',
-    barcode: '',
     stock: '',
     weight: '',
-    status: 'draft'
+    status: 'active',
+    options: {
+      Size: '',
+      Color: ''
+    }
   })
 
   const handleImageUpload = files => {
@@ -65,17 +68,36 @@ export default function ProductEdit({ productId }) {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
+  const handleOptionChange = (optionName, value) => {
+    setFormData(prev => ({
+      ...prev,
+      options: {
+        ...prev.options,
+        [optionName]: value
+      }
+    }))
+  }
+
+  const handleCreateVariant = () => {
+    // In a real app, this would save to a database
+    console.log('Creating variant:', formData)
+    alert(`Successfully created variant for product ${productId}`)
+    // Navigate back to variants list
+    window.location.href = `/products/edit/${productId}/variants`
+  }
+
   return (
     <AuthenticatedLayout>
+      <Head title='Create Product Variant' />
       <div className='py-4'>
         <div className='flex flex-col md:flex-row justify-between items-center mb-6'>
-          <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Edit Product</h2>
+          <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Create Product Variant</h2>
           {/* Back button bar */}
           <div className=''>
-            <Link href='/products'>
+            <Link href={`/products/edit/${productId}/variants`}>
               <Button variant='ghost' size='sm' className='gap-2 text-gray-400 hover:text-white'>
                 <ArrowLeft className='w-4 h-4' />
-                Back to Products
+                Back to Variants
               </Button>
             </Link>
           </div>
@@ -89,46 +111,60 @@ export default function ProductEdit({ productId }) {
               <div className='lg:col-span-2 space-y-6'>
                 {/* Basic Information */}
                 <div className='bg-card border border-border rounded-xl p-6 space-y-4'>
-                  <h2 className='text-lg font-semibold text-foreground'>Basic Information</h2>
+                  <h2 className='text-lg font-semibold text-foreground'>Variant Information</h2>
 
                   <div className='space-y-4'>
                     <div className='space-y-2'>
                       <CustomTextField
                         id='name'
-                        label='Product Name'
-                        placeholder='Enter product name'
+                        label='Variant Name'
+                        placeholder='Enter variant name (e.g., Black / Large)'
                         value={formData.name}
                         onChange={e => handleInputChange('name', e.target.value)}
                       />
                     </div>
 
-                    <div className='space-y-2'>
-                      <CustomTextField
-                        id='description'
-                        label='Description'
-                        placeholder='Enter product description'
-                        multiline
-                        rows={5}
-                        value={formData.description}
-                        onChange={e => handleInputChange('description', e.target.value)}
-                      />
-                    </div>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                      <div className='space-y-2'>
+                        <CustomSelectField
+                          label='Size'
+                          value={formData.options.Size}
+                          onChange={e => handleOptionChange('Size', e.target.value)}
+                          options={[
+                            { value: '', label: 'Select Size' },
+                            { value: 'XS', label: 'XS' },
+                            { value: 'S', label: 'S' },
+                            { value: 'M', label: 'M' },
+                            { value: 'L', label: 'L' },
+                            { value: 'XL', label: 'XL' },
+                            { value: 'XXL', label: 'XXL' }
+                          ]}
+                        />
+                      </div>
 
-                    <div className='space-y-2'>
-                      <CustomTextField
-                        id='category'
-                        label='Category'
-                        placeholder='Enter category'
-                        value={formData.category}
-                        onChange={e => handleInputChange('category', e.target.value)}
-                      />
+                      <div className='space-y-2'>
+                        <CustomSelectField
+                          label='Color'
+                          value={formData.options.Color}
+                          onChange={e => handleOptionChange('Color', e.target.value)}
+                          options={[
+                            { value: '', label: 'Select Color' },
+                            { value: 'Black', label: 'Black' },
+                            { value: 'White', label: 'White' },
+                            { value: 'Red', label: 'Red' },
+                            { value: 'Blue', label: 'Blue' },
+                            { value: 'Green', label: 'Green' },
+                            { value: 'Yellow', label: 'Yellow' }
+                          ]}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Product Images */}
+                {/* Variant Images */}
                 <div className='bg-card border border-border rounded-xl p-6 space-y-4'>
-                  <h2 className='text-lg font-semibold text-foreground'>Product Images</h2>
+                  <h2 className='text-lg font-semibold text-foreground'>Variant Images</h2>
 
                   <div
                     className={cn(
@@ -144,7 +180,7 @@ export default function ProductEdit({ productId }) {
                         <Upload className='w-8 h-8 text-muted-foreground' />
                       </div>
                       <div>
-                        <p className='text-sm font-medium text-foreground mb-1'>Drag and drop images here, or click to browse</p>
+                        <p className='text-sm font-medium text-foreground mb-1'>Drag and drop variant images here, or click to browse</p>
                         <p className='text-xs text-muted-foreground'>PNG, JPG, GIF up to 10MB</p>
                       </div>
                       <Button type='button' variant='outline' onClick={() => document.getElementById('file-upload')?.click()} className='gap-2'>
@@ -168,7 +204,7 @@ export default function ProductEdit({ productId }) {
                         <div key={image.id} className='relative group'>
                           <img
                             src={image.url || '/placeholder.svg'}
-                            alt={`Product ${index + 1}`}
+                            alt={`Variant ${index + 1}`}
                             className='w-full h-32 object-cover rounded-lg border border-border'
                           />
                           {index === 0 && <Badge className='absolute top-2 left-2 bg-emerald-500 text-white'>Primary</Badge>}
@@ -252,16 +288,6 @@ export default function ProductEdit({ productId }) {
 
                     <div className='space-y-2'>
                       <CustomTextField
-                        id='barcode'
-                        label='Barcode'
-                        placeholder='Enter barcode'
-                        value={formData.barcode}
-                        onChange={e => handleInputChange('barcode', e.target.value)}
-                      />
-                    </div>
-
-                    <div className='space-y-2'>
-                      <CustomTextField
                         id='stock'
                         label='Stock Quantity'
                         type='number'
@@ -282,26 +308,6 @@ export default function ProductEdit({ productId }) {
                       />
                     </div>
                   </div>
-                </div>
-
-                {/* Product Variants - Only available after product creation */}
-                <div className='bg-card border border-border rounded-xl p-6 space-y-4'>
-                  <div className='flex items-center justify-between'>
-                    <div>
-                      <h2 className='text-lg font-semibold text-foreground'>Product Variants</h2>
-                      <p className='text-sm text-muted-foreground'>Manage sizes, colors, and other variations</p>
-                    </div>
-                    <Link href={`/products/edit/${productId}/variants`}>
-                      <Button className='gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600'>
-                        <Package className='w-4 h-4' />
-                        Manage Variants
-                      </Button>
-                    </Link>
-                  </div>
-                  <p className='text-sm text-muted-foreground'>
-                    Product variants can be managed after the product is created. You'll be able to add different options like sizes, colors, or
-                    materials for this product. Each variant can have its own SKU, price, and stock level.
-                  </p>
                 </div>
               </div>
 
@@ -329,51 +335,29 @@ export default function ProductEdit({ productId }) {
                         </div>
                         <div>
                           <p className='font-medium text-text-primary'>Active</p>
-                          <p className='text-xs text-muted-foreground'>Product is live and visible</p>
+                          <p className='text-xs text-muted-foreground'>Variant is available for sale</p>
                         </div>
                       </div>
                     </button>
 
                     <button
                       type='button'
-                      onClick={() => handleInputChange('status', 'draft')}
+                      onClick={() => handleInputChange('status', 'inactive')}
                       className={cn(
                         'w-full p-4 rounded-lg border-2 transition-all duration-200 text-left',
-                        formData.status === 'draft' ? 'border-amber-500 bg-amber-500/10' : 'border-border hover:border-amber-500/50'
+                        formData.status === 'inactive' ? 'border-gray-500 bg-gray-500/10' : 'border-border hover:border-gray-500/50'
                       )}>
                       <div className='flex items-center gap-3'>
                         <div
                           className={cn(
                             'w-4 h-4 rounded-full border-2 flex items-center justify-center',
-                            formData.status === 'draft' ? 'border-amber-500' : 'border-muted-foreground'
+                            formData.status === 'inactive' ? 'border-gray-500' : 'border-muted-foreground'
                           )}>
-                          {formData.status === 'draft' && <div className='w-2 h-2 rounded-full bg-amber-500' />}
+                          {formData.status === 'inactive' && <div className='w-2 h-2 rounded-full bg-gray-500' />}
                         </div>
                         <div>
-                          <p className='font-medium text-text-primary'>Draft</p>
-                          <p className='text-xs text-muted-foreground'>Product is hidden</p>
-                        </div>
-                      </div>
-                    </button>
-
-                    <button
-                      type='button'
-                      onClick={() => handleInputChange('status', 'archived')}
-                      className={cn(
-                        'w-full p-4 rounded-lg border-2 transition-all duration-200 text-left',
-                        formData.status === 'archived' ? 'border-gray-500 bg-gray-500/10' : 'border-border hover:border-gray-500/50'
-                      )}>
-                      <div className='flex items-center gap-3'>
-                        <div
-                          className={cn(
-                            'w-4 h-4 rounded-full border-2 flex items-center justify-center',
-                            formData.status === 'archived' ? 'border-gray-500' : 'border-muted-foreground'
-                          )}>
-                          {formData.status === 'archived' && <div className='w-2 h-2 rounded-full bg-gray-500' />}
-                        </div>
-                        <div>
-                          <p className='font-medium text-foreground'>Archived</p>
-                          <p className='text-xs text-muted-foreground'>Product is archived</p>
+                          <p className='font-medium text-foreground'>Inactive</p>
+                          <p className='text-xs text-muted-foreground'>Variant is hidden from customers</p>
                         </div>
                       </div>
                     </button>
@@ -383,11 +367,12 @@ export default function ProductEdit({ productId }) {
                 {/* Actions */}
                 <div className='bg-card border border-border rounded-xl p-6 space-y-3'>
                   <Button
+                    onClick={handleCreateVariant}
                     className='w-full gap-2 !bg-black dark:!bg-white !text-white dark:!text-black'
                     variant='primary'
                     size='md'
                     startIcon={<Save className='w-4 h-4' />}>
-                    Save
+                    Create Variant
                   </Button>
                 </div>
               </div>

@@ -38,6 +38,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/featured', function () {
             return Inertia::render('Admin/Products/FeaturedProductPage');
         })->name('admin.products.featured');
+
+        Route::get('/edit/{id}/variants', function ($id) {
+            return Inertia::render('Admin/Products/VariantList', [
+                'productId' => $id
+            ]);
+        })->name('admin.products.variants');
+
+        Route::get('/edit/{id}/variants/create', function ($id) {
+            return Inertia::render('Admin/Products/CreateVariant', [
+                'productId' => $id
+            ]);
+        })->name('admin.products.variants.create');
     });
 
     // Orders
