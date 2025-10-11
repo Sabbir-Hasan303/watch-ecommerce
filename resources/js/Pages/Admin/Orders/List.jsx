@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { router } from '@inertiajs/react'
+import { router, Link } from '@inertiajs/react'
 import { Download, Eye, Package, Clock, CheckCircle, XCircle, Truck, MoreVertical } from 'lucide-react'
 import { Search, Filter } from '@mui/icons-material'
 import { Button, InputAdornment, FormControl, Menu, MenuItem, Divider, IconButton } from '@mui/material'
@@ -144,7 +144,6 @@ export default function OrdersList() {
 
   return (
     <AuthenticatedLayout>
-      {/* Content */}
       <div className='py-4'>
         <div className='space-y-6'>
           <div className='flex flex-col md:flex-row justify-between items-center mb-6'>
@@ -256,15 +255,11 @@ export default function OrdersList() {
                         </td>
                         <td className='py-4 px-6'>
                           <div className='flex items-center justify-end gap-2'>
-                            <IconButton
-                              size='small'
-                              className='h-8 w-8'
-                              onClick={e => {
-                                e.stopPropagation()
-                                handleViewOrder(order.id)
-                              }}>
-                              <Eye className='w-4 h-4' />
-                            </IconButton>
+                            <Link href={`/orders/${order.id}`} className='w-8 h-8'>
+                              <IconButton size='small' className='h-8 w-8'>
+                                <Eye className='w-4 h-4' />
+                              </IconButton>
+                            </Link>
                             <IconButton size='small' className='h-8 w-8' onClick={e => handleMenuOpen(e, order.id)}>
                               <MoreVertical className='w-4 h-4' />
                             </IconButton>

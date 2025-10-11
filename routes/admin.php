@@ -30,6 +30,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/categories', function () {
             return Inertia::render('Admin/Products/Categories');
         })->name('admin.products.categories');
+
+        Route::get('/tags', function () {
+            return Inertia::render('Admin/Products/Tags');
+        })->name('admin.products.tags');
     });
 
     // Orders
@@ -37,6 +41,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/', function () {
             return Inertia::render('Admin/Orders/List');
         })->name('admin.orders.index');
+
+        Route::get('/{id}', function ($id) {
+            return Inertia::render('Admin/Orders/ViewOrder', [
+                'orderId' => $id
+            ]);
+        })->name('admin.orders.view');
     });
 
     // Contents
@@ -47,6 +57,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/contact-list', function () {
         return Inertia::render('Admin/Contents/ContactList');
     })->name('admin.contents.contact-list');
+
+    Route::get('/faqs', function () {
+        return Inertia::render('Admin/Contents/FaqList');
+    })->name('admin.contents.faqs');
 });
 
 require __DIR__ . '/auth.php';

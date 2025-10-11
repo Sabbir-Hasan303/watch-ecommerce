@@ -178,6 +178,27 @@ export const ThemeContextProvider = ({ children }) => {
               }
             }
           }
+        },
+        MuiDialogTitle: {
+          styleOverrides: {
+            root: {
+              backgroundColor: mode === 'dark' ? '#1c252e' : '#ffffff'
+            }
+          }
+        },
+        MuiDialogContent: {
+          styleOverrides: {
+            root: {
+              backgroundColor: mode === 'dark' ? '#1c252e' : '#ffffff'
+            }
+          }
+        },
+        MuiDialogActions: {
+          styleOverrides: {
+            root: {
+              backgroundColor: mode === 'dark' ? '#1c252e' : '#ffffff'
+            }
+          }
         }
       }
     })

@@ -45,7 +45,8 @@ export default function Sidebar({ collapsed, onToggle }) {
       subItems: [
         { label: 'Product List', href: '/products' },
         { label: 'Add Product', href: '/products/create' },
-        { label: 'Categories', href: '/products/categories' }
+        { label: 'Categories', href: '/products/categories' },
+        { label: 'Tags', href: '/products/tags' }
       ]
     },
     {
@@ -71,8 +72,7 @@ export default function Sidebar({ collapsed, onToggle }) {
         { label: 'Contact List', href: '/contact-list' },
         { label: 'Banners', href: '/content/banners' },
         { label: 'Featured Products', href: '/content/featured' },
-        { label: 'Tags', href: '/content/tags' },
-        { label: 'FAQs', href: '/content/faqs' }
+        { label: 'FAQs', href: '/faqs' }
       ]
     },
     {

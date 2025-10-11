@@ -290,21 +290,23 @@ export default function ContactList() {
             border: '1px solid #374151'
           }
         }}>
-        <DialogTitle sx={{ color: '#F9FAFB', fontSize: '1.25rem', fontWeight: 600 }}>Contact Message Details</DialogTitle>
+        <DialogTitle sx={{ fontSize: '1.25rem', fontWeight: 600 }} className='text-text-primary'>
+          Contact Message Details
+        </DialogTitle>
         {selectedContact && (
-          <DialogContent sx={{ color: '#9CA3AF' }}>
+          <DialogContent className='text-text-primary'>
             <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
               <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
                 <Box>
-                  <Typography variant='body2' sx={{ color: '#9CA3AF', mb: 1 }}>
+                  <Typography variant='body2' className='text-text-primary mb-1'>
                     Name
                   </Typography>
-                  <Typography variant='body1' sx={{ color: '#F9FAFB', fontWeight: 500 }}>
+                  <Typography variant='body1' className='text-text-primary font-medium mb-1'>
                     {selectedContact.name}
                   </Typography>
                 </Box>
                 <Box>
-                  <Typography variant='body2' sx={{ color: '#9CA3AF', mb: 1 }}>
+                  <Typography variant='body2' className='text-text-primary mb-1'>
                     Status
                   </Typography>
                   <Chip
@@ -323,58 +325,57 @@ export default function ContactList() {
                   />
                 </Box>
                 <Box>
-                  <Typography variant='body2' sx={{ color: '#9CA3AF', mb: 1 }}>
+                  <Typography variant='body2' className='text-text-primary mb-1'>
                     Email
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Mail size={16} />
-                    <Typography variant='body1' sx={{ color: '#F9FAFB' }}>
+                    <Typography variant='body1' className='text-text-primary font-medium mb-1'>
                       {selectedContact.email}
                     </Typography>
                   </Box>
                 </Box>
                 <Box>
-                  <Typography variant='body2' sx={{ color: '#9CA3AF', mb: 1 }}>
+                  <Typography variant='body2' className='text-text-primary mb-1'>
                     Phone
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Phone size={16} />
-                    <Typography variant='body1' sx={{ color: '#F9FAFB' }}>
+                    <Typography variant='body1' className='text-text-primary font-medium mb-1'>
                       {selectedContact.phone}
                     </Typography>
                   </Box>
                 </Box>
                 <Box sx={{ gridColumn: '1 / -1' }}>
-                  <Typography variant='body2' sx={{ color: '#9CA3AF', mb: 1 }}>
+                  <Typography variant='body2' className='text-text-primary mb-1'>
                     Subject
                   </Typography>
-                  <Typography variant='body1' sx={{ color: '#F9FAFB', fontWeight: 500 }}>
+                  <Typography variant='body1' className='text-text-primary font-medium mb-1'>
                     {selectedContact.subject}
                   </Typography>
                 </Box>
                 <Box sx={{ gridColumn: '1 / -1' }}>
-                  <Typography variant='body2' sx={{ color: '#9CA3AF', mb: 1 }}>
+                  <Typography variant='body2' className='text-text-primary mb-1'>
                     Message
                   </Typography>
                   <Box
                     sx={{
-                      bgcolor: '#141A21',
                       p: 2,
                       borderRadius: 1,
                       border: '1px solid #374151'
                     }}>
-                    <Typography variant='body1' sx={{ color: '#F9FAFB' }}>
+                    <Typography variant='body1' className='text-text-primary font-medium mb-1'>
                       {selectedContact.message}
                     </Typography>
                   </Box>
                 </Box>
                 <Box>
-                  <Typography variant='body2' sx={{ color: '#9CA3AF', mb: 1 }}>
+                  <Typography variant='body2' className='text-text-primary mb-1'>
                     Date
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Calendar size={16} />
-                    <Typography variant='body1' sx={{ color: '#F9FAFB' }}>
+                    <Typography variant='body1' className='text-text-primary font-medium mb-1'>
                       {new Date(selectedContact.date).toLocaleDateString()}
                     </Typography>
                   </Box>
