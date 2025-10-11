@@ -34,6 +34,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/tags', function () {
             return Inertia::render('Admin/Products/Tags');
         })->name('admin.products.tags');
+
+        Route::get('/featured', function () {
+            return Inertia::render('Admin/Products/FeaturedProductPage');
+        })->name('admin.products.featured');
     });
 
     // Orders
@@ -47,6 +51,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 'orderId' => $id
             ]);
         })->name('admin.orders.view');
+    });
+
+    // Customers
+    Route::prefix('customers')->group(function () {
+        Route::get('/', function () {
+            return Inertia::render('Admin/Customers/List');
+        })->name('admin.customers.index');
+
+        Route::get('/ratings', function () {
+            return Inertia::render('Admin/Customers/Ratings');
+        })->name('admin.customers.ratings');
+
+        Route::get('/reviews', function () {
+            return Inertia::render('Admin/Customers/Reviews');
+        })->name('admin.customers.reviews');
     });
 
     // Contents

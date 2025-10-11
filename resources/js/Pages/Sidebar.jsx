@@ -46,7 +46,8 @@ export default function Sidebar({ collapsed, onToggle }) {
         { label: 'Product List', href: '/products' },
         { label: 'Add Product', href: '/products/create' },
         { label: 'Categories', href: '/products/categories' },
-        { label: 'Tags', href: '/products/tags' }
+        { label: 'Tags', href: '/products/tags' },
+        { label: 'Featured Products', href: '/products/featured' }
       ]
     },
     {
@@ -71,7 +72,6 @@ export default function Sidebar({ collapsed, onToggle }) {
         { label: 'Newsletter', href: '/newsletters' },
         { label: 'Contact List', href: '/contact-list' },
         { label: 'Banners', href: '/dynamic-banner' },
-        { label: 'Featured Products', href: '/content/featured' },
         { label: 'FAQs', href: '/faqs' }
       ]
     },

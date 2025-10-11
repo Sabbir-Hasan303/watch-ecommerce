@@ -200,7 +200,7 @@ export default function ProductList() {
                       </InputAdornment>
                     )
                   }}
-                  options={categories.map(category => ({ label: category.charAt(0).toUpperCase() + category.slice(1) }))}
+                  options={categories.map(category => ({ value: category, label: category.charAt(0).toUpperCase() + category.slice(1) }))}
                 />
               </FormControl>
 
