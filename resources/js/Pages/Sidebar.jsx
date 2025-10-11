@@ -70,7 +70,7 @@ export default function Sidebar({ collapsed, onToggle }) {
       subItems: [
         { label: 'Newsletter', href: '/newsletters' },
         { label: 'Contact List', href: '/contact-list' },
-        { label: 'Banners', href: '/content/banners' },
+        { label: 'Banners', href: '/dynamic-banner' },
         { label: 'Featured Products', href: '/content/featured' },
         { label: 'FAQs', href: '/faqs' }
       ]

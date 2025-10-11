@@ -61,6 +61,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/faqs', function () {
         return Inertia::render('Admin/Contents/FaqList');
     })->name('admin.contents.faqs');
+
+    Route::get('/dynamic-banner', function () {
+        return Inertia::render('Admin/Contents/DynamicBanner');
+    })->name('admin.contents.dynamic-banner');
 });
 
 require __DIR__ . '/auth.php';

@@ -104,12 +104,18 @@ export const ThemeContextProvider = ({ children }) => {
             root: {
               borderRadius: '12px',
               textTransform: 'none',
-              fontWeight: 500,
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              fontWeight: 600,
+              background: 'none',
+              '&:hover': {
+                backgroundColor: 'transparent'
+              },
               '&:hover': {
                 transform: 'scale(1.05)',
                 boxShadow: mode === 'dark' ? '0 8px 25px -8px rgba(245, 158, 11, 0.3)' : '0 8px 25px -8px rgba(99, 102, 241, 0.2)'
               }
+            },
+            sizeLarge: {
+              padding: '12px 24px'
             }
           }
         },
