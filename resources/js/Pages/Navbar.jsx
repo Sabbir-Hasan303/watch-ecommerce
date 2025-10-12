@@ -19,6 +19,7 @@ import ClearIcon from '@mui/icons-material/Clear'
 import { Search, Notifications, AccountCircle, Settings, LightMode, DarkMode, KeyboardArrowDown, Menu as MenuIcon } from '@mui/icons-material'
 import { useThemeContext } from '@/contexts/ThemeContext'
 import CustomTextField from '@/Components/CustomTextField'
+import { Link, useForm } from '@inertiajs/react'
 // import { HamburgerButton } from "@/Components/hamburger-button"
 
 export default function Navbar({ title, subtitle, collapsed, onToggleSidebar }) {
@@ -26,6 +27,7 @@ export default function Navbar({ title, subtitle, collapsed, onToggleSidebar }) 
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [notificationsAnchor, setNotificationsAnchor] = useState(null)
   const [profileAnchor, setProfileAnchor] = useState(null)
+  const { post } = useForm()
 
   const handleNotificationsClick = event => {
     setNotificationsAnchor(event.currentTarget)
@@ -38,6 +40,11 @@ export default function Navbar({ title, subtitle, collapsed, onToggleSidebar }) 
   const handleClose = () => {
     setNotificationsAnchor(null)
     setProfileAnchor(null)
+  }
+
+  const handleLogout = () => {
+    post(route('logout'))
+    handleClose()
   }
 
   return (
@@ -256,7 +263,7 @@ export default function Navbar({ title, subtitle, collapsed, onToggleSidebar }) 
                 p: 1,
                 borderTop: '1px solid rgba(255, 255, 255, 0.1)'
               }}>
-              <MenuItem onClick={handleClose}>
+              <MenuItem onClick={handleLogout}>
                 <ListItemText
                   primary='Sign Out'
                   primaryTypographyProps={{
