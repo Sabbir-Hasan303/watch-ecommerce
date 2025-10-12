@@ -221,6 +221,10 @@
     font-feature-settings: 'rlig' 1, 'calt' 1;
   }
 
+  .custom-container {
+    max-width: 1200px !important;
+  }
+
   /* Added smooth scrolling behavior */
   html {
     scroll-behavior: smooth;

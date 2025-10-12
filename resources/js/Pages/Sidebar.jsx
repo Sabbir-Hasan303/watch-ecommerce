@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { Link, usePage } from '@inertiajs/react'
 import {
@@ -34,11 +34,11 @@ export default function Sidebar({ collapsed, onToggle }) {
   const menuItems = [{ icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' }]
 
   const managementItems = [
-    {
-      icon: LayoutDashboard,
-      label: 'Dashboard',
-      href: '/dashboard'
-    },
+    // {
+    //   icon: LayoutDashboard,
+    //   label: 'Dashboard',
+    //   href: '/dashboard'
+    // },
     {
       icon: Package,
       label: 'Product',
@@ -55,16 +55,16 @@ export default function Sidebar({ collapsed, onToggle }) {
       label: 'Order',
       subItems: [{ label: 'All Orders', href: '/orders' }]
     },
-    {
-      icon: CreditCard,
-      label: 'Accounts',
-      subItems: [
-        { label: 'Dashboard', href: '/accounts' },
-        { label: 'Revenue Reports', href: '/accounts/revenue' },
-        { label: 'Transactions', href: '/accounts/transactions' },
-        { label: 'Invoices', href: '/accounts/invoices' }
-      ]
-    },
+    // {
+    //   icon: CreditCard,
+    //   label: 'Accounts',
+    //   subItems: [
+    //     { label: 'Dashboard', href: '/accounts' },
+    //     { label: 'Revenue Reports', href: '/accounts/revenue' },
+    //     { label: 'Transactions', href: '/accounts/transactions' },
+    //     { label: 'Invoices', href: '/accounts/invoices' }
+    //   ]
+    // },
     {
       icon: ImageIcon,
       label: 'Content',
@@ -75,11 +75,11 @@ export default function Sidebar({ collapsed, onToggle }) {
         { label: 'FAQs', href: '/faqs' }
       ]
     },
-    {
-      icon: Users,
-      label: 'User',
-      subItems: [{ label: 'All Users', href: '/users' }]
-    },
+    // {
+    //   icon: Users,
+    //   label: 'User',
+    //   subItems: [{ label: 'All Users', href: '/users' }]
+    // },
     {
       icon: UserCheck,
       label: 'Customers',
@@ -93,18 +93,52 @@ export default function Sidebar({ collapsed, onToggle }) {
       icon: Settings,
       label: 'Settings',
       subItems: [
-        { label: 'Profile', href: '/settings/profile' },
-        { label: 'Security', href: '/settings/security' },
-        { label: 'Payment Methods', href: '/settings/payment' },
-        { label: 'API Configuration', href: '/settings/api' },
-        { label: 'Mail Settings', href: '/settings/mail' },
-        { label: 'Preferences', href: '/settings/preferences' }
+        { label: 'Profile', href: '/settings/profile' }
+        // { label: 'Security', href: '/settings/security' },
+        // { label: 'Payment Methods', href: '/settings/payment' },
+        // { label: 'API Configuration', href: '/settings/api' },
+        // { label: 'Mail Settings', href: '/settings/mail' },
+        // { label: 'Preferences', href: '/settings/preferences' }
       ]
     }
   ]
 
+  // Auto-expand active parent on component mount and URL change
+  useEffect(() => {
+    const activeParent = getActiveParent()
+    if (activeParent) {
+      setExpandedItems(prev => {
+        if (!prev.includes(activeParent.label)) {
+          return [...prev, activeParent.label]
+        }
+        return prev
+      })
+    }
+  }, [url])
+
   const toggleExpanded = label => {
-    setExpandedItems(prev => (prev.includes(label) ? prev.filter(item => item !== label) : [...prev, label]))
+    const activeParent = getActiveParent()
+    const isActiveParent = activeParent && activeParent.label === label
+
+    setExpandedItems(prev => {
+      // If this is the active parent, always keep it expanded
+      if (isActiveParent) {
+        return prev.includes(label) ? prev : [...prev, label]
+      }
+
+      // For non-active parents, implement accordion behavior
+      // Close all other parents except the active one, then toggle the clicked one
+      const activeParentLabel = activeParent ? activeParent.label : null
+      const filteredItems = prev.filter(item => item === activeParentLabel)
+
+      // If the clicked item is already expanded, collapse it
+      if (prev.includes(label)) {
+        return filteredItems
+      }
+
+      // Otherwise, expand the clicked item (and keep active parent open)
+      return [...filteredItems, label]
+    })
   }
 
   const renderMenuItem = (item, index) => {

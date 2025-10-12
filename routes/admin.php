@@ -71,6 +71,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return Inertia::render('Admin/Customers/List');
         })->name('admin.customers.index');
 
+        Route::get('/{id}/orders', function ($id) {
+            return Inertia::render('Admin/Customers/CustomerOrders', [
+                'customerId' => $id
+            ]);
+        })->name('admin.customers.orders');
+
         Route::get('/ratings', function () {
             return Inertia::render('Admin/Customers/Ratings');
         })->name('admin.customers.ratings');
@@ -96,6 +102,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dynamic-banner', function () {
         return Inertia::render('Admin/Contents/DynamicBanner');
     })->name('admin.contents.dynamic-banner');
+
+    Route::prefix('settings')->group(function () {
+        Route::get('/profile', function () {
+            return Inertia::render('Admin/Settings/Profile');
+        })->name('admin.settings.profile');
+    });
 });
 
 require __DIR__ . '/auth.php';

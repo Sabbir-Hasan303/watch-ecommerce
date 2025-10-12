@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import CustomTextField from '@/Components/CustomTextField'
 import CustomSelectField from '@/Components/CustomSelectField'
-import { Head } from '@inertiajs/react'
+import { Head, router } from '@inertiajs/react'
 import { Card } from '@/Components/ui/card'
 
 const mockCustomers = [
@@ -615,7 +615,14 @@ export default function CustomerList() {
               }}>
               Close
             </Button>
-            <Button variant='contained' startIcon={<Eye size={16} />} className='!bg-text-primary !text-primary-foreground'>
+            <Button
+              variant='contained'
+              startIcon={<Eye size={16} />}
+              className='!bg-text-primary !text-primary-foreground'
+              onClick={() => {
+                router.visit(`/customers/${selectedCustomer.id}/orders`)
+                setSelectedCustomer(null)
+              }}>
               View Orders
             </Button>
           </DialogActions>
