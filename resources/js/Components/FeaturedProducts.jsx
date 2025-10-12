@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Search, Filter, Star, TrendingUp, Flame, Sparkles, Upload, ImageIcon, Check, ChevronDown } from 'lucide-react'
-// import { Card } from "@/components/ui/card"
-// import { Input } from "@/components/ui/input"
-// import { Button } from "@/components/ui/button"
+// import { Card } from "@/Components/ui/card"
+// import { Input } from "@/Components/ui/input"
+// import { Button } from "@/Components/ui/button"
 import {
   Card,
   Input,

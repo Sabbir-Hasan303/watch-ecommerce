@@ -1,6 +1,6 @@
 import { React, useState } from 'react'
 import { Button, InputAdornment } from '@mui/material'
-import { Card } from '@/components/ui/card'
+import { Card } from '@/Components/ui/card'
 import { User, Mail, Lock, Upload, Save, Eye, EyeOff, Phone } from 'lucide-react'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Head } from '@inertiajs/react'

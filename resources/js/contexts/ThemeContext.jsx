@@ -107,9 +107,7 @@ export const ThemeContextProvider = ({ children }) => {
               fontWeight: 600,
               background: 'none',
               '&:hover': {
-                backgroundColor: 'transparent'
-              },
-              '&:hover': {
+                backgroundColor: 'transparent',
                 transform: 'scale(1.05)',
                 boxShadow: mode === 'dark' ? '0 8px 25px -8px rgba(245, 158, 11, 0.3)' : '0 8px 25px -8px rgba(99, 102, 241, 0.2)'
               }
