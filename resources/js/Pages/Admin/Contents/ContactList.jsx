@@ -257,17 +257,15 @@ export default function ContactList() {
                           variant='outlined'
                           size='small'
                           startIcon={<Eye size={16} />}
-                          onClick={() => setSelectedContact(contact)}
                           sx={{
-                            color: '#10B981',
-                            borderColor: '#10B981',
-                            '&:hover': {
-                              bgcolor: 'rgba(16, 185, 129, 0.1)',
-                              borderColor: '#059669'
+                            padding: '7px 11px',
+                            minWidth: '0px',
+                            '& .MuiButton-startIcon': {
+                              marginRight: 0,
+                              marginLeft: 0
                             }
-                          }}>
-                          View
-                        </Button>
+                          }}
+                          onClick={() => setSelectedContact(contact)}></Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -398,15 +396,7 @@ export default function ContactList() {
             }}>
             Close
           </Button>
-          <Button
-            variant='contained'
-            startIcon={<Mail size={16} />}
-            sx={{
-              bgcolor: '#10B981',
-              '&:hover': {
-                bgcolor: '#059669'
-              }
-            }}>
+          <Button variant='contained' startIcon={<Mail size={16} />} className='!bg-text-primary !text-primary-foreground'>
             Reply
           </Button>
         </DialogActions>

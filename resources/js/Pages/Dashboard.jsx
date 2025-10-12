@@ -191,12 +191,12 @@ export default function Dashboard() {
               ))}
             </div>
 
-            <FeaturedProducts />
+            {/* <FeaturedProducts /> */}
 
             <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6'>
               {/* Recent Orders */}
               <Card
-                className='bg-card border border-border/40 p-6 lg:col-span-2 animate-in fade-in slide-in-from-left-4 hover:border-emerald-500/20 transition-all duration-500'
+                className='bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-left-4 hover:border-emerald-500/20 transition-all duration-500'
                 style={{ animationDelay: '400ms' }}>
                 <div className='flex items-center justify-between mb-6'>
                   <div>
@@ -279,11 +279,21 @@ export default function Dashboard() {
                   ))}
                 </div>
               </Card>
+
+              <Card className='bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4' style={{ animationDelay: '500ms' }}>
+                <div className='flex items-center justify-between mb-6'>
+                  <div>
+                    <h3 className='text-lg font-semibold text-text-primary'>Product Sales</h3>
+                    <p className='text-sm text-muted-foreground mt-1'>Sales by category</p>
+                  </div>
+                </div>
+                <BarChart />
+              </Card>
             </div>
 
             <div className='space-y-6'>
               {/* Stats Grid */}
-              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
+              {/* <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
                 {stats.map((stat, index) => (
                   <Card
                     key={index}
@@ -315,7 +325,7 @@ export default function Dashboard() {
                     </div>
                   </Card>
                 ))}
-              </div>
+              </div> */}
 
               {/* Charts Grid */}
               <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
@@ -331,48 +341,6 @@ export default function Dashboard() {
                     </select>
                   </div>
                   <AreaChart />
-                </Card>
-
-                <Card className='bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4' style={{ animationDelay: '500ms' }}>
-                  <div className='flex items-center justify-between mb-6'>
-                    <div>
-                      <h3 className='text-lg font-semibold text-text-primary'>Product Sales</h3>
-                      <p className='text-sm text-muted-foreground mt-1'>Sales by category</p>
-                    </div>
-                  </div>
-                  <BarChart />
-                </Card>
-              </div>
-
-              {/* Bottom Grid */}
-              <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-                <Card
-                  className='bg-card border border-border/40 p-6 lg:col-span-2 animate-in fade-in slide-in-from-bottom-4'
-                  style={{ animationDelay: '600ms' }}>
-                  <h3 className='text-lg font-semibold text-text-primary mb-6'>Recent Orders</h3>
-                  <div className='space-y-4'>
-                    {[1, 2, 3, 4, 5].map(item => (
-                      <div
-                        key={item}
-                        className='flex items-center justify-between p-4 bg-foreground/5 rounded-lg hover:bg-foreground/10 transition-all duration-300 group'>
-                        <div className='flex items-center gap-4'>
-                          <div className='w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg flex items-center justify-center'>
-                            <Package className='w-5 h-5 text-white' />
-                          </div>
-                          <div>
-                            <p className='text-sm font-medium text-text-primary'>Order #{1000 + item}</p>
-                            <p className='text-xs text-muted-foreground'>2 hours ago</p>
-                          </div>
-                        </div>
-                        <div className='text-right'>
-                          <p className='text-sm font-semibold text-text-primary'>${(Math.random() * 500 + 100).toFixed(2)}</p>
-                          <span className='inline-block px-2 py-1 text-xs font-medium text-emerald-400 bg-emerald-500/10 rounded-full'>
-                            Completed
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </Card>
 
                 <Card className='bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4' style={{ animationDelay: '700ms' }}>

@@ -245,18 +245,20 @@ export default function Navbar({ title, subtitle, collapsed, onToggleSidebar }) 
               </Box>
             </Box>
             <Box sx={{ p: 1 }}>
-              <MenuItem onClick={handleClose}>
-                <ListItemIcon>
-                  <AccountCircle fontSize='small' />
-                </ListItemIcon>
-                <ListItemText primary='Profile Settings' />
-              </MenuItem>
-              <MenuItem onClick={handleClose}>
+              <Link href='/settings/profile'>
+                <MenuItem onClick={handleClose}>
+                  <ListItemIcon>
+                    <AccountCircle fontSize='small' />
+                  </ListItemIcon>
+                  <ListItemText primary='Profile Settings' />
+                </MenuItem>
+              </Link>
+              {/* <MenuItem onClick={handleClose}>
                 <ListItemIcon>
                   <Settings fontSize='small' />
                 </ListItemIcon>
                 <ListItemText primary='Account Settings' />
-              </MenuItem>
+              </MenuItem> */}
             </Box>
             <Box
               sx={{

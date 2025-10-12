@@ -242,7 +242,7 @@ export default function OrdersList() {
                           </p>
                         </td>
                         <td className='py-4 px-6'>
-                          <Badge variant='outline' className={`gap-1.5 ${statusConfig[order.status].color}`}>
+                          <Badge variant='outline' className={`gap-1.5 px-2 py-1 rounded-lg flex items-center ${statusConfig[order.status].color}`}>
                             <StatusIcon className='w-3.5 h-3.5' />
                             {statusConfig[order.status].label}
                           </Badge>
@@ -255,7 +255,7 @@ export default function OrdersList() {
                         </td>
                         <td className='py-4 px-6'>
                           <div className='flex items-center justify-end gap-2'>
-                            <Link href={`/orders/${order.id}`} className='w-8 h-8'>
+                            <Link href={`/orders/${order.id}`} className='w-8 h-8 border border-border rounded-lg'>
                               <IconButton size='small' className='h-8 w-8'>
                                 <Eye className='w-4 h-4' />
                               </IconButton>

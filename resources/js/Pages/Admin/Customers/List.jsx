@@ -267,7 +267,7 @@ export default function CustomerList() {
                     <TableCell className='table-header-cell dark:table-header-cell'>Location</TableCell>
                     <TableCell className='table-header-cell dark:table-header-cell'>Orders</TableCell>
                     <TableCell className='table-header-cell dark:table-header-cell'>Spent</TableCell>
-                    <TableCell className='table-header-cell dark:table-header-cell'>Rating</TableCell>
+                    {/* <TableCell className='table-header-cell dark:table-header-cell'>Rating</TableCell> */}
                     <TableCell className='table-header-cell dark:table-header-cell'>Status</TableCell>
                     <TableCell className='table-header-cell dark:table-header-cell'>Actions</TableCell>
                   </TableRow>
@@ -314,13 +314,13 @@ export default function CustomerList() {
                       <TableCell className='table-body-cell dark:table-body-cell'>
                         <p className='font-medium text-emerald-400'>${customer.totalSpent.toFixed(2)}</p>
                       </TableCell>
-                      <TableCell className='table-body-cell dark:table-body-cell'>
+                      {/* <TableCell className='table-body-cell dark:table-body-cell'>
                         <div className='flex items-center gap-1'>
                           <Star className='h-4 w-4 text-amber-400 fill-amber-400' />
                           <span className='font-medium'>{customer.averageRating.toFixed(1)}</span>
                           <span className='text-xs text-muted-foreground'>({customer.reviewsCount})</span>
                         </div>
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell className='table-body-cell dark:table-body-cell'>
                         <Badge
                           label={customer.status.charAt(0).toUpperCase() + customer.status.slice(1)}
@@ -342,7 +342,8 @@ export default function CustomerList() {
                                   ? 'rgba(34, 197, 94, 0.2)'
                                   : 'rgba(107, 114, 128, 0.2)'
                             }
-                          }}>
+                          }}
+                          className='px-2 py-1 rounded-lg'>
                           {customer.status.charAt(0).toUpperCase() + customer.status.slice(1)}
                         </Badge>
                       </TableCell>
@@ -353,15 +354,13 @@ export default function CustomerList() {
                           startIcon={<Eye size={16} />}
                           onClick={() => setSelectedCustomer(customer)}
                           sx={{
-                            color: '#10B981',
-                            borderColor: '#10B981',
-                            '&:hover': {
-                              bgcolor: 'rgba(16, 185, 129, 0.1)',
-                              borderColor: '#059669'
+                            padding: '7px 11px',
+                            minWidth: '0px',
+                            '& .MuiButton-startIcon': {
+                              marginRight: 0,
+                              marginLeft: 0
                             }
-                          }}>
-                          View
-                        </Button>
+                          }}></Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -562,7 +561,7 @@ export default function CustomerList() {
                       ${selectedCustomer.totalSpent.toFixed(2)}
                     </Typography>
                   </Box>
-                  <Box
+                  {/* <Box
                     sx={{
                       p: 2,
                       bgcolor: 'rgba(245, 158, 11, 0.05)',
@@ -594,7 +593,7 @@ export default function CustomerList() {
                     <Typography variant='h5' sx={{ color: '#3B82F6', fontWeight: 700 }}>
                       {selectedCustomer.reviewsCount}
                     </Typography>
-                  </Box>
+                  </Box> */}
                 </Box>
               </Box>
             </DialogContent>
@@ -617,7 +616,7 @@ export default function CustomerList() {
             </Button>
             <Button
               variant='contained'
-              startIcon={<Eye size={16} />}
+              //   startIcon={<Eye size={16} />}
               className='!bg-text-primary !text-primary-foreground'
               onClick={() => {
                 router.visit(`/customers/${selectedCustomer.id}/orders`)

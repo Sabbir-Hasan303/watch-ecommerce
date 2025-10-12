@@ -248,29 +248,25 @@ export default function VariantList({ productId }) {
                             startIcon={<Eye size={16} />}
                             onClick={() => setSelectedVariant(variant)}
                             sx={{
-                              color: '#10B981',
-                              borderColor: '#10B981',
-                              '&:hover': {
-                                bgcolor: 'rgba(16, 185, 129, 0.1)',
-                                borderColor: '#059669'
+                              padding: '7px 11px',
+                              minWidth: '0px',
+                              '& .MuiButton-startIcon': {
+                                marginRight: 0,
+                                marginLeft: 0
                               }
-                            }}>
-                            View
-                          </Button>
+                            }}></Button>
                           <Button
                             variant='outlined'
                             size='small'
                             startIcon={<Edit size={16} />}
                             sx={{
-                              color: '#3B82F6',
-                              borderColor: '#3B82F6',
-                              '&:hover': {
-                                bgcolor: 'rgba(59, 130, 246, 0.1)',
-                                borderColor: '#2563EB'
+                              padding: '7px 11px',
+                              minWidth: '0px',
+                              '& .MuiButton-startIcon': {
+                                marginRight: 0,
+                                marginLeft: 0
                               }
-                            }}>
-                            Edit
-                          </Button>
+                            }}></Button>
                         </div>
                       </TableCell>
                     </TableRow>

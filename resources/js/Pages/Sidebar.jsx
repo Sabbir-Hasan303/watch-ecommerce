@@ -45,9 +45,9 @@ export default function Sidebar({ collapsed, onToggle }) {
       subItems: [
         { label: 'Product List', href: '/products' },
         { label: 'Add Product', href: '/products/create' },
-        { label: 'Categories', href: '/products/categories' },
-        { label: 'Tags', href: '/products/tags' },
-        { label: 'Featured Products', href: '/products/featured' }
+        { label: 'Categories', href: '/products/categories' }
+        // { label: 'Tags', href: '/products/tags' }
+        // { label: 'Featured Products', href: '/products/featured' }
       ]
     },
     {
@@ -70,9 +70,9 @@ export default function Sidebar({ collapsed, onToggle }) {
       label: 'Content',
       subItems: [
         { label: 'Newsletter', href: '/newsletters' },
-        { label: 'Contact List', href: '/contact-list' },
-        { label: 'Banners', href: '/dynamic-banner' },
-        { label: 'FAQs', href: '/faqs' }
+        { label: 'Contact List', href: '/contact-list' }
+        // { label: 'Banners', href: '/dynamic-banner' },
+        // { label: 'FAQs', href: '/faqs' }
       ]
     },
     // {
@@ -84,9 +84,9 @@ export default function Sidebar({ collapsed, onToggle }) {
       icon: UserCheck,
       label: 'Customers',
       subItems: [
-        { label: 'All Customers', href: '/customers' },
-        { label: 'Customer Reviews', href: '/customers/reviews' },
-        { label: 'Customer Ratings', href: '/customers/ratings' }
+        { label: 'All Customers', href: '/customers' }
+        // { label: 'Customer Reviews', href: '/customers/reviews' },
+        // { label: 'Customer Ratings', href: '/customers/ratings' }
       ]
     },
     {

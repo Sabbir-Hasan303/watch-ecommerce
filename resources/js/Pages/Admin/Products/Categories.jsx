@@ -225,8 +225,8 @@ export default function Categories() {
                           className={cn(
                             'text-xs',
                             category.status === 'active'
-                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                              : 'bg-gray-500/10 text-gray-400 border-gray-500/20'
+                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 px-2 py-1 rounded-lg'
+                              : 'bg-gray-500/10 text-gray-400 border-gray-500/20 px-2 py-1 rounded-lg'
                           )}>
                           {category.status}
                         </Badge>
@@ -407,10 +407,26 @@ export default function Categories() {
             </div>
 
             <div className='p-6 border-t border-border flex flex-col flex-col-reverse md:flex-row gap-3 justify-end'>
-              <Button variant='outline' onClick={handleCancel} size='md'>
+              <Button
+                variant='outline'
+                onClick={handleCancel}
+                // size='md'
+                sx={{
+                  color: '#9CA3AF',
+                  borderColor: '#374151',
+                  '&:hover': {
+                    bgcolor: 'rgba(55, 65, 81, 0.3)',
+                    borderColor: '#6B7280'
+                  }
+                }}>
                 Cancel
               </Button>
-              <Button onClick={handleSubmit} variant='primary' size='md' startIcon={<Save className='w-4 h-4' />}>
+              <Button
+                onClick={handleSubmit}
+                variant='contained'
+                size='md'
+                className='!bg-text-primary !text-primary-foreground'
+                startIcon={<Save className='w-4 h-4' />}>
                 {editingCategory ? 'Update Category' : 'Create Category'}
               </Button>
             </div>
