@@ -1,138 +1,111 @@
 import React from 'react'
 import { useState } from 'react'
-import { cn } from '@/lib/utils'
 import { Plus, Edit, Trash2, FolderOpen, Save, X, ImageIcon, Upload, ArrowUpDown } from 'lucide-react'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Button, InputAdornment } from '@mui/material'
 import { Search } from '@mui/icons-material'
-import Badge from '@mui/material/Badge'
 import CustomTextField from '@/Components/CustomTextField'
-import CustomSelectField from '@/Components/CustomSelectField'
+import { router } from '@inertiajs/react'
 
-export default function Categories() {
+export default function Categories({ categories = [] }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingCategory, setEditingCategory] = useState(null)
 
-  const [categories, setCategories] = useState([
-    {
-      id: '1',
-      name: 'Electronics',
-      slug: 'electronics',
-      description: 'Electronic devices and accessories',
-      productCount: 45,
-      status: 'active'
-    },
-    {
-      id: '2',
-      name: 'Fashion',
-      slug: 'fashion',
-      description: 'Clothing, shoes, and accessories',
-      productCount: 128,
-      status: 'active'
-    },
-    {
-      id: '3',
-      name: 'Sports',
-      slug: 'sports',
-      description: 'Sports equipment and fitness gear',
-      productCount: 67,
-      status: 'active'
-    },
-    {
-      id: '4',
-      name: 'Furniture',
-      slug: 'furniture',
-      description: 'Home and office furniture',
-      productCount: 34,
-      status: 'active'
-    },
-    {
-      id: '5',
-      name: 'Books',
-      slug: 'books',
-      description: 'Books and educational materials',
-      productCount: 89,
-      status: 'inactive'
-    }
-  ])
-
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
-    description: '',
     image: '',
     status: 'active'
   })
+
+  const [selectedImage, setSelectedImage] = useState(null)
 
   const handleEdit = category => {
     setEditingCategory(category)
     setFormData({
       name: category.name,
       slug: category.slug,
-      description: category.description,
-      image: category.image || '',
-      status: category.status
+      image: category.image_url || '',
+      status: 'active' // Default status since we removed it from the form
     })
+
+    // Set selected image if category has an existing image
+    if (category.image_url) {
+      setSelectedImage({
+        file: null, // Existing images don't have file objects
+        url: category.image_url
+      })
+    } else {
+      setSelectedImage(null)
+    }
+
     setShowModal(true)
   }
 
   const handleDelete = id => {
     if (confirm('Are you sure you want to delete this category?')) {
-      setCategories(categories.filter(cat => cat.id !== id))
+      router.delete(route('admin.products.categories.destroy', id))
     }
   }
 
   const handleSubmit = () => {
+    const formDataToSubmit = new FormData()
+    formDataToSubmit.append('name', formData.name)
+    formDataToSubmit.append('slug', formData.slug)
+
+    if (selectedImage && selectedImage.file) {
+      formDataToSubmit.append('image', selectedImage.file)
+    }
+
     if (editingCategory) {
       // Update existing category
-      setCategories(
-        categories.map(cat =>
-          cat.id === editingCategory.id
-            ? {
-                ...cat,
-                name: formData.name,
-                slug: formData.slug,
-                description: formData.description,
-                image: formData.image,
-                status: formData.status
-              }
-            : cat
-        )
+      router.post(
+        route('admin.products.categories.update', editingCategory.id),
+        {
+          _method: 'PUT',
+          name: formData.name,
+          slug: formData.slug,
+          image: selectedImage && selectedImage.file ? selectedImage.file : null
+        },
+        {
+          forceFormData: true,
+          onSuccess: () => {
+            handleCancel()
+          }
+        }
       )
     } else {
       // Create new category
-      const newCategory = {
-        id: Date.now().toString(),
-        name: formData.name,
-        slug: formData.slug,
-        description: formData.description,
-        image: formData.image,
-        productCount: 0,
-        status: formData.status
-      }
-      setCategories([...categories, newCategory])
+      router.post(
+        route('admin.products.categories.store'),
+        {
+          name: formData.name,
+          slug: formData.slug,
+          image: selectedImage && selectedImage.file ? selectedImage.file : null
+        },
+        {
+          forceFormData: true,
+          onSuccess: () => {
+            handleCancel()
+          }
+        }
+      )
     }
-
-    // Reset form
-    setShowModal(false)
-    setEditingCategory(null)
-    setFormData({
-      name: '',
-      slug: '',
-      description: '',
-      image: '',
-      status: 'active'
-    })
   }
 
   const handleCancel = () => {
+    // Clean up image URL if it was created for preview
+    if (selectedImage && selectedImage.file) {
+      URL.revokeObjectURL(selectedImage.url)
+    }
+
     setShowModal(false)
     setEditingCategory(null)
+    setSelectedImage(null)
     setFormData({
       name: '',
       slug: '',
-      description: '',
       image: '',
       status: 'active'
     })
@@ -143,6 +116,47 @@ export default function Categories() {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '')
+  }
+
+  const handleImageUpload = event => {
+    const file = event.target.files[0]
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/ico']
+      if (!allowedTypes.includes(file.type)) {
+        alert('Please select a valid image file (JPG, PNG, or ICO)')
+        return
+      }
+
+      // Validate file size (5MB max)
+      const maxSize = 5 * 1024 * 1024 // 5MB in bytes
+      if (file.size > maxSize) {
+        alert('File size must be less than 5MB')
+        return
+      }
+
+      // Create preview URL
+      const imageUrl = URL.createObjectURL(file)
+      setSelectedImage({
+        file,
+        url: imageUrl
+      })
+
+      // Update form data
+      setFormData(prev => ({ ...prev, image: imageUrl }))
+    }
+  }
+
+  const handleRemoveImage = () => {
+    if (selectedImage) {
+      URL.revokeObjectURL(selectedImage.url)
+    }
+    setSelectedImage(null)
+    setFormData(prev => ({ ...prev, image: '' }))
+  }
+
+  const handleFileSelect = () => {
+    document.getElementById('category-image-upload')?.click()
   }
 
   return (
@@ -186,14 +200,12 @@ export default function Categories() {
                       </div>
                     </th>
                     <th className='text-left p-4 text-sm font-semibold text-foreground'>Slug</th>
-                    <th className='text-left p-4 text-sm font-semibold text-foreground'>Description</th>
                     <th className='text-left p-4 text-sm font-semibold text-foreground'>
                       <div className='flex items-center gap-2'>
                         Products
                         <ArrowUpDown className='w-4 h-4 text-muted-foreground' />
                       </div>
                     </th>
-                    <th className='text-left p-4 text-sm font-semibold text-foreground'>Status</th>
                     <th className='text-right p-4 text-sm font-semibold text-foreground'>Actions</th>
                   </tr>
                 </thead>
@@ -215,21 +227,7 @@ export default function Categories() {
                         <span className='text-sm font-mono text-muted-foreground'>{category.slug}</span>
                       </td>
                       <td className='p-4'>
-                        <p className='text-sm text-foreground line-clamp-2 max-w-md'>{category.description}</p>
-                      </td>
-                      <td className='p-4'>
-                        <span className='text-sm font-semibold text-foreground'>{category.productCount}</span>
-                      </td>
-                      <td className='p-4'>
-                        <Badge
-                          className={cn(
-                            'text-xs',
-                            category.status === 'active'
-                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 px-2 py-1 rounded-lg'
-                              : 'bg-gray-500/10 text-gray-400 border-gray-500/20 px-2 py-1 rounded-lg'
-                          )}>
-                          {category.status}
-                        </Badge>
+                        <span className='text-sm font-semibold text-foreground'>{category.products_count || 0}</span>
                       </td>
                       <td className='p-4'>
                         <div className='flex items-center justify-end gap-2'>
@@ -273,136 +271,71 @@ export default function Categories() {
             </div>
 
             <div className='p-6 space-y-6'>
+              {/* Category Name */}
+              <div className=''>
+                <div>
+                  <CustomTextField
+                    label='Category Name'
+                    placeholder='Enter category name'
+                    value={formData.name}
+                    onChange={e => {
+                      const name = e.target.value
+                      setFormData({
+                        ...formData,
+                        name,
+                        slug: generateSlug(name)
+                      })
+                    }}
+                  />
+                </div>
+
+                <div className='mt-6'>
+                  <CustomTextField
+                    label='Slug'
+                    placeholder='Enter category slug'
+                    value={formData.slug}
+                    onChange={e => setFormData({ ...formData, slug: e.target.value })}
+                  />
+                </div>
+              </div>
               {/* Category Image */}
               <div className='space-y-2'>
                 <div>Category Image</div>
-                <div className='border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-emerald-500/50 transition-colors'>
-                  <div className='flex flex-col items-center gap-3'>
-                    <div className='w-16 h-16 bg-muted rounded-full flex items-center justify-center'>
-                      <Upload className='w-8 h-8 text-muted-foreground' />
+
+                {selectedImage ? (
+                  <div className='relative'>
+                    <div className='border-2 border-border rounded-lg p-4'>
+                      <img src={selectedImage.url} alt='Category preview' className='w-full h-32 object-cover rounded-lg' />
                     </div>
-                    <div>
-                      <p className='text-sm font-medium text-foreground'>Upload category image</p>
-                      <p className='text-xs text-muted-foreground'>PNG, JPG up to 5MB</p>
-                    </div>
-                    <Button variant='outline' size='sm' className='gap-2 bg-transparent'>
-                      <ImageIcon className='w-4 h-4' />
-                      Choose File
+                    <Button variant='destructive' size='small' onClick={handleRemoveImage} className='absolute top-2 right-2 h-8 w-8 p-0'>
+                      <X className='w-4 h-4' />
                     </Button>
                   </div>
-                </div>
-              </div>
-
-              {/* Category Name */}
-              <div className='space-y-2'>
-                <CustomTextField
-                  label='Category Name'
-                  placeholder='Enter category name'
-                  value={formData.name}
-                  onChange={e => {
-                    const name = e.target.value
-                    setFormData({
-                      ...formData,
-                      name,
-                      slug: generateSlug(name)
-                    })
-                  }}
-                />
-              </div>
-
-              {/* Slug */}
-              <div className='space-y-2'>
-                <CustomTextField
-                  label='Slug'
-                  placeholder='Enter category slug'
-                  value={formData.slug}
-                  onChange={e => setFormData({ ...formData, slug: e.target.value })}
-                  className='font-mono'
-                />
-                <CustomTextField
-                  placeholder='category-slug'
-                  value={formData.slug}
-                  onChange={e => setFormData({ ...formData, slug: e.target.value })}
-                  className='font-mono'
-                />
-                <p className='text-xs text-muted-foreground'>URL-friendly version of the name</p>
-              </div>
-
-              {/* Description */}
-              <div className='space-y-2'>
-                <CustomTextField
-                  label='Description'
-                  placeholder='Enter category description'
-                  rows={4}
-                  value={formData.description}
-                  onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  className='resize-none'
-                />
-                <CustomTextField
-                  placeholder='Enter category description'
-                  rows={4}
-                  value={formData.description}
-                  onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  className='resize-none'
-                />
-              </div>
-
-              {/* Status */}
-              <div className='space-y-2'>
-                <CustomSelectField
-                  label='Status'
-                  options={[
-                    { label: 'Active', value: 'active' },
-                    { label: 'Inactive', value: 'inactive' }
-                  ]}
-                  value={formData.status}
-                  onChange={e => setFormData({ ...formData, status: e.target.value })}
-                />
-                <div className='grid grid-cols-2 gap-3'>
-                  <button
-                    type='button'
-                    onClick={() => setFormData({ ...formData, status: 'active' })}
-                    className={cn(
-                      'p-4 rounded-lg border-2 transition-all duration-200 text-left',
-                      formData.status === 'active' ? 'border-emerald-500 bg-emerald-500/10' : 'border-border hover:border-emerald-500/50'
-                    )}>
-                    <div className='flex items-center gap-3'>
-                      <div
-                        className={cn(
-                          'w-4 h-4 rounded-full border-2 flex items-center justify-center',
-                          formData.status === 'active' ? 'border-emerald-500' : 'border-muted-foreground'
-                        )}>
-                        {formData.status === 'active' && <div className='w-2 h-2 rounded-full bg-emerald-500' />}
+                ) : (
+                  <div className='border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-emerald-500/50 transition-colors'>
+                    <div className='flex flex-col items-center gap-3'>
+                      <div className='w-16 h-16 bg-muted rounded-full flex items-center justify-center'>
+                        <Upload className='w-8 h-8 text-muted-foreground' />
                       </div>
                       <div>
-                        <p className='font-medium text-foreground'>Active</p>
-                        <p className='text-xs text-muted-foreground'>Category is visible</p>
+                        <p className='text-sm font-medium text-foreground'>Upload category image</p>
+                        <p className='text-xs text-muted-foreground'>PNG, JPG, ICO up to 5MB</p>
                       </div>
+                      <Button variant='outline' size='sm' className='gap-2 bg-transparent' onClick={handleFileSelect}>
+                        <ImageIcon className='w-4 h-4' />
+                        Choose File
+                      </Button>
                     </div>
-                  </button>
+                  </div>
+                )}
 
-                  <button
-                    type='button'
-                    onClick={() => setFormData({ ...formData, status: 'inactive' })}
-                    className={cn(
-                      'p-4 rounded-lg border-2 transition-all duration-200 text-left',
-                      formData.status === 'inactive' ? 'border-gray-500 bg-gray-500/10' : 'border-border hover:border-gray-500/50'
-                    )}>
-                    <div className='flex items-center gap-3'>
-                      <div
-                        className={cn(
-                          'w-4 h-4 rounded-full border-2 flex items-center justify-center',
-                          formData.status === 'inactive' ? 'border-gray-500' : 'border-muted-foreground'
-                        )}>
-                        {formData.status === 'inactive' && <div className='w-2 h-2 rounded-full bg-gray-500' />}
-                      </div>
-                      <div>
-                        <p className='font-medium text-foreground'>Inactive</p>
-                        <p className='text-xs text-muted-foreground'>Category is hidden</p>
-                      </div>
-                    </div>
-                  </button>
-                </div>
+                <input
+                  id='category-image-upload'
+                  type='file'
+                  accept='image/jpeg,image/jpg,image/png,image/ico'
+                  className='hidden'
+                  onChange={handleImageUpload}
+                />
               </div>
             </div>
 

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\Admin\CategoryController;
 
 
 
@@ -27,9 +28,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ]);
         })->name('admin.products.edit');
 
-        Route::get('/categories', function () {
-            return Inertia::render('Admin/Products/Categories');
-        })->name('admin.products.categories');
+        Route::get('/categories', [CategoryController::class, 'index'])->name('admin.products.categories');
+        Route::post('/categories', [CategoryController::class, 'store'])->name('admin.products.categories.store');
+        Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('admin.products.categories.update');
+        Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('admin.products.categories.destroy');
 
         Route::get('/tags', function () {
             return Inertia::render('Admin/Products/Tags');
