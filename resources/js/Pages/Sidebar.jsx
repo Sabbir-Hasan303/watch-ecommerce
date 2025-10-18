@@ -34,11 +34,11 @@ export default function Sidebar({ collapsed, onToggle }) {
   const menuItems = [{ icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' }]
 
   const managementItems = [
-    // {
-    //   icon: LayoutDashboard,
-    //   label: 'Dashboard',
-    //   href: '/dashboard'
-    // },
+    {
+      icon: LayoutDashboard,
+      label: 'Dashboard',
+      href: '/dashboard'
+    },
     {
       icon: Package,
       label: 'Product',
@@ -267,7 +267,7 @@ export default function Sidebar({ collapsed, onToggle }) {
         </div>
 
         <div className='flex-1 overflow-y-auto py-4 px-3 space-y-6 scrollbar-thin scrollbar-thumb-emerald-500/20 scrollbar-track-transparent hover:scrollbar-thumb-emerald-500/40'>
-          <div className='space-y-1'>{menuItems.map((item, index) => renderMenuItem(item, index))}</div>
+          {/* <div className='space-y-1'>{menuItems.map((item, index) => renderMenuItem(item, index))}</div>
 
           {!collapsed && (
             <div className='px-3 pt-2'>
@@ -277,7 +277,7 @@ export default function Sidebar({ collapsed, onToggle }) {
                 <div className='h-px flex-1 bg-gradient-to-r from-transparent via-sidebar-border to-transparent' />
               </div>
             </div>
-          )}
+          )} */}
 
           <div className='space-y-1'>{managementItems.map((item, index) => renderMenuItem(item, index))}</div>
         </div>
