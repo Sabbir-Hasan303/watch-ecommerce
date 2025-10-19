@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ProductController;
 
 
 
@@ -18,9 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return Inertia::render('Admin/Products/List');
         })->name('admin.products.index');
 
-        Route::get('/create', function () {
-            return Inertia::render('Admin/Products/Create');
-        })->name('admin.products.create');
+        Route::get('/create', [ProductController::class, 'create'])->name('admin.products.create');
 
         Route::get('/edit/{id}', function ($id) {
             return Inertia::render('Admin/Products/Edit', [

@@ -10,7 +10,7 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'category_id', 'name', 'slug', 'short_description', 'description', 'sku', 'status', 'features', 'technical_specs', 'model_features'
+        'name', 'slug', 'short_description', 'description', 'sku', 'status', 'features', 'technical_specs', 'model_features'
     ];
 
     protected $casts = [
@@ -19,9 +19,9 @@ class Product extends Model
         'model_features' => 'array',
     ];
 
-    public function category()
+    public function categories()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsToMany(Category::class)->withTimestamps();
     }
 
     public function images()

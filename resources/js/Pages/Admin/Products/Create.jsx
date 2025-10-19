@@ -7,6 +7,7 @@ import { ArrowLeft, Upload, X, Save, ImageIcon, Trash2, Plus, Edit } from 'lucid
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import CustomTextField from '@/Components/CustomTextField'
 import CustomSelectField from '@/Components/CustomSelectField'
+import CustomMultiSelect from '@/Components/CustomMultiSelect'
 
 // Constants
 const STATUS_OPTIONS = [
@@ -19,11 +20,24 @@ const MODEL_FEATURE_CATEGORIES = [
   { label: 'Additional Features', value: 'additional' }
 ]
 
+const PRODUCT_CATEGORIES = [
+  { label: 'Luxury Watches', value: 'luxury' },
+  { label: 'Sports Watches', value: 'sports' },
+  { label: 'Dress Watches', value: 'dress' },
+  { label: 'Smart Watches', value: 'smart' },
+  { label: 'Vintage Watches', value: 'vintage' },
+  { label: 'Diving Watches', value: 'diving' },
+  { label: 'Pilot Watches', value: 'pilot' },
+  { label: 'Chronograph Watches', value: 'chronograph' },
+  { label: 'Automatic Watches', value: 'automatic' },
+  { label: 'Quartz Watches', value: 'quartz' }
+]
+
 const INITIAL_FORM_DATA = {
   name: '',
   description: '',
   short_description: '',
-  category: '',
+  categories: [],
   sku: '',
   status: 'draft',
   features: [],
@@ -315,7 +329,7 @@ const VariantTable = ({ variants, onEdit, onRemove }) => (
   </TableContainer>
 )
 
-export default function ProductCreate() {
+export default function ProductCreate({ categories }) {
   // Main form state
   const [formData, setFormData, updateFormField] = useFormState(INITIAL_FORM_DATA)
 
@@ -502,12 +516,13 @@ export default function ProductCreate() {
                       onChange={e => updateFormField('sku', e.target.value)}
                     />
 
-                    <CustomTextField
-                      id='category'
-                      label='Category'
-                      placeholder='Enter category'
-                      value={formData.category}
-                      onChange={e => updateFormField('category', e.target.value)}
+                    <CustomMultiSelect
+                      id='categories'
+                      label='Categories'
+                      placeholder='Select categories'
+                      options={categories.map(category => ({ label: category.name, value: category.id }))}
+                      value={formData.categories}
+                      onChange={values => updateFormField('categories', values)}
                     />
 
                     <CustomTextField
