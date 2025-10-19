@@ -15,17 +15,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Products
     Route::prefix('products')->group(function () {
-        Route::get('/', function () {
-            return Inertia::render('Admin/Products/List');
-        })->name('admin.products.index');
 
+        Route::get('/', [ProductController::class, 'index'])->name('admin.products.index');
         Route::get('/create', [ProductController::class, 'create'])->name('admin.products.create');
+        Route::get('/edit/{id}', [ProductController::class, 'edit'])->name('admin.products.edit');
 
-        Route::get('/edit/{id}', function ($id) {
-            return Inertia::render('Admin/Products/Edit', [
-                'productId' => $id
-            ]);
-        })->name('admin.products.edit');
+        Route::post('/', [ProductController::class, 'store'])->name('admin.products.store');
+        // Route::put('/{id}', [ProductController::class, 'update'])->name('admin.products.update');
+        // Route::delete('/{id}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
 
         Route::get('/categories', [CategoryController::class, 'index'])->name('admin.products.categories');
         Route::post('/categories', [CategoryController::class, 'store'])->name('admin.products.categories.store');

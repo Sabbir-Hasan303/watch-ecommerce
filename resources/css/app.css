@@ -79,6 +79,7 @@
   --background: #1c252e; /* This is basically the surface color */
   /* Background Color For Dark Mode */
 
+  --color-darkCharcoal: #252E37;
   --foreground: oklch(0.95 0 0);
   --card: #1c252e;
   --card-foreground: oklch(0.95 0 0);
@@ -676,6 +677,73 @@
 
 .dark {
   .table-pagination {
-    background-color: var(--color-text-primary) !important;
+    background-color: var(--background) !important;
   }
+}
+/* Table Pagination Styles */
+.table-pagination {
+    font-family: 'Public Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif !important;
+}
+
+.table-pagination .MuiTablePagination-selectLabel,
+.table-pagination .MuiTablePagination-displayedRows {
+    font-family: 'Public Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif !important;
+    font-size: 14px !important;
+    color: #637381 !important;
+    font-weight: 500 !important;
+}
+
+.table-pagination .MuiTablePagination-select {
+    font-family: 'Public Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif !important;
+    font-size: 14px !important;
+    color: #637381 !important;
+    font-weight: 500 !important;
+}
+
+.table-pagination .MuiIconButton-root {
+    color: #637381 !important;
+}
+
+.table-pagination .MuiIconButton-root:hover {
+    background-color: #f4f6f8 !important;
+}
+
+.dark {
+    .table-pagination .MuiIconButton-root {
+        color: #ffffff !important;
+    }
+}
+
+.dark {
+    .table-pagination .MuiIconButton-root:hover {
+        background-color: #374151 !important;
+    }
+}
+
+.dark {
+    .table-pagination .MuiTablePagination-selectLabel, .table-pagination .MuiTablePagination-displayedRows {
+        color: #ffffff !important;
+    }
+}
+
+.dark {
+    .table-pagination .MuiTablePagination-select {
+        color: #ffffff !important;
+    }
+}
+
+.table-pagination .MuiSvgIcon-root {
+    color: #637381 !important;
+}
+
+.dark {
+    .table-pagination .MuiSvgIcon-root {
+        color: #ffffff !important;
+    }
+}
+
+.dark {
+    .table-pagination .MuiTablePagination-actions {
+        color: #ffffff !important;
+    }
 }
