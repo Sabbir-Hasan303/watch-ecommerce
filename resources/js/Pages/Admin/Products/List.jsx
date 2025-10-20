@@ -89,8 +89,8 @@ export default function ProductList({ products = [], categories = [], statuses =
 
                 <div className='space-y-6'>
                     {/* Filters and Actions */}
-                    <div className='p-6 background border rounded-lg'>
-                        <div className='flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between'>
+                    <div className='bg-card shadow-lg rounded-lg'>
+                        <div className='p-6 flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between'>
                             <div className='flex flex-col sm:flex-row gap-3 w-full lg:w-auto'>
                                 <FormControl size='small' sx={{ minWidth: 300 }}>
                                     <CustomTextField
@@ -131,7 +131,7 @@ export default function ProductList({ products = [], categories = [], statuses =
                             </div>
                         </div>
 
-                        <Paper sx={{ width: '100%', my: 2 }}>
+                        <Paper sx={{ width: '100%' }}>
                             <TableContainer sx={{ maxHeight: '500px' }} className='table-container'>
                                 <Table>
                                     <TableHead>
@@ -172,7 +172,7 @@ export default function ProductList({ products = [], categories = [], statuses =
                                             </TableRow>
                                         ) : (
                                             paginatedProducts.map(product => (
-                                            <TableRow key={product.id}>
+                                            <TableRow key={product.id} hover>
                                                 <TableCell className='table-body-cell dark:table-body-cell'>
                                                     <div className='flex items-center gap-3'>
                                                         <img

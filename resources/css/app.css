@@ -75,8 +75,9 @@
   --color-surface: #1c252e;
 
   /* Background Color For Dark Mode */
-  /* --background: #141a21; */
-  --background: #1c252e; /* This is basically the surface color */
+  --background: #141a21;
+  /* --background: #1c252e;  */
+  /* This is basically the surface color */
   /* Background Color For Dark Mode */
 
   --color-darkCharcoal: #252E37;
@@ -636,7 +637,7 @@
 
 .dark {
   .table-container {
-    background-color: var(--background) !important;
+    background-color: var(--color-surface) !important;
   }
 }
 
@@ -677,7 +678,7 @@
 
 .dark {
   .table-pagination {
-    background-color: var(--background) !important;
+    background-color: var(--color-surface) !important;
   }
 }
 /* Table Pagination Styles */

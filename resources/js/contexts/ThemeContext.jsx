@@ -44,20 +44,20 @@ export const ThemeContextProvider = ({ children }) => {
     return createTheme({
       palette: {
         mode,
-        primary: {
-          main: mode === 'dark' ? '#f59e0b' : '#6366f1', // orange-500 : indigo-500
-          light: mode === 'dark' ? '#fbbf24' : '#818cf8', // amber-400 : indigo-400
-          dark: mode === 'dark' ? '#d97706' : '#4f46e5' // amber-600 : indigo-600
-        },
-        secondary: {
-          main: mode === 'dark' ? '#10b981' : '#06b6d4', // emerald-500 : cyan-500
-          light: mode === 'dark' ? '#34d399' : '#22d3ee', // emerald-400 : cyan-400
-          dark: mode === 'dark' ? '#059669' : '#0891b2' // emerald-600 : cyan-600
-        },
-        background: {
-          default: mode === 'dark' ? '#1c252e' : '#fafafa',
-          paper: mode === 'dark' ? '#1c252e' : '#ffffff'
-        },
+        // primary: {
+        //   main: mode === 'dark' ? '#f59e0b' : '#6366f1', // orange-500 : indigo-500
+        //   light: mode === 'dark' ? '#fbbf24' : '#818cf8', // amber-400 : indigo-400
+        //   dark: mode === 'dark' ? '#d97706' : '#4f46e5' // amber-600 : indigo-600
+        // },
+        // secondary: {
+        //   main: mode === 'dark' ? '#10b981' : '#06b6d4', // emerald-500 : cyan-500
+        //   light: mode === 'dark' ? '#34d399' : '#22d3ee', // emerald-400 : cyan-400
+        //   dark: mode === 'dark' ? '#059669' : '#0891b2' // emerald-600 : cyan-600
+        // },
+        // background: {
+        //   default: mode === 'dark' ? '#1c252e' : '#fafafa',
+        //   paper: mode === 'dark' ? '#1c252e' : '#ffffff'
+        // },
         text: {
           primary: mode === 'dark' ? '#ffffff' : '#1c252e',
           secondary: mode === 'dark' ? '#9ca3af' : '#6b7280'
@@ -129,8 +129,8 @@ export const ThemeContextProvider = ({ children }) => {
         MuiPaper: {
           styleOverrides: {
             root: {
-              backgroundColor: mode === 'dark' ? '#1c252e' : '#ffffff',
-              border: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)',
+              backgroundColor: mode === 'dark' ? '#141a21' : '#ffffff',
+            //   border: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)',
               borderRadius: '12px',
               backgroundImage: 'none',
               boxShadow:
@@ -156,7 +156,7 @@ export const ThemeContextProvider = ({ children }) => {
         MuiAppBar: {
           styleOverrides: {
             root: {
-              backgroundColor: mode === 'dark' ? '#1c252e' : '#ffffff',
+            //   backgroundColor: mode === 'dark' ? '#1c252e' : '#ffffff',
               backdropFilter: 'blur(20px)',
               borderBottom: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)',
               boxShadow:
@@ -169,7 +169,7 @@ export const ThemeContextProvider = ({ children }) => {
         MuiCard: {
           styleOverrides: {
             root: {
-              backgroundColor: mode === 'dark' ? '#1c252e' : '#ffffff',
+            //   backgroundColor: mode === 'dark' ? '#1c252e' : '#ffffff',
               border: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)',
               borderRadius: '12px',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',

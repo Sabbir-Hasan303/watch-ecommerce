@@ -200,11 +200,61 @@ class ProductController extends Controller
      */
     public function edit(string $id)
     {
-        // return Inertia::render('Admin/Products/Edit', [
-        //     'productId' => $id,
-        // ]);
+        $product = Product::with(['categories:id,name', 'images:id,product_id,image_path,is_primary,product_variant_id', 'variants'])
+            ->findOrFail($id);
+
+        // Map product for frontend consumption
+        $productPayload = [
+            'id' => $product->id,
+            'name' => $product->name,
+            'description' => $product->description,
+            'short_description' => $product->short_description,
+            'sku' => $product->sku,
+            'status' => $product->status,
+            'features' => $product->features ?? [],
+            'technical_specs' => $product->technical_specs ?? [],
+            'model_features' => $product->model_features ?? [],
+            'categories' => $product->categories->map(fn ($c) => ['id' => $c->id, 'name' => $c->name])->values(),
+            'images' => $product->images->map(function ($img) {
+                return [
+                    'id' => $img->id,
+                    'url' => $img->image_path ? (Storage::url($img->image_path)) : null,
+                    'image_path' => $img->image_path,
+                    'is_primary' => (bool) $img->is_primary,
+                    'product_variant_id' => $img->product_variant_id,
+                ];
+            })->values(),
+            'variants' => $product->variants->map(function ($v) use ($product) {
+                // Attempt to find linked image by product_variant_id
+                $linkedImage = $product->images->firstWhere('product_variant_id', $v->id);
+                return [
+                    'id' => $v->id,
+                    'title' => $v->title,
+                    'variant_name' => $v->title,
+                    'sku' => $v->sku,
+                    'size' => $v->size,
+                    'color' => $v->color,
+                    'material' => $v->material,
+                    'price' => $v->price,
+                    'compare_at_price' => $v->compare_at_price,
+                    'quantity' => $v->quantity,
+                    'stock_quantity' => $v->quantity,
+                    'status' => $v->status,
+                    'image' => $linkedImage ? [
+                        'id' => $linkedImage->id,
+                        'url' => $linkedImage->image_path ? (Storage::url($linkedImage->image_path)) : null,
+                        'image_path' => $linkedImage->image_path,
+                    ] : null,
+                ];
+            })->values(),
+        ];
+
+        $categories = Category::all(['id', 'name']);
+
         return Inertia::render('Admin/Products/Edit', [
             'productId' => $id,
+            'product' => $productPayload,
+            'categories' => $categories,
         ]);
     }
 
@@ -213,7 +263,144 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        // Validate the request
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'short_description' => 'nullable|string',
+            'description' => 'nullable|string',
+            'sku' => 'required|string|unique:products,sku,' . $id,
+            'status' => 'required|in:active,draft',
+            'categories' => 'required|array|min:1',
+            'categories.*' => 'exists:categories,id',
+            'features' => 'nullable|array',
+            'features.*.name' => 'required|string',
+            'features.*.type' => 'required|string',
+            'features.*.icon' => 'nullable|string',
+            'technical_specs' => 'nullable|array',
+            'technical_specs.*.key' => 'required|string',
+            'technical_specs.*.value' => 'required|string',
+            'model_features' => 'nullable|array',
+            'model_features.*.name' => 'required|string',
+            'model_features.*.category' => 'nullable|string',
+            'variants' => 'required|array|min:1',
+            'variants.*.title' => 'required|string',
+            'variants.*.sku' => 'required|string',
+            'variants.*.price' => 'required|numeric|min:0',
+            'variants.*.quantity' => 'required|integer|min:0',
+            'variants.*.status' => 'required|in:active,draft',
+            'variants.*.size' => 'nullable|string',
+            'variants.*.color' => 'nullable|string',
+            'variants.*.material' => 'nullable|string',
+            'variants.*.compare_at_price' => 'nullable|numeric|min:0',
+            'images' => 'nullable|array',
+            'existing_image_ids' => 'nullable|array',
+            'existing_image_ids.*' => 'integer|exists:product_images,id',
+        ]);
+
+        // If validation fails, return with errors
+        if ($validator->fails()) {
+            Log::error('Validation errors: ' . $validator->errors()->toJson());
+            return back()->withInput()
+                ->withErrors($validator->errors());
+        }
+
+        // Get validated data
+        $validated = $validator->validated();
+
+        try {
+            DB::beginTransaction();
+
+            // Find the product
+            $product = Product::findOrFail($id);
+
+            // Generate slug from name
+            $slug = Str::slug($request->name);
+
+            // Update the product
+            $product->update([
+                'name' => $request->name,
+                'slug' => $slug,
+                'short_description' => $request->short_description ?? null,
+                'description' => $request->description ?? null,
+                'sku' => $request->sku,
+                'status' => $request->status,
+                'features' => $request->features ?? [],
+                'technical_specs' => $request->technical_specs ?? [],
+                'model_features' => $request->model_features ?? [],
+            ]);
+
+            // Sync categories
+            $product->categories()->sync($request->categories);
+
+            // Handle existing images to keep
+            $existingImageIds = $request->existing_image_ids ?? [];
+            if (!empty($existingImageIds)) {
+                // Keep only the specified existing images
+                $product->images()->whereNotIn('id', $existingImageIds)->delete();
+            } else {
+                // If no existing images specified, delete all current images
+                $product->images()->delete();
+            }
+
+            // Handle new product images
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $index => $image) {
+                    $path = $image->store('products/' . $product->id, 'public');
+
+                    $product->images()->create([
+                        'image_path' => $path,
+                        'is_primary' => $index === 0 && empty($existingImageIds), // First new image is primary if no existing images
+                        'product_variant_id' => null,
+                    ]);
+                }
+            }
+
+            // Handle variants - delete existing and recreate
+            $product->variants()->delete();
+
+            foreach ($request->variants as $variantData) {
+                $variant = $product->variants()->create([
+                    'title' => $variantData['title'],
+                    'sku' => $variantData['sku'],
+                    'size' => $variantData['size'] ?? null,
+                    'color' => $variantData['color'] ?? null,
+                    'material' => $variantData['material'] ?? null,
+                    'price' => $variantData['price'],
+                    'compare_at_price' => $variantData['compare_at_price'] ?? null,
+                    'quantity' => $variantData['quantity'],
+                    'status' => $variantData['status'],
+                ]);
+
+                // Handle variant images
+                if (isset($variantData['image']) && $variantData['image']) {
+                    // New variant image
+                    $variantImagePath = $variantData['image']->store('products/' . $product->id . '/variants', 'public');
+
+                    $product->images()->create([
+                        'image_path' => $variantImagePath,
+                        'is_primary' => false,
+                        'product_variant_id' => $variant->id,
+                    ]);
+                } elseif (isset($variantData['existing_image_id']) && $variantData['existing_image_id']) {
+                    // Link existing image to variant
+                    $product->images()
+                        ->where('id', $variantData['existing_image_id'])
+                        ->update(['product_variant_id' => $variant->id]);
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('admin.products.index')
+                ->with('success', 'Product updated successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to update product: ' . $e->getMessage());
+
+            return back()->withInput()
+                ->withErrors(['error' => 'Failed to update product: ' . $e->getMessage()]);
+        }
     }
 
     /**

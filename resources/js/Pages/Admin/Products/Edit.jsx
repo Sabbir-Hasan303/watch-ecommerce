@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { Link } from '@inertiajs/react'
+import { Link, router } from '@inertiajs/react'
 import { cn } from '@/lib/utils'
 import { Badge, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
 import { ArrowLeft, Upload, X, Save, ImageIcon, Trash2, Plus, Edit } from 'lucide-react'
@@ -7,6 +7,7 @@ import { ArrowLeft, Upload, X, Save, ImageIcon, Trash2, Plus, Edit } from 'lucid
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import CustomTextField from '@/Components/CustomTextField'
 import CustomSelectField from '@/Components/CustomSelectField'
+import CustomMultiSelect from '@/Components/CustomMultiSelect'
 
 // Constants
 const STATUS_OPTIONS = [
@@ -23,7 +24,7 @@ const INITIAL_FORM_DATA = {
   name: '',
   description: '',
   short_description: '',
-  category: '',
+  categories: [],
   sku: '',
   status: 'draft',
   features: [],
@@ -124,6 +125,7 @@ const useImageUpload = () => {
 
   return {
     images,
+    setImages,
     dragActive,
     handleImageUpload,
     removeImage,
@@ -182,7 +184,7 @@ const ImageUploadArea = ({ dragActive, onDrag, onDrop, onFileSelect }) => (
         <p className='text-sm font-medium text-foreground mb-1'>Drag and drop images here, or click to browse</p>
         <p className='text-xs text-muted-foreground'>PNG, JPG, GIF up to 10MB</p>
       </div>
-      <Button type='button' variant='outline' onClick={onFileSelect} className='gap-2'>
+      <Button type='button' variant='outline' onClick={() => onFileSelect()} className='gap-2'>
         <ImageIcon className='w-4 h-4' />
         Choose Files
       </Button>
@@ -315,7 +317,7 @@ const VariantTable = ({ variants, onEdit, onRemove }) => (
   </TableContainer>
 )
 
-export default function ProductEdit({ productId, product }) {
+export default function ProductEdit({ productId, product, categories }) {
   // Main form state
   const [formData, setFormData, updateFormField] = useFormState(INITIAL_FORM_DATA)
 
@@ -330,7 +332,10 @@ export default function ProductEdit({ productId, product }) {
   const [variantForm, setVariantForm] = useFormState(INITIAL_VARIANT_FORM)
 
   // Image upload
-  const { images, dragActive, handleImageUpload, removeImage, handleDrag, handleDrop } = useImageUpload()
+  const { images, setImages, dragActive, handleImageUpload, removeImage, handleDrag, handleDrop } = useImageUpload()
+
+  // Saving state
+  const [saving, setSaving] = useState(false)
 
   // Load product data on mount
   useEffect(() => {
@@ -339,7 +344,12 @@ export default function ProductEdit({ productId, product }) {
         name: product.name || '',
         description: product.description || '',
         short_description: product.short_description || '',
-        category: product.category || '',
+        categories:
+          Array.isArray(product.categories)
+            ? (product.categories.length > 0 && typeof product.categories[0] === 'object'
+                ? product.categories.map(c => c.id)
+                : product.categories)
+            : (product.category ? [product.category] : []),
         sku: product.sku || '',
         status: product.status || 'draft',
         features: product.features || [],
@@ -493,9 +503,13 @@ export default function ProductEdit({ productId, product }) {
   )
 
   // Event handlers
-  const handleFileSelect = useCallback(() => {
-    document.getElementById('file-upload')?.click()
-  }, [])
+  const handleFileSelect = useCallback(files => {
+    if (files) {
+      handleImageUpload(files)
+    } else {
+      document.getElementById('file-upload')?.click()
+    }
+  }, [handleImageUpload])
 
   const handleVariantFileSelect = useCallback(() => {
     document.getElementById('variant-image-upload')?.click()
@@ -555,13 +569,24 @@ export default function ProductEdit({ productId, product }) {
                       onChange={e => updateFormField('sku', e.target.value)}
                     />
 
-                    <CustomTextField
-                      id='category'
-                      label='Category'
-                      placeholder='Enter category'
-                      value={formData.category}
-                      onChange={e => updateFormField('category', e.target.value)}
-                    />
+                    {Array.isArray(categories) && categories.length > 0 ? (
+                      <CustomMultiSelect
+                        id='categories'
+                        label='Categories'
+                        placeholder='Select categories'
+                        options={categories.map(category => ({ label: category.name, value: category.id }))}
+                        value={formData.categories}
+                        onChange={values => updateFormField('categories', values)}
+                      />
+                    ) : (
+                      <CustomTextField
+                        id='categories_fallback'
+                        label='Categories'
+                        placeholder='Enter categories (comma separated)'
+                        value={Array.isArray(formData.categories) ? formData.categories.join(',') : ''}
+                        onChange={e => updateFormField('categories', e.target.value.split(',').map(v => v.trim()).filter(Boolean))}
+                      />
+                    )}
 
                     <CustomTextField
                       id='short_description'
@@ -895,8 +920,84 @@ export default function ProductEdit({ productId, product }) {
                     className='w-full gap-2 !bg-black dark:!bg-white !text-white dark:!text-black'
                     variant='primary'
                     size='md'
+                    disabled={saving}
+                    onClick={() => {
+                      const payload = new FormData()
+
+                      // Basic fields
+                      payload.append('name', formData.name)
+                      payload.append('description', formData.description)
+                      payload.append('short_description', formData.short_description)
+                      payload.append('sku', formData.sku)
+                      payload.append('status', formData.status)
+
+                      // Categories
+                      if (Array.isArray(formData.categories)) {
+                        formData.categories.forEach(categoryId => {
+                          payload.append('categories[]', categoryId)
+                        })
+                      }
+
+                      // Features
+                      formData.features.forEach((feature, index) => {
+                        payload.append(`features[${index}][name]`, feature.name)
+                        payload.append(`features[${index}][type]`, feature.type)
+                        payload.append(`features[${index}][icon]`, feature.icon || '')
+                      })
+
+                      // Technical specs
+                      formData.technical_specs.forEach((spec, index) => {
+                        payload.append(`technical_specs[${index}][key]`, spec.key)
+                        payload.append(`technical_specs[${index}][value]`, spec.value)
+                      })
+
+                      // Model features
+                      formData.model_features.forEach((feature, index) => {
+                        payload.append(`model_features[${index}][name]`, feature.name)
+                        payload.append(`model_features[${index}][category]`, feature.category || '')
+                      })
+
+                      // Images: send new files; keep existing image ids
+                      const existingImageIds = []
+                      images.forEach(image => {
+                        if (image.file) {
+                          payload.append('images[]', image.file)
+                        } else if (image.id) {
+                          existingImageIds.push(image.id)
+                        }
+                      })
+                      existingImageIds.forEach(id => payload.append('existing_image_ids[]', id))
+
+                      // Variants
+                      variants.forEach((variant, index) => {
+                        if (variant.id) payload.append(`variants[${index}][id]`, String(variant.id))
+                        payload.append(`variants[${index}][title]`, variant.title)
+                        payload.append(`variants[${index}][sku]`, variant.sku)
+                        payload.append(`variants[${index}][size]`, variant.size || '')
+                        payload.append(`variants[${index}][color]`, variant.color || '')
+                        payload.append(`variants[${index}][material]`, variant.material || '')
+                        payload.append(`variants[${index}][price]`, variant.price)
+                        payload.append(`variants[${index}][compare_at_price]`, variant.compare_at_price || '')
+                        payload.append(`variants[${index}][quantity]`, variant.quantity)
+                        payload.append(`variants[${index}][status]`, variant.status)
+
+                        if (variant.image && variant.image.file) {
+                          payload.append(`variants[${index}][image]`, variant.image.file)
+                        } else if (variant.image && variant.image.id) {
+                          payload.append(`variants[${index}][existing_image_id]`, String(variant.image.id))
+                        }
+                      })
+
+                      setSaving(true)
+                      payload.append('_method', 'PUT')
+                      router.post(`/products/${productId}`, payload, {
+                        forceFormData: true,
+                        preserveScroll: true,
+                        onFinish: () => setSaving(false)
+                      })
+                    }}
                     startIcon={<Save className='w-4 h-4' />}>
-                    Save Changes
+                    {saving ? 'Saving Changes...' : 'Save Changes'}
                   </Button>
                 </div>
               </div>
