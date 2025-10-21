@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 
 
@@ -40,9 +41,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Orders
     Route::prefix('orders')->group(function () {
-        Route::get('/', function () {
-            return Inertia::render('Admin/Orders/List');
-        })->name('admin.orders.index');
+        Route::get('/', [OrderController::class, 'index'])->name('admin.orders.index');
+        Route::get('/create', [OrderController::class, 'create'])->name('admin.orders.create');
 
         Route::get('/{id}', function ($id) {
             return Inertia::render('Admin/Orders/ViewOrder', [

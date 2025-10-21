@@ -185,6 +185,13 @@ const CustomTextField = ({
         sx: {
             backgroundColor: isDark ? colors.rgba : 'white',
             color: isDark ? colors.darkTextPrimary : colors.lightTextPrimary,
+            marginTop: '4px',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            borderRadius: '8px',
+            border: `1px solid ${isDark ? colors.darkBorderColor : '#e5e7eb'}`,
+            transform: 'none !important',
+            transition: 'none !important',
+            animation: 'none !important',
             '& .MuiAutocompleteOption': {
                 color: isDark ? colors.darkTextPrimary : colors.lightTextPrimary,
                 '&:hover': {
@@ -203,10 +210,15 @@ const CustomTextField = ({
     // If suggestions are provided and not empty, render Autocomplete
     if (shouldShowSuggestions) {
         // Extract necessary props for Autocomplete
-        const { value, onChange, label, error, helperText, required, ...autocompleteRest } = rest;
+        const { value, onChange, label, error, helperText, required, onSelect, ...autocompleteRest } = rest;
 
         // Handle value change for autocomplete
         const handleAutocompleteChange = (event, newValue) => {
+            // If a value is selected from the dropdown (not just typed)
+            if (newValue && onSelect && typeof newValue === 'string') {
+                onSelect(newValue);
+            }
+
             if (onChange) {
                 // Create a synthetic event object similar to regular input onChange
                 const syntheticEvent = {
@@ -219,28 +231,76 @@ const CustomTextField = ({
         };
 
         return (
-            <Autocomplete
-                fullWidth={fullWidth}
-                options={suggestions}
-                value={value || ''}
-                onChange={handleAutocompleteChange}
-                freeSolo={true} // Allow free text input
-                autoComplete
-                autoHighlight
-                PaperComponent={(props) => <div {...props} style={{ ...props.style, ...paperProps.sx }} />}
-                renderInput={(params) => (
-                    <TextField
-                        {...params}
-                        label={label}
-                        variant={variant}
-                        required={required}
-                        error={error}
-                        helperText={helperText}
-                        sx={finalSx}
-                    />
-                )}
-                {...autocompleteRest}
-            />
+            <div style={{ position: 'relative', width: '100%' }}>
+                <Autocomplete
+                    fullWidth={fullWidth}
+                    options={suggestions}
+                    value={value || ''}
+                    onChange={handleAutocompleteChange}
+                    freeSolo={true} // Allow free text input
+                    autoComplete
+                    autoHighlight
+                    disablePortal={true}
+                    openOnFocus={true}
+                    componentsProps={{
+                        popper: {
+                            style: {
+                                width: 'fit-content',
+                                minWidth: '100%'
+                            },
+                            modifiers: [
+                                {
+                                    name: 'flip',
+                                    enabled: false
+                                },
+                                {
+                                    name: 'preventOverflow',
+                                    enabled: true,
+                                    options: {
+                                        altAxis: false,
+                                        altBoundary: false,
+                                        tether: false,
+                                        rootBoundary: 'document'
+                                    }
+                                }
+                            ]
+                        }
+                    }}
+                    PaperComponent={(props) => <div {...props} style={{ ...props.style, ...paperProps.sx }} />}
+                    ListboxProps={{
+                        style: {
+                            maxHeight: '200px',
+                            overflow: 'auto'
+                        }
+                    }}
+                    sx={{
+                        '& .MuiAutocomplete-popper': {
+                            transform: 'none !important',
+                            transition: 'none !important',
+                            animation: 'none !important',
+                            inset: 'auto !important',
+                            position: 'static !important'
+                        },
+                        '& .MuiPaper-root': {
+                            transform: 'none !important',
+                            transition: 'none !important',
+                            animation: 'none !important'
+                        }
+                    }}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            label={label}
+                            variant={variant}
+                            required={required}
+                            error={error}
+                            helperText={helperText}
+                            sx={finalSx}
+                        />
+                    )}
+                    {...autocompleteRest}
+                />
+            </div>
         );
     }
 

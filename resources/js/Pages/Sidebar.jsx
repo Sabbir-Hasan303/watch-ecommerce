@@ -53,7 +53,10 @@ export default function Sidebar({ collapsed, onToggle }) {
     {
       icon: ShoppingBag,
       label: 'Order',
-      subItems: [{ label: 'All Orders', href: '/orders' }]
+      subItems: [
+        { label: 'All Orders', href: '/orders' },
+        { label: 'Create Order', href: '/orders/create' }
+      ]
     },
     // {
     //   icon: CreditCard,
