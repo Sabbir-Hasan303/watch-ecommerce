@@ -834,9 +834,8 @@ export default function ProductCreate({ categories }) {
                                             </div>
 
                                             <div className='flex gap-2'>
-                                                <Button onClick={addVariant} className='gap-2 bg-emerald-600 hover:bg-emerald-700 text-white'>
-                                                    <Plus className='w-4 h-4' />
-                                                    Add Variant
+                                                <Button variant='contained' onClick={addVariant} className='!bg-text-primary !text-primary-foreground'>
+                                                    Add
                                                 </Button>
                                                 <Button variant='outline' onClick={handleVariantCancel}>
                                                     Cancel

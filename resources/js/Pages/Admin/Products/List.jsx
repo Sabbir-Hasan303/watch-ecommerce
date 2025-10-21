@@ -24,7 +24,7 @@ import CustomTextField from '@/Components/CustomTextField'
 import CustomSelectField from '@/Components/CustomSelectField'
 import { Head } from '@inertiajs/react'
 
-export default function ProductList({ products = [], categories = [], statuses = [] }) {
+export default function ProductList({ products = [], categories = [], statuses = [], flash }) {
     const [searchQuery, setSearchQuery] = useState('')
     const [selectedCategory, setSelectedCategory] = useState('all')
     const [selectedStatus, setSelectedStatus] = useState('all')
@@ -47,6 +47,12 @@ export default function ProductList({ products = [], categories = [], statuses =
     // Pagination
     const startIndex = page * rowsPerPage
     const paginatedProducts = filteredProducts.slice(startIndex, startIndex + rowsPerPage)
+
+    const handleDelete = productId => {
+        if (window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+            router.delete(`/products/${productId}`)
+        }
+    }
 
     const handleEdit = productId => {
         router.visit(`/products/edit/${productId}`)
@@ -72,7 +78,7 @@ export default function ProductList({ products = [], categories = [], statuses =
     }
 
     return (
-        <AuthenticatedLayout>
+        <AuthenticatedLayout flash={flash}>
             <Head title='Product Management' />
 
             <div className='py-4 custom-container mx-auto md:px-[40px] md:py-[18px]'>
@@ -245,7 +251,7 @@ export default function ProductList({ products = [], categories = [], statuses =
                                                         <Button variant='ghost' size='icon' className='h-8 w-8' onClick={() => handleEdit(product.id)}>
                                                             <Edit className='w-4 h-4' />
                                                         </Button>
-                                                        <Button variant='ghost' size='icon' className='h-8 w-8 text-destructive'>
+                                                        <Button variant='ghost' size='icon' className='h-8 w-8 text-destructive' onClick={() => handleDelete(product.id)}>
                                                             <Trash2 className='w-4 h-4' />
                                                         </Button>
                                                     </div>

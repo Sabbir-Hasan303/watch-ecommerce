@@ -47,6 +47,10 @@ class ProductController extends Controller
             'products' => $products,
             'categories' => $categories,
             'statuses' => $statuses,
+            'flash' => [
+                'success' => session('success'),
+                'error' => session('error'),
+            ],
         ]);
     }
 
@@ -408,6 +412,33 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            DB::beginTransaction();
+
+            $product = Product::with('images')->findOrFail($id);
+
+            // Delete all associated images (both product and variant images) from storage
+            $deletedImages = [];
+            foreach ($product->images as $image) {
+                if ($image->image_path && Storage::disk('public')->exists($image->image_path)) {
+                    Storage::disk('public')->delete($image->image_path);
+                    $deletedImages[] = $image->image_path;
+                }
+            }
+
+            $product->variants()->delete();
+            $product->categories()->detach();
+            $product->delete();
+
+            DB::commit();
+            return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to delete product: ' . $e->getMessage());
+
+            return redirect()->route('admin.products.index')->with('error', 'Failed to delete product: ' . $e->getMessage());
+        }
     }
 }
+

@@ -1,11 +1,22 @@
 import Sidebar from '@/Pages/Sidebar'
 import { Head } from '@inertiajs/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Navbar from '@/Pages/Navbar'
 import { Container } from '@mui/material'
+import { Toaster, toast } from 'react-hot-toast'
 
-export default function AuthenticatedLayout ({ header, children }) {
+export default function AuthenticatedLayout ({ header, children, flash }) {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+
+    // Handle flash messages from Laravel
+    useEffect(() => {
+        if (flash?.success) {
+            toast.success(flash.success)
+        }
+        if (flash?.error) {
+            toast.error(flash.error)
+        }
+    }, [flash])
 
     return (
         <div className='flex h-screen overflow-hidden bg-background'>
@@ -38,6 +49,30 @@ export default function AuthenticatedLayout ({ header, children }) {
                     </Container>
                 </main>
             </div>
+            <Toaster
+                position="top-right"
+                toastOptions={{
+                    duration: 4000,
+                    style: {
+                        background: '#363636',
+                        color: '#fff',
+                    },
+                    success: {
+                        duration: 3000,
+                        iconTheme: {
+                            primary: '#4ade80',
+                            secondary: '#fff',
+                        },
+                    },
+                    error: {
+                        duration: 5000,
+                        iconTheme: {
+                            primary: '#ef4444',
+                            secondary: '#fff',
+                        },
+                    },
+                }}
+            />
         </div>
 
         // <Box
