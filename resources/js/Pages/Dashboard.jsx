@@ -149,7 +149,7 @@ export default function Dashboard() {
               {stats.map((stat, index) => (
                 <Card
                   key={index}
-                  className='bg-card border border-border/40 p-6 hover:border-emerald-500/30 transition-all duration-500 group animate-in fade-in slide-in-from-bottom-4 hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-1 cursor-pointer overflow-hidden relative'
+                  className='!bg-card border border-border/40 p-6 hover:border-emerald-500/30 transition-all duration-500 group animate-in fade-in slide-in-from-bottom-4 hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-1 cursor-pointer overflow-hidden relative'
                   style={{
                     animationDelay: `${index * 100}ms`
                   }}>
@@ -196,7 +196,7 @@ export default function Dashboard() {
             <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6'>
               {/* Recent Orders */}
               <Card
-                className='bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-left-4 hover:border-emerald-500/20 transition-all duration-500'
+                className='!bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-left-4 hover:border-emerald-500/20 transition-all duration-500'
                 style={{ animationDelay: '400ms' }}>
                 <div className='flex items-center justify-between mb-6'>
                   <div>
@@ -250,7 +250,7 @@ export default function Dashboard() {
 
               {/* Top Products */}
               <Card
-                className='bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-right-4 hover:border-emerald-500/20 transition-all duration-500'
+                className='!bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-right-4 hover:border-emerald-500/20 transition-all duration-500'
                 style={{ animationDelay: '500ms' }}>
                 <div className='mb-6'>
                   <h3 className='text-lg font-semibold text-text-primary'>Top Products</h3>
@@ -280,7 +280,7 @@ export default function Dashboard() {
                 </div>
               </Card>
 
-              <Card className='bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4' style={{ animationDelay: '500ms' }}>
+              <Card className='!bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4' style={{ animationDelay: '500ms' }}>
                 <div className='flex items-center justify-between mb-6'>
                   <div>
                     <h3 className='text-lg font-semibold text-text-primary'>Product Sales</h3>
@@ -329,7 +329,7 @@ export default function Dashboard() {
 
               {/* Charts Grid */}
               <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-                <Card className='bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4' style={{ animationDelay: '400ms' }}>
+                <Card className='!bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4' style={{ animationDelay: '400ms' }}>
                   <div className='flex items-center justify-between mb-6'>
                     <div>
                       <h3 className='text-lg font-semibold text-text-primary'>Revenue Overview</h3>
@@ -343,7 +343,7 @@ export default function Dashboard() {
                   <AreaChart />
                 </Card>
 
-                <Card className='bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4' style={{ animationDelay: '700ms' }}>
+                <Card className='!bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4' style={{ animationDelay: '700ms' }}>
                   <h3 className='text-lg font-semibold text-text-primary mb-6'>Sales Distribution</h3>
                   <DonutChart />
                   <div className='mt-6 space-y-3'>
@@ -382,11 +382,11 @@ export default function Dashboard() {
               </div>
 
               <div className='grid gap-6 lg:grid-cols-2'>
-                <div className='rounded-2xl border border-border/40 bg-card p-6 shadow-sm animate-in fade-in slide-in-from-left-4'>
+                <div className='rounded-2xl border border-border/40 !bg-card p-6 shadow-sm animate-in fade-in slide-in-from-left-4'>
                   <h3 className='mb-4 text-lg font-semibold text-text-primary'>Revenue Overview</h3>
                   <NewAreaChart />
                 </div>
-                <div className='rounded-2xl border border-border/40 bg-card p-6 shadow-sm animate-in fade-in slide-in-from-right-4'>
+                <div className='rounded-2xl border border-border/40 !bg-card p-6 shadow-sm animate-in fade-in slide-in-from-right-4'>
                   <h3 className='mb-4 text-lg font-semibold text-text-primary'>Performance Trends</h3>
                   <LineChart />
                 </div>

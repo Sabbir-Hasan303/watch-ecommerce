@@ -3,12 +3,11 @@ import { Link, useForm } from '@inertiajs/react'
 import { cn } from '@/lib/utils'
 import { Badge, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
 import { ArrowLeft, Upload, X, Save, ImageIcon, Trash2, Plus, Edit } from 'lucide-react'
-
+import { useThemeContext } from '@/Contexts/ThemeContext'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import CustomTextField from '@/Components/CustomTextField'
 import CustomSelectField from '@/Components/CustomSelectField'
 import CustomMultiSelect from '@/Components/CustomMultiSelect'
-
 // Constants
 const STATUS_OPTIONS = [
     { label: 'Active', value: 'active' },
@@ -57,7 +56,6 @@ const generateId = () => ++idCounter
 // Custom hooks
 const useFormState = initialState => {
     const [state, setState] = useState(initialState)
-
     const updateField = useCallback((field, value) => {
         setState(prev => ({ ...prev, [field]: value }))
     }, [])
@@ -223,6 +221,8 @@ const VariantTable = ({ variants, onEdit, onRemove }) => (
 )
 
 export default function ProductCreate({ categories }) {
+    const { isDark } = useThemeContext()
+
     // Main form state using Inertia
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
@@ -552,7 +552,15 @@ export default function ProductCreate({ categories }) {
                                             />
                                         </div>
 
-                                        <Button onClick={addFeature} className='gap-2 bg-emerald-600 hover:bg-emerald-700 text-white'>
+                                        <Button variant='outlined' onClick={addFeature}
+                                            sx={{
+                                                color: isDark ? '#9CA3AF' : '#6B7280',
+                                                borderColor: isDark ? '#374151' : '#6B7280',
+                                                '&:hover': {
+                                                    bgcolor: isDark ? 'rgba(55, 65, 81, 0.3)' : 'rgba(55, 65, 81, 0.3)',
+                                                    borderColor: isDark ? '#6B7280' : '#6B7280'
+                                                }
+                                            }}>
                                             <Plus className='w-4 h-4' />
                                             Add Feature
                                         </Button>
@@ -591,7 +599,15 @@ export default function ProductCreate({ categories }) {
                                             />
                                         </div>
 
-                                        <Button onClick={addTechnicalSpec} className='gap-2 bg-emerald-600 hover:bg-emerald-700 text-white'>
+                                        <Button variant='outlined' onClick={addTechnicalSpec}
+                                            sx={{
+                                                color: isDark ? '#9CA3AF' : '#6B7280',
+                                                borderColor: isDark ? '#374151' : '#6B7280',
+                                                '&:hover': {
+                                                    bgcolor: isDark ? 'rgba(55, 65, 81, 0.3)' : 'rgba(55, 65, 81, 0.3)',
+                                                    borderColor: isDark ? '#6B7280' : '#6B7280'
+                                                }
+                                            }}>
                                             <Plus className='w-4 h-4' />
                                             Add Specification
                                         </Button>
@@ -633,7 +649,15 @@ export default function ProductCreate({ categories }) {
                                             />
                                         </div>
 
-                                        <Button onClick={addModelFeature} className='gap-2 bg-emerald-600 hover:bg-emerald-700 text-white'>
+                                        <Button variant='outlined' onClick={addModelFeature}
+                                            sx={{
+                                                color: isDark ? '#9CA3AF' : '#6B7280',
+                                                borderColor: isDark ? '#374151' : '#6B7280',
+                                                '&:hover': {
+                                                    bgcolor: isDark ? 'rgba(55, 65, 81, 0.3)' : 'rgba(55, 65, 81, 0.3)',
+                                                    borderColor: isDark ? '#6B7280' : '#6B7280'
+                                                }
+                                            }}>
                                             <Plus className='w-4 h-4' />
                                             Add Model Feature
                                         </Button>
@@ -705,7 +729,15 @@ export default function ProductCreate({ categories }) {
                                             <h2 className='text-lg font-semibold text-foreground'>Product Variants</h2>
                                             <p className='text-sm text-muted-foreground'>Create different variations of your product</p>
                                         </div>
-                                        <Button onClick={() => setShowVariantForm(!showVariantForm)} className='gap-2 bg-emerald-600 hover:bg-emerald-700 text-white'>
+                                        <Button variant='outlined' onClick={() => setShowVariantForm(!showVariantForm)}
+                                            sx={{
+                                                color: isDark ? '#9CA3AF' : '#6B7280',
+                                                borderColor: isDark ? '#374151' : '#6B7280',
+                                                '&:hover': {
+                                                    bgcolor: isDark ? 'rgba(55, 65, 81, 0.3)' : 'rgba(55, 65, 81, 0.3)',
+                                                    borderColor: isDark ? '#6B7280' : '#6B7280'
+                                                }
+                                            }}>
                                             <Plus className='w-4 h-4' />
                                             Add Variant
                                         </Button>
@@ -837,7 +869,15 @@ export default function ProductCreate({ categories }) {
                                                 <Button variant='contained' onClick={addVariant} className='!bg-text-primary !text-primary-foreground'>
                                                     Add
                                                 </Button>
-                                                <Button variant='outline' onClick={handleVariantCancel}>
+                                                <Button variant='outlined' onClick={handleVariantCancel}
+                                                    sx={{
+                                                        color: '#9CA3AF',
+                                                        borderColor: '#374151',
+                                                        '&:hover': {
+                                                            bgcolor: 'rgba(55, 65, 81, 0.3)',
+                                                            borderColor: '#6B7280'
+                                                        }
+                                                    }}>
                                                     Cancel
                                                 </Button>
                                             </div>
