@@ -14,13 +14,15 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('shipping_address_id')->nullable()->constrained('addresses')->nullOnDelete();
             $table->foreignId('billing_address_id')->nullable()->constrained('addresses')->nullOnDelete();
+            $table->json('guest_info')->nullable()->comment('Guest info (when user_id is null)');
             $table->enum('status', ['pending','confirmed','shipped','delivered','cancelled'])->default('pending')->index();
             $table->decimal('subtotal', 10, 2);
             $table->decimal('shipping_cost', 10, 2)->default(0);
             $table->decimal('discount_total', 10, 2)->default(0);
             $table->decimal('total', 10, 2);
             $table->string('payment_method')->default('cod');
-            $table->string('payment_status')->default('unpaid');
+            $table->enum('payment_status', ['unpaid', 'paid', 'refunded'])->default('unpaid');
+            $table->string('notes')->nullable();
             $table->timestamps();
         });
     }

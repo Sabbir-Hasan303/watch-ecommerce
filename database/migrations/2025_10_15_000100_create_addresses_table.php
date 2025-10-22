@@ -17,10 +17,7 @@ return new class extends Migration
             $table->string('full_name');
             $table->string('phone', 32)->nullable();
             $table->string('address_line');
-            $table->string('city');
-            $table->string('state')->nullable();
-            $table->string('postal_code', 32)->nullable();
-            $table->string('country', 2)->default('BD');
+            $table->enum('area', ['inside_dhaka', 'outside_dhaka'])->default('inside_dhaka');
             $table->boolean('is_default')->default(false)->index();
             $table->timestamps();
         });
