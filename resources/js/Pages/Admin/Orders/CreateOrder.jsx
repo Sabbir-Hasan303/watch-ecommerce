@@ -1,11 +1,10 @@
 import { React, useState } from 'react'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Link, router } from '@inertiajs/react'
-import { Search, User, Package, ShoppingCart, CreditCard, MapPin, Mail, FileText, Send, Plus, Minus, X, Check, ArrowRight, ArrowLeft, Truck, DollarSign, AlertTriangle, Tag, Calendar, MessageSquare, Eye, Filter, Star, TrendingUp, Clock, Percent, Download, Printer, UserPlus } from 'lucide-react'
-import { Button, RadioGroup, Radio, FormControlLabel, FormControl, FormLabel, Switch, Avatar } from '@mui/material'
+import { User, Package, ShoppingCart, CreditCard, MapPin, Mail, FileText, Send, Plus, Minus, X, Check, ArrowRight, ArrowLeft, Truck, DollarSign, AlertTriangle, Tag, Clock, Percent, Download, UserPlus, Eye } from 'lucide-react'
+import { Button, RadioGroup, Radio, FormControlLabel, FormControl, Switch, Avatar } from '@mui/material'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import CustomSelectField from '@/components/CustomSelectField'
 import CustomTextField from '@/components/CustomTextField'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { CheckBox } from '@mui/icons-material'
@@ -164,14 +163,6 @@ export default function CreateOrder() {
         zipCode: '',
         country: ''
     })
-    const [billingAddress, setBillingAddress] = useState({
-        street: '',
-        city: '',
-        state: '',
-        zipCode: '',
-        country: ''
-    })
-    const [useDefaultAddress, setUseDefaultAddress] = useState(false)
     const [sameAsShipping, setSameAsShipping] = useState(true)
 
     // Step 3: Payment & Shipping
@@ -180,15 +171,9 @@ export default function CreateOrder() {
     const [orderNotes, setOrderNotes] = useState('')
     const [discountCode, setDiscountCode] = useState('')
     const [discountAmount, setDiscountAmount] = useState(0)
-    const [scheduleOrder, setScheduleOrder] = useState(false)
-    const [scheduledDate, setScheduledDate] = useState('')
-
     // Step 4: Confirmation & Notifications
     const [sendConfirmationEmail, setSendConfirmationEmail] = useState(true)
     const [sendInvoice, setSendInvoice] = useState(true)
-    const [generateInvoice, setGenerateInvoice] = useState(true)
-    const [sendSMS, setSendSMS] = useState(false)
-    const [emailTemplate, setEmailTemplate] = useState('standard')
     const [showInvoicePreview, setShowInvoicePreview] = useState(false)
 
     const filteredCustomers = customerSearch.length > 0 ? mockCustomers.filter(customer => {
@@ -249,29 +234,10 @@ export default function CreateOrder() {
         }
     }
 
-    const handleUseDefaultAddress = checked => {
-        setUseDefaultAddress(checked)
-        if (checked && selectedCustomer?.defaultShippingAddress) {
-            setShippingAddress(selectedCustomer.defaultShippingAddress)
-            if (sameAsShipping) {
-                setBillingAddress(selectedCustomer.defaultShippingAddress)
-            }
-        }
-    }
-
-    const handleSameAsShipping = checked => {
-        setSameAsShipping(checked)
-        if (checked) {
-            setBillingAddress(shippingAddress)
-        }
-    }
 
     const handleShippingAddressChange = (field, value) => {
         const newAddress = { ...shippingAddress, [field]: value }
         setShippingAddress(newAddress)
-        if (sameAsShipping) {
-            setBillingAddress(newAddress)
-        }
     }
 
     const handleCreateCustomer = () => {
@@ -294,7 +260,6 @@ export default function CreateOrder() {
             }
         }
         setSelectedCustomer(newCustomer)
-        setBillingAddress(shippingAddress)
         setShowNewCustomerForm(false)
         setNewCustomerData({
             firstName: '',
@@ -308,7 +273,6 @@ export default function CreateOrder() {
         setSelectedCustomer(customer)
         if (customer.defaultShippingAddress) {
             setShippingAddress(customer.defaultShippingAddress)
-            setBillingAddress(customer.defaultShippingAddress)
         }
     }
 
@@ -327,21 +291,6 @@ export default function CreateOrder() {
         }
     }
 
-    const handleSendEmail = () => {
-        console.log('Sending order confirmation email...')
-        alert('Order confirmation email sent!')
-    }
-
-    const handleGenerateInvoicePDF = () => {
-        console.log('Generating invoice PDF...')
-        alert('Invoice generated and downloaded!')
-    }
-
-    const handlePrintPackingSlip = () => {
-        console.log('Printing packing slip...')
-        alert('Packing slip sent to printer!')
-    }
-
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
     const shippingCost = shippingMethod === 'express' ? 25.0 : shippingMethod === 'standard' ? 10.0 : 0
     const discountValue = (subtotal * discountAmount) / 100
@@ -349,7 +298,7 @@ export default function CreateOrder() {
     const total = subtotal - discountValue + shippingCost + tax
 
     const handlePlaceOrder = () => {
-        console.log('Placing order:', { customer: selectedCustomer, cart, shippingAddress, billingAddress, paymentMethod, shippingMethod, orderNotes, discountCode, discountAmount, scheduleOrder, scheduledDate, sendConfirmationEmail, sendInvoice, generateInvoice, sendSMS, emailTemplate, total })
+        console.log('Placing order:', { customer: selectedCustomer, cart, shippingAddress, paymentMethod, shippingMethod, orderNotes, discountCode, discountAmount, sendConfirmationEmail, sendInvoice, total })
 
         alert('Order placed successfully! Redirecting to order details...')
         router.push('/orders')
@@ -400,10 +349,10 @@ export default function CreateOrder() {
                                     <div className='flex flex-col items-center flex-1'>
                                         <div
                                             className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${isCompleted
-                                                ? 'bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30'
-                                                : isActive
-                                                    ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border-2 border-emerald-500 text-emerald-500'
-                                                    : 'bg-muted text-muted-foreground'
+                                                    ? 'bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30'
+                                                    : isActive
+                                                        ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border-2 border-emerald-500 text-emerald-500'
+                                                        : 'bg-muted text-muted-foreground'
                                                 }`}>
                                             {isCompleted ? <Check className='w-6 h-6' /> : <StepIcon className='w-6 h-6' />}
                                         </div>
@@ -724,29 +673,27 @@ export default function CreateOrder() {
                                             </div>
 
                                             <div className='space-y-4'>
-                                                {(!useDefaultAddress || showNewCustomerForm) && (
-                                                    <div className='space-y-4  slide-in-from-top-2 duration-300'>
+                                                <div className='space-y-4  slide-in-from-top-2 duration-300'>
+                                                    <div>
+                                                        <CustomTextField label='Street Address' name='street' value={shippingAddress.street} onChange={e => handleShippingAddressChange('street', e.target.value)} placeholder='123 Main St' />
+                                                    </div>
+                                                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                                                         <div>
-                                                            <CustomTextField label='Street Address' name='street' value={shippingAddress.street} onChange={e => handleShippingAddressChange('street', e.target.value)} placeholder='123 Main St' />
+                                                            <CustomTextField label='City' name='city' value={shippingAddress.city} onChange={e => handleShippingAddressChange('city', e.target.value)} placeholder='New York' />
                                                         </div>
-                                                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-                                                            <div>
-                                                                <CustomTextField label='City' name='city' value={shippingAddress.city} onChange={e => handleShippingAddressChange('city', e.target.value)} placeholder='New York' />
-                                                            </div>
-                                                            <div>
-                                                                <CustomTextField label='State' name='state' value={shippingAddress.state} onChange={e => handleShippingAddressChange('state', e.target.value)} placeholder='NY' />
-                                                            </div>
-                                                        </div>
-                                                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-                                                            <div>
-                                                                <CustomTextField label='ZIP Code' name='zipCode' value={shippingAddress.zipCode} onChange={e => handleShippingAddressChange('zipCode', e.target.value)} placeholder='10001' />
-                                                            </div>
-                                                            <div>
-                                                                <CustomTextField label='Country' name='country' value={shippingAddress.country} onChange={e => handleShippingAddressChange('country', e.target.value)} placeholder='USA' />
-                                                            </div>
+                                                        <div>
+                                                            <CustomTextField label='State' name='state' value={shippingAddress.state} onChange={e => handleShippingAddressChange('state', e.target.value)} placeholder='NY' />
                                                         </div>
                                                     </div>
-                                                )}
+                                                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                                                        <div>
+                                                            <CustomTextField label='ZIP Code' name='zipCode' value={shippingAddress.zipCode} onChange={e => handleShippingAddressChange('zipCode', e.target.value)} placeholder='10001' />
+                                                        </div>
+                                                        <div>
+                                                            <CustomTextField label='Country' name='country' value={shippingAddress.country} onChange={e => handleShippingAddressChange('country', e.target.value)} placeholder='USA' />
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </Card>
                                     </Card>
