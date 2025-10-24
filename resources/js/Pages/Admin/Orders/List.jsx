@@ -6,6 +6,7 @@ import { Button, InputAdornment, FormControl, Menu, MenuItem, Divider, IconButto
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import CustomSelectField from '@/Components/CustomSelectField'
 import CustomTextField from '@/Components/CustomTextField'
+import CancelOrderDialog from '@/Components/CancelOrderDialog'
 import { Head } from '@inertiajs/react'
 
 const statusConfig = {
@@ -43,6 +44,7 @@ export default function OrdersList({ orders = [], flash }) {
     const [selectedOrderId, setSelectedOrderId] = useState(null)
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowsPerPage] = useState(10)
+    const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
 
     const filteredOrders = orders.filter(order => {
         const matchesSearch =
@@ -82,15 +84,21 @@ export default function OrdersList({ orders = [], flash }) {
                 break
             case 'download':
                 // Handle download invoice
-                console.log('Download invoice for order:', orderId)
+                window.open(`/orders/${orderId}/invoice`, '_blank')
                 break
             case 'cancel':
                 // Handle cancel order
-                console.log('Cancel order:', orderId)
+                setSelectedOrderId(orderId)
+                setCancelDialogOpen(true)
                 break
             default:
                 break
         }
+    }
+
+    const handleCancelOrderSuccess = () => {
+        // Refresh the page to show updated order status
+        router.reload()
     }
 
     return (
@@ -99,11 +107,11 @@ export default function OrdersList({ orders = [], flash }) {
             <div className='py-4 custom-container mx-auto md:px-[40px] md:py-[18px]'>
                 <div className='flex flex-col md:flex-row justify-between items-center mb-6'>
                     <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Order Management</h2>
-                    <div>
+                    {/* <div>
                         <Button variant='outlined' size='md' startIcon={<Download className='w-4 h-4' />}>
                             Export
                         </Button>
-                    </div>
+                    </div> */}
                 </div>
 
                 <div className='space-y-6'>
@@ -340,6 +348,14 @@ export default function OrdersList({ orders = [], flash }) {
                             Cancel Order
                         </MenuItem>
                     </Menu>
+
+                    {/* Cancel Order Dialog */}
+                    <CancelOrderDialog
+                        open={cancelDialogOpen}
+                        onClose={() => setCancelDialogOpen(false)}
+                        orderId={selectedOrderId}
+                        onSuccess={handleCancelOrderSuccess}
+                    />
                 </div>
             </div>
         </AuthenticatedLayout>

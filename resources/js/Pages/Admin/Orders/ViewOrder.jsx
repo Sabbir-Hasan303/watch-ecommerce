@@ -1,10 +1,11 @@
 import { React, useState } from 'react'
 import { ArrowLeft, Package, MapPin, CreditCard, Truck, CheckCircle, XCircle, Clock, Download, Printer, User, XCircleIcon } from 'lucide-react'
-import { Button, FormControl, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material'
+import { Button, FormControl } from '@mui/material'
 import { router } from '@inertiajs/react'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import CustomSelectField from '@/Components/CustomSelectField'
 import Taka from '@/Components/Taka'
+import CancelOrderDialog from '@/Components/CancelOrderDialog'
 import { toast } from 'react-hot-toast'
 import { useThemeContext } from '@/Contexts/ThemeContext'
 
@@ -42,11 +43,11 @@ export default function ViewOrder({ order }) {
     const { isDarkMode } = useThemeContext()
     // Helper function to get customer info
     const getCustomerInfo = () => {
-        if (order?.user) {
+        if (order?.user && order?.shipping_address) {
             return {
                 name: order.user.name,
                 email: order.user.email,
-                phone: order.user.phone || 'N/A'
+                phone: order.user.addresses.find(address => address.is_default)?.phone || 'N/A'
             }
         } else if (order?.guest_info) {
             return {
@@ -80,21 +81,8 @@ export default function ViewOrder({ order }) {
         }
     }
 
-    const handleCancelOrder = () => {
-        // Call backend API to cancel order
-        router.post('/orders/cancel', {
-            id: order.id
-        }, {
-            onSuccess: () => {
-                setOrderStatus('cancelled')
-                setCancelDialogOpen(false)
-                toast.success('Order has been cancelled')
-            },
-            onError: (errors) => {
-                console.error('Error cancelling order:', errors)
-                toast.error('Failed to cancel order')
-            }
-        })
+    const handleCancelOrderSuccess = () => {
+        setOrderStatus('cancelled')
     }
 
     const StatusIcon = statusConfig[orderStatus].icon
@@ -284,12 +272,20 @@ export default function ViewOrder({ order }) {
                                     <div className='space-y-1 text-sm text-muted-foreground'>
                                         {order?.shipping_address ? (
                                             <>
+                                                <p><strong>{order.shipping_address.full_name || order.user.name}</strong></p>
+                                                <p>{order.shipping_address.phone}</p>
+                                                {order.shipping_address.area === 'inside_dhaka' ? (
+                                                    <p>Inside Dhaka</p>
+                                                ) : (
+                                                    <p>Outside Dhaka</p>
+                                                )}
                                                 <p>{order.shipping_address.address_line}</p>
-                                                <p>{order.shipping_address.area}</p>
-                                                <p>Bangladesh</p>
                                             </>
                                         ) : order?.guest_info?.address ? (
                                             <>
+                                                <p><strong>{order.guest_info.name}</strong></p>
+                                                <p>{order.guest_info.phone}</p>
+                                                <p>{order.guest_info.email}</p>
                                                 {order.guest_info.area === 'inside_dhaka' ? (
                                                     <p>Inside Dhaka</p>
                                                 ) : (
@@ -301,12 +297,6 @@ export default function ViewOrder({ order }) {
                                             <p>No shipping address provided</p>
                                         )}
                                     </div>
-                                    {order?.tracking_number && (
-                                        <div className='mt-4 pt-4 border-t border-border'>
-                                            <p className='text-xs text-muted-foreground mb-1'>Tracking Number</p>
-                                            <p className='text-sm font-mono text-foreground'>{order.tracking_number}</p>
-                                        </div>
-                                    )}
                                 </div>
 
                                 {/* Payment Info */}
@@ -340,52 +330,12 @@ export default function ViewOrder({ order }) {
             </div>
 
             {/* Cancel Order Dialog */}
-            <Dialog
+            <CancelOrderDialog
                 open={cancelDialogOpen}
                 onClose={() => setCancelDialogOpen(false)}
-                maxWidth='sm'
-                fullWidth
-                PaperProps={{
-                    sx: {
-                        bgcolor: '#1C252E',
-                        border: '1px solid #374151'
-                    }
-                }}>
-                <DialogTitle sx={{ fontSize: '1.25rem', fontWeight: 600 }} className='text-text-primary'>
-                    Cancel Order
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText sx={{ color: '#9CA3AF', mt: 1 }} className='text-text-primary'>
-                        Are you sure you want to cancel this order? This action cannot be undone.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions sx={{ p: 3, gap: 1 }}>
-                    <Button
-                        variant='outlined'
-                        onClick={() => setCancelDialogOpen(false)}
-                        sx={{
-                            color: '#9CA3AF',
-                            borderColor: '#374151',
-                            '&:hover': {
-                                bgcolor: 'rgba(55, 65, 81, 0.3)',
-                                borderColor: '#6B7280'
-                            }
-                        }}>
-                        No, keep order
-                    </Button>
-                    <Button
-                        variant='contained'
-                        onClick={handleCancelOrder}
-                        sx={{
-                            bgcolor: '#EF4444',
-                            '&:hover': {
-                                bgcolor: '#DC2626'
-                            }
-                        }}>
-                        Yes, cancel order
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                orderId={order.id}
+                onSuccess={handleCancelOrderSuccess}
+            />
         </AuthenticatedLayout>
     )
 }

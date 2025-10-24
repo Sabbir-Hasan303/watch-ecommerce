@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -73,11 +74,30 @@
             margin-top: 10px;
         }
 
-        .status-pending { background: #fff3cd; color: #856404; }
-        .status-confirmed { background: #d1ecf1; color: #0c5460; }
-        .status-shipped { background: #e2e3f1; color: #383d41; }
-        .status-delivered { background: #d4edda; color: #155724; }
-        .status-cancelled { background: #f8d7da; color: #721c24; }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-confirmed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-shipped {
+            background: #e2e3f1;
+            color: #383d41;
+        }
+
+        .status-delivered {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
 
         .clearfix::after {
             content: "";
@@ -207,6 +227,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="invoice-container">
         <!-- Header -->
@@ -229,25 +250,45 @@
             <div class="details-row">
                 <div class="details-col">
                     <div class="section-title">Bill To</div>
-                    <div class="detail-item"><strong>{{ $customer->name ?? 'Guest Customer' }}</strong></div>
-                    <div class="detail-item">{{ $customer->email ?? 'N/A' }}</div>
-                    <div class="detail-item">{{ $customer->phone ?? 'N/A' }}</div>
-                    @if($order->billingAddress)
-                        <div class="detail-item">{{ $order->billingAddress->address_line }}</div>
-                        <div class="detail-item">{{ $order->billingAddress->area }}</div>
-                    @endif
-                </div>
-                <div class="details-col">
-                    <div class="section-title">Ship To</div>
-                    @if($order->shippingAddress)
-                        <div class="detail-item"><strong>{{ $order->shippingAddress->full_name }}</strong></div>
-                        <div class="detail-item">{{ $order->shippingAddress->address_line }}</div>
-                        <div class="detail-item">{{ $order->shippingAddress->area }}</div>
-                        <div class="detail-item">Bangladesh</div>
+                    @if ($order->user)
+                        <div class="detail-item"><strong>{{ $order->user->name }}</strong></div>
+                        @php
+                            $defaultAddress = $order->user->addresses->where('is_default', 1)->first();
+                        @endphp
+                        @if ($defaultAddress)
+                            <div class="detail-item">{{ $defaultAddress->phone }}</div>
+                        @endif
+                        <div class="detail-item">{{ $order->user->email }}</div>
                     @elseif($order->guest_info && isset($order->guest_info['address']))
                         <div class="detail-item"><strong>{{ $order->guest_info['name'] ?? 'Guest' }}</strong></div>
+                        <div class="detail-item">{{ $order->guest_info['phone'] }}</div>
+                        <div class="detail-item">{{ $order->guest_info['email'] }}</div>
+                    @else
+                        <div class="detail-item">No billing address provided</div>
+                    @endif
+                </div>
+
+                <div class="details-col">
+                    <div class="section-title">Ship To</div>
+                    @if ($order->shippingAddress)
+                        <div class="detail-item">
+                            <strong>{{ $order->shippingAddress->full_name ?? $order->user->name }}</strong>
+                        </div>
+                        <div class="detail-item">{{ $order->shippingAddress->phone }}</div>
+                        @if ($order->shippingAddress->area == 'inside_dhaka')
+                            <div class="detail-item">Inside Dhaka</div>
+                        @else
+                            <div class="detail-item">Outside Dhaka</div>
+                        @endif
+                        <div class="detail-item">{{ $order->shippingAddress->address_line }}</div>
+                    @elseif($order->guest_info && isset($order->guest_info['address']))
+                        <div class="detail-item"><strong>{{ $order->guest_info['name'] ?? 'Guest' }}</strong></div>
+                        <div class="detail-item">{{ $order->guest_info['phone'] }}</div>
+                        <div class="detail-item">{{ $order->guest_info['email'] }}</div>
+                        <div class="detail-item">
+                            {{ $order->guest_info['area'] === 'inside_dhaka' ? 'Inside Dhaka' : 'Outside Dhaka' }}
+                        </div>
                         <div class="detail-item">{{ $order->guest_info['address'] }}</div>
-                        <div class="detail-item">{{ $order->guest_info['area'] === 'inside_dhaka' ? 'Inside Dhaka' : 'Outside Dhaka' }}</div>
                     @else
                         <div class="detail-item">No shipping address provided</div>
                     @endif
@@ -269,15 +310,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($order->items as $item)
-                    <tr>
-                        <td><strong>{{ $item->product->name }}</strong></td>
-                        <td>{{ $item->variant->title ?? 'Default' }}</td>
-                        <td>{{ $item->variant->sku ?? $item->product->sku }}</td>
-                        <td class="text-center">{{ $item->quantity }}</td>
-                        <td class="text-right">BDT {{ number_format($item->unit_price, 2) }}</td>
-                        <td class="text-right">BDT {{ number_format($item->total_price, 2) }}</td>
-                    </tr>
+                    @foreach ($order->items as $item)
+                        <tr>
+                            <td><strong>{{ $item->product->name }}</strong></td>
+                            <td>{{ $item->variant->title ?? 'Default' }}</td>
+                            <td>{{ $item->variant->sku ?? $item->product->sku }}</td>
+                            <td class="text-center">{{ $item->quantity }}</td>
+                            <td class="text-right">BDT {{ number_format($item->unit_price, 2) }}</td>
+                            <td class="text-right">BDT {{ number_format($item->total_price, 2) }}</td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>
@@ -294,10 +335,12 @@
                     <td class="label">Shipping:</td>
                     <td class="value">BDT {{ number_format($order->shipping_cost, 2) }}</td>
                 </tr>
-                <tr>
-                    <td class="label">Tax:</td>
-                    <td class="value">BDT {{ number_format($order->tax_total, 2) }}</td>
-                </tr>
+                @if ($order->tax_total > 0)
+                    <tr>
+                        <td class="label">Tax:</td>
+                        <td class="value">BDT {{ number_format($order->tax_total, 2) }}</td>
+                    </tr>
+                @endif
                 <tr class="total-row">
                     <td class="label">Total:</td>
                     <td class="value">BDT {{ number_format($order->total, 2) }}</td>
@@ -312,7 +355,7 @@
                 <strong>Payment Method:</strong>
                 {{ $order->payment_method === 'cod' ? 'Cash on Delivery' : ucfirst($order->payment_method) }}
             </div>
-            @if($order->tracking_number)
+            @if ($order->tracking_number)
                 <div class="detail-item">
                     <strong>Tracking Number:</strong> {{ $order->tracking_number }}
                 </div>
@@ -324,6 +367,11 @@
             <p>Thank you for your business!</p>
             <p>This is a computer-generated invoice.</p>
         </div>
+
+        @php
+            dd($order);
+        @endphp
     </div>
 </body>
+
 </html>

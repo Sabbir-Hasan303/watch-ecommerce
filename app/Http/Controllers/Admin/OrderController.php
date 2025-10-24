@@ -135,7 +135,7 @@ class OrderController extends Controller
     public function show($id)
     {
         $order = Order::with([
-            'user',
+            'user.addresses',
             'items.product.images',
             'items.variant',
             'shippingAddress',
@@ -181,7 +181,7 @@ class OrderController extends Controller
     // Download invoice
     public function downloadInvoice($id)
     {
-        $order = Order::with(['user', 'items.product', 'items.variant', 'shippingAddress', 'billingAddress'])
+        $order = Order::with(['user.addresses', 'items.product', 'items.variant', 'shippingAddress', 'billingAddress'])
             ->find($id);
 
         if (!$order) {
