@@ -368,9 +368,9 @@
             <p>This is a computer-generated invoice.</p>
         </div>
 
-        @php
+        {{-- @php
             dd($order);
-        @endphp
+        @endphp --}}
     </div>
 </body>
 
