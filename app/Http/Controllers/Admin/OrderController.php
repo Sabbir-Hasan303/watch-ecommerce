@@ -15,16 +15,42 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 class OrderController extends Controller
 {
     public function index()
     {
-        // $orders = Order::all();
-        // return Inertia::render('Admin/Orders/List', [
-        //     'orders' => $orders
-        // ]);
-        return Inertia::render('Admin/Orders/List');
+        $orders = Order::with(['user', 'items.product', 'shippingAddress'])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'customer' => [
+                        'name' => $order->user ? $order->user->name : ($order->guest_info['name'] ?? 'Guest'),
+                        'email' => $order->user ? $order->user->email : ($order->guest_info['email'] ?? 'N/A'),
+                        'phone' => $order->user ? $order->user->phone : ($order->guest_info['phone'] ?? 'N/A')
+                    ],
+                    'date' => $order->created_at->format('Y-m-d'),
+                    'status' => $order->status ?? 'pending',
+                    'total' => (float) $order->total,
+                    'items_count' => $order->items->sum('quantity'),
+                    'payment_method' => ucfirst($order->payment_method),
+                    'shipping_address' => $order->shippingAddress ? [
+                        'full_name' => $order->shippingAddress->full_name,
+                        'phone' => $order->shippingAddress->phone,
+                        'address_line' => $order->shippingAddress->address_line,
+                        'area' => $order->shippingAddress->area
+                    ] : null
+                ];
+            });
+
+        return Inertia::render('Admin/Orders/List', [
+            'orders' => $orders,
+            'flash' => session('flash')
+        ]);
     }
 
     public function create()
@@ -62,7 +88,7 @@ class OrderController extends Controller
                 'send_confirmation_email' => 'boolean',
                 'send_invoice' => 'boolean',
                 'subtotal' => 'required|numeric|min:0',
-                'shipping_cost' => 'required|numeric|min:0',
+                // 'shipping_cost' => 'required|numeric|min:0',
                 'total' => 'required|numeric|min:0',
             ]);
 
@@ -104,6 +130,92 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', 'Order creation failed: ' . $e->getMessage())->withInput();
         }
+    }
+
+    public function show($id)
+    {
+        $order = Order::with([
+            'user',
+            'items.product.images',
+            'items.variant',
+            'shippingAddress',
+            'billingAddress'
+        ])->find($id);
+
+        if (!$order) {
+            abort(404, 'Order not found');
+        }
+
+        return Inertia::render('Admin/Orders/ViewOrder', [
+            'order' => $order
+        ]);
+    }
+
+    public function changeOrderStatus(Request $request)
+    {
+        $validated = $request->validate([
+            'id' => 'required|integer|exists:orders,id',
+            'status' => 'required|string|in:pending,confirmed,shipped,delivered,cancelled'
+        ]);
+
+        $order = Order::find($validated['id']);
+        $order->status = $validated['status'];
+        $order->save();
+
+        return redirect()->back()->with('success', 'Order status changed successfully');
+    }
+
+    public function cancelOrder(Request $request)
+    {
+        $validated = $request->validate([
+            'id' => 'required|integer|exists:orders,id'
+        ]);
+
+        $order = Order::find($validated['id']);
+        $order->status = 'cancelled';
+        $order->save();
+
+        return redirect()->back()->with('success', 'Order cancelled successfully');
+    }
+
+    // Download invoice
+    public function downloadInvoice($id)
+    {
+        $order = Order::with(['user', 'items.product', 'items.variant', 'shippingAddress', 'billingAddress'])
+            ->find($id);
+
+        if (!$order) {
+            abort(404, 'Order not found');
+        }
+
+        // Generate PDF invoice using DomPDF
+        $pdf = PDF::loadView('invoices.order', [
+            'order' => $order,
+            'customer' => $order->user ? $order->user : (object) $order->guest_info
+        ]);
+
+        // Set PDF options for better compatibility
+        $pdf->setPaper('A4', 'portrait');
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => false,
+            'defaultFont' => 'Arial',
+            'isPhpEnabled' => false,
+            'isFontSubsettingEnabled' => false,
+            'isUnicode' => false,
+            'debugKeepTemp' => false,
+            'debugCss' => false,
+            'debugLayout' => false,
+            'debugLayoutLines' => false,
+            'debugLayoutBlocks' => false,
+            'debugLayoutInline' => false,
+            'debugLayoutPaddingBox' => false,
+            'defaultMediaType' => 'print',
+            'isJavascriptEnabled' => false,
+            'isFontCacheEnabled' => true
+        ]);
+
+        return $pdf->download('invoice-' . $order->order_number . '.pdf');
     }
 
 }

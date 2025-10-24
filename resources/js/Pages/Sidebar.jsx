@@ -254,7 +254,7 @@ export default function Sidebar({ collapsed, onToggle }) {
           title={collapsed ? 'Expand' : 'Collapse'}>
           {collapsed ? <ChevronRight className='w-4 h-4' /> : <ChevronLeft className='w-4 h-4' />}
         </button>
-        <div className={cn('flex items-center gap-3 p-4 border-b border-white/5 ', collapsed && 'justify-center')}>
+        <div className={cn('flex items-center gap-3 p-4 border-b border-border', collapsed && 'justify-center')}>
           <div className='relative flex-shrink-0 group'>
             <div className='absolute inset-0 rounded-xl blur-md opacity-50 group-hover:opacity-75 transition-opacity duration-300' />
             <div className='relative w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300'>
@@ -264,7 +264,7 @@ export default function Sidebar({ collapsed, onToggle }) {
           {!collapsed && (
             <div className='flex-1 animate-in slide-in-from-left duration-300'>
               <h1 className='text-lg font-bold text-text-primary'>Dashboard</h1>
-              <p className='text-xs text-text-secondary'>Admin Panel v2.0</p>
+              <p className='text-xs text-text-secondary'>Admin Panel</p>
             </div>
           )}
         </div>
