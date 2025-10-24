@@ -19,8 +19,10 @@ return new class extends Migration
             $table->decimal('subtotal', 10, 2);
             $table->decimal('shipping_cost', 10, 2)->default(0);
             $table->decimal('discount_total', 10, 2)->default(0);
+            $table->decimal('tax_total', 10, 2)->default(0);
             $table->decimal('total', 10, 2);
             $table->string('payment_method')->default('cod');
+            $table->string('shipping_method')->nullable();
             $table->enum('payment_status', ['unpaid', 'paid', 'refunded'])->default('unpaid');
             $table->string('notes')->nullable();
             $table->timestamps();

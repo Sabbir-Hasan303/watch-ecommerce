@@ -1,7 +1,8 @@
 import { useState } from "react"
-import { Link } from "@inertiajs/react"
+import { Link, router } from "@inertiajs/react"
 import { ArrowRight, ArrowLeft, X } from "lucide-react"
 import { Button } from "@mui/material"
+import toast from "react-hot-toast"
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout"
 import ProductSelection from "./components/ProductSelection"
 import CartSummary from "./components/CartSummary"
@@ -10,181 +11,7 @@ import PaymentShipping from "./components/PaymentShipping"
 import OrderReview from "./components/OrderReview"
 import OrderSummary from "./components/OrderSummary"
 
-const mockCustomers = [
-    {
-        id: "1",
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "+1 (555) 123-4567",
-        address: "123 Main St, New York, NY 10001",
-        type: "vip",
-        totalOrders: 45,
-        totalSpent: 12450.0,
-        lastOrderDate: "2024-02-10",
-        defaultShippingAddress: {
-            street: "123 Main St",
-            city: "New York",
-            state: "NY",
-            zipCode: "10001",
-            country: "USA",
-        },
-        addresses: [
-            {
-                id: 1,
-                name: "Home Address",
-                street: "123 Main St",
-                city: "New York",
-                state: "NY",
-                zipCode: "10001",
-                country: "USA",
-                isDefault: true,
-            },
-            {
-                id: 2,
-                name: "Office Address",
-                street: "456 Business Ave",
-                city: "New York",
-                state: "NY",
-                zipCode: "10002",
-                country: "USA",
-                isDefault: false,
-            },
-        ],
-    },
-    {
-        id: "2",
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "+1 (555) 234-5678",
-        address: "456 Oak Ave, Los Angeles, CA 90001",
-        type: "regular",
-        totalOrders: 12,
-        totalSpent: 3200.0,
-        lastOrderDate: "2024-02-05",
-        defaultShippingAddress: {
-            street: "456 Oak Ave",
-            city: "Los Angeles",
-            state: "CA",
-            zipCode: "90001",
-            country: "USA",
-        },
-        addresses: [
-            {
-                id: 1,
-                name: "Home Address",
-                street: "456 Oak Ave",
-                city: "Los Angeles",
-                state: "CA",
-                zipCode: "90001",
-                country: "USA",
-                isDefault: true,
-            },
-        ],
-    },
-    {
-        id: "3",
-        name: "Bob Johnson",
-        email: "bob@example.com",
-        phone: "+1 (555) 345-6789",
-        address: "789 Pine Rd, Chicago, IL 60601",
-        type: "new",
-        totalOrders: 2,
-        totalSpent: 450.0,
-        lastOrderDate: "2024-02-15",
-        defaultShippingAddress: {
-            street: "789 Pine Rd",
-            city: "Chicago",
-            state: "IL",
-            zipCode: "60601",
-            country: "USA",
-        },
-        addresses: [
-            {
-                id: 1,
-                name: "Home Address",
-                street: "789 Pine Rd",
-                city: "Chicago",
-                state: "IL",
-                zipCode: "60601",
-                country: "USA",
-                isDefault: true,
-            },
-        ],
-    },
-    {
-        id: "4",
-        name: "Alice Williams",
-        email: "alice@example.com",
-        phone: "+1 (555) 456-7890",
-        address: "321 Elm St, Miami, FL 33101",
-        type: "vip",
-        totalOrders: 67,
-        totalSpent: 18900.0,
-        lastOrderDate: "2024-02-12",
-        defaultShippingAddress: {
-            street: "321 Elm St",
-            city: "Miami",
-            state: "FL",
-            zipCode: "33101",
-            country: "USA",
-        },
-    },
-]
-
-const mockProducts = [
-    {
-        id: "1",
-        name: "Wireless Headphones Pro",
-        price: 299.99,
-        stock: 5,
-        image: "http://127.0.0.1:8000/storage/products/4/zMiOkSYPjhJLqs4SGAVsw7EtAeTKQYv55Q0aStVc.webp",
-        category: "Electronics",
-        sku: "WHP-001",
-        lowStockThreshold: 10,
-    },
-    {
-        id: "2",
-        name: "Smart Watch Ultra",
-        price: 499.99,
-        stock: 23,
-        image: "http://127.0.0.1:8000/storage/products/5/variants/erwVWL65ImzrqAbLCX65k6PauvE3ct2NofhmcYXy.webp",
-        category: "Electronics",
-        sku: "SWU-002",
-        lowStockThreshold: 15,
-    },
-    {
-        id: "3",
-        name: "Premium Yoga Mat",
-        price: 79.99,
-        stock: 67,
-        image: "/placeholder.svg?height=60&width=60",
-        category: "Sports",
-        sku: "PYM-003",
-        lowStockThreshold: 20,
-    },
-    {
-        id: "4",
-        name: "Designer Backpack",
-        price: 149.99,
-        stock: 2,
-        image: "/placeholder.svg?height=60&width=60",
-        category: "Fashion",
-        sku: "DBP-004",
-        lowStockThreshold: 5,
-    },
-    {
-        id: "5",
-        name: "LED Desk Lamp",
-        price: 59.99,
-        stock: 89,
-        image: "/placeholder.svg?height=60&width=60",
-        category: "Home",
-        sku: "LDL-005",
-        lowStockThreshold: 25,
-    },
-]
-
-export default function CreateOrder() {
+export default function CreateOrder({ products = [], customers = [], shippingCosts = {} }) {
     const [currentStep, setCurrentStep] = useState(1)
 
     // Step 1: Product Selection
@@ -227,10 +54,11 @@ export default function CreateOrder() {
     const [selectedAddress, setSelectedAddress] = useState(null)
     const [isCreatingNewAddress, setIsCreatingNewAddress] = useState(false)
     const [isAddressFieldsDisabled, setIsAddressFieldsDisabled] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const filteredCustomers =
         customerSearch.length > 0
-            ? mockCustomers.filter((customer) => {
+            ? customers.filter((customer) => {
                 const matchesSearch =
                     customer.name.toLowerCase().includes(customerSearch.toLowerCase()) ||
                     customer.email.toLowerCase().includes(customerSearch.toLowerCase()) ||
@@ -241,7 +69,7 @@ export default function CreateOrder() {
 
     const filteredProducts =
         productSearch.length > 0
-            ? mockProducts.filter(
+            ? products.filter(
                 (product) =>
                     product.name.toLowerCase().includes(productSearch.toLowerCase()) ||
                     product.sku.toLowerCase().includes(productSearch.toLowerCase()) ||
@@ -294,11 +122,8 @@ export default function CreateOrder() {
             totalSpent: 0,
             lastOrderDate: new Date().toISOString().split("T")[0],
             defaultShippingAddress: {
-                street: newCustomerData.address,
-                city: "",
-                state: "",
-                zipCode: "",
-                country: "",
+                address_line: newCustomerData.address,
+                area: newCustomerData.area,
             },
         }
 
@@ -333,11 +158,19 @@ export default function CreateOrder() {
             setShippingAddress({
                 fullName: customer.name,
                 phone: customer.phone,
-                address: customer.defaultShippingAddress.street,
-                area: "inside_dhaka",
+                address: customer.defaultShippingAddress.address_line,
+                area: customer.defaultShippingAddress.area,
             })
             setIsAddressFieldsDisabled(true)
             setIsCreatingNewAddress(false)
+        }
+
+        // Auto-select the default address if customer has addresses
+        if (customer.addresses && customer.addresses.length > 0) {
+            const defaultAddress = customer.addresses.find(addr => addr.isDefault)
+            if (defaultAddress) {
+                setSelectedAddress(defaultAddress.id)
+            }
         }
     }
 
@@ -356,13 +189,14 @@ export default function CreateOrder() {
 
     const handleAddressSelect = (addressId) => {
         if (selectedCustomer && selectedCustomer.addresses) {
-            const address = selectedCustomer.addresses.find((addr) => addr.id === addressId)
+            const address = selectedCustomer.addresses.find((addr) => addr.id == addressId)
+
             if (address) {
                 setShippingAddress({
                     fullName: selectedCustomer.name,
                     phone: selectedCustomer.phone,
-                    address: address.street,
-                    area: "inside_dhaka",
+                    address: address.address_line,
+                    area: address.area,
                 })
                 setIsAddressFieldsDisabled(true)
                 setIsCreatingNewAddress(false)
@@ -386,29 +220,105 @@ export default function CreateOrder() {
         }
     }
 
-    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
-    const shippingCost = shippingMethod === "express" ? 25.0 : shippingMethod === "standard" ? 10.0 : 0
+    const subtotal = cart.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0)
+
+    // Calculate shipping cost based on area and method
+    const getShippingCost = () => {
+        if (shippingMethod === 'free') return 0
+        const area = shippingAddress.area || 'inside_dhaka'
+        return shippingCosts[area]?.[shippingMethod] || 0
+    }
+
+    const shippingCost = getShippingCost()
     const discountValue = (subtotal * discountAmount) / 100
-    const tax = (subtotal - discountValue) * 0.08
+    const tax = 0 // This will be calculated on the backend
     const total = subtotal - discountValue + shippingCost + tax
 
     const handlePlaceOrder = () => {
-        console.log("Placing order:", {
-            customer: selectedCustomer,
-            cart,
-            shippingAddress,
-            paymentMethod,
-            shippingMethod,
-            orderNotes,
-            discountCode,
-            discountAmount,
-            sendConfirmationEmail,
-            sendInvoice,
-            total,
-        })
+        // Determine if it's a guest customer
+        const isGuestCustomer = selectedCustomer?.type === 'guest'
 
-        alert("Order placed successfully! Redirecting to order details...")
-        // router.push('/orders')
+        // Determine if it's a new address
+        const isNewAddress = isCreatingNewAddress
+
+        // Get selected address ID (if not a new address)
+        const selectedAddressId = isNewAddress ? null : selectedAddress
+
+        // Prepare guest customer details (if applicable)
+        const guestCustomerDetails = isGuestCustomer ? {
+            name: selectedCustomer.name,
+            email: selectedCustomer.email,
+            phone: selectedCustomer.phone,
+            address: shippingAddress.address,
+            area: shippingAddress.area
+        } : null
+
+        // Clean order data with only essential information
+        const orderData = {
+            // Customer information
+            customer_id: isGuestCustomer ? null : selectedCustomer?.id || null,
+            is_guest: isGuestCustomer,
+            guest_details: guestCustomerDetails,
+
+            // Address information
+            selected_address_id: selectedAddressId,
+            is_new_address: isNewAddress,
+            shipping_address: {
+                full_name: shippingAddress.fullName,
+                phone: shippingAddress.phone,
+                address_line: shippingAddress.address,
+                area: shippingAddress.area
+            },
+
+            // Order items
+            items: cart.map(item => ({
+                product_id: item.productId,
+                variant_id: item.variantId,
+                quantity: item.quantity,
+                price: item.price
+            })),
+
+            // Order details
+            payment_method: paymentMethod,
+            shipping_method: shippingMethod,
+            order_notes: orderNotes,
+            discount_code: discountCode,
+            discount_amount: discountAmount,
+
+            // Notifications
+            send_confirmation_email: sendConfirmationEmail,
+            send_invoice: sendInvoice,
+
+            // Totals
+            subtotal: subtotal,
+            discount_amount: discountAmount,
+            total: total
+        }
+
+        console.log("Clean order data:", orderData)
+
+        // Submit order using Inertia
+        setIsSubmitting(true)
+        const loadingToast = toast.loading('Creating order...')
+        router.post('/orders/store', orderData, {
+            onStart: () => {
+            },
+            onSuccess: (page) => {
+                setIsSubmitting(false)
+                toast.dismiss(loadingToast)
+                toast.success("Order placed successfully!")
+            },
+            onError: (errors) => {
+                setIsSubmitting(false)
+                toast.dismiss(loadingToast)
+                if (errors && typeof errors === 'object') {
+                    const errorMessages = Object.values(errors).flat()
+                    toast.error(errorMessages.join(', '))
+                } else {
+                    toast.error("Failed to place order. Please try again.")
+                }
+            }
+        })
     }
 
     const canProceedToStep2 = cart.length > 0
@@ -565,6 +475,8 @@ export default function CreateOrder() {
                                             setPaymentMethod={setPaymentMethod}
                                             orderNotes={orderNotes}
                                             setOrderNotes={setOrderNotes}
+                                            shippingCosts={shippingCosts}
+                                            shippingAddress={shippingAddress}
                                         />
                                     </div>
 
@@ -618,6 +530,7 @@ export default function CreateOrder() {
                                             showInvoicePreview={showInvoicePreview}
                                             setShowInvoicePreview={setShowInvoicePreview}
                                             handlePlaceOrder={handlePlaceOrder}
+                                            isSubmitting={isSubmitting}
                                         />
                                     </div>
                                 </div>

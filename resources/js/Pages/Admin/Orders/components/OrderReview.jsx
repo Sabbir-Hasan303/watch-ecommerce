@@ -57,11 +57,16 @@ export default function OrderReview({
                             />
                             <div className="flex-1">
                                 <p className="font-semibold text-foreground">{item.name}</p>
+                                {item.variantTitle && (
+                                    <p className="text-sm text-muted-foreground">
+                                        Variant: {item.variantTitle}
+                                    </p>
+                                )}
                                 <p className="text-sm text-muted-foreground mt-1">
                                     Quantity: {item.quantity} • SKU: {item.sku}
                                 </p>
                                 <p className="text-sm font-semibold text-emerald-500 mt-2">
-                                    ${(item.price * item.quantity).toFixed(2)}
+                                    ${((item.price || 0) * item.quantity).toFixed(2)}
                                 </p>
                             </div>
                         </div>

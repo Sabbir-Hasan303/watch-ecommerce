@@ -202,12 +202,32 @@ export default function CustomerSelection({
                                     selectedCustomer.addresses.length > 1 && (
                                         <CustomSelectField
                                             label="Saved Address"
-                                            options={selectedCustomer.addresses.map((address) => ({
-                                                label: address.name,
-                                                value: address.id,
-                                            }))}
-                                            value={selectedAddress}
-                                            onChange={(addressId) => handleAddressSelect(addressId)}
+                                            options={selectedCustomer.addresses.map((address, index) => {
+                                                const getOrdinal = (num) => {
+                                                    const suffixes = ['th', 'st', 'nd', 'rd'];
+                                                    const v = num % 100;
+                                                    return num + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
+                                                };
+
+                                                let label;
+                                                if (address.isDefault) {
+                                                    label = "Default Address";
+                                                } else if (index === 1) {
+                                                    label = "Secondary Address";
+                                                } else {
+                                                    label = `${getOrdinal(index + 1)} Address`;
+                                                }
+
+                                                return {
+                                                    label,
+                                                    value: String(address.id),
+                                                };
+                                            })}
+                                            value={selectedAddress ? String(selectedAddress) : ""}
+                                            onChange={(event) => {
+                                                const addressId = event.target.value
+                                                handleAddressSelect(addressId)
+                                            }}
                                             placeholder="Choose address"
                                             className="w-full md:w-48"
                                         />

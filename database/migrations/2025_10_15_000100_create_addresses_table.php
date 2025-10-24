@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('full_name');
-            $table->string('phone', 32)->nullable();
+            $table->string('full_name')->nullable();
+            $table->string('phone', 32);
             $table->string('address_line');
             $table->enum('area', ['inside_dhaka', 'outside_dhaka'])->default('inside_dhaka');
             $table->boolean('is_default')->default(false)->index();

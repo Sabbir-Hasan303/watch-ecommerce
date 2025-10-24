@@ -14,10 +14,7 @@ class Address extends Model
         'full_name',
         'phone',
         'address_line',
-        'city',
-        'state',
-        'postal_code',
-        'country',
+        'area',
         'is_default',
     ];
 

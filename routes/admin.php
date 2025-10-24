@@ -43,6 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('orders')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('admin.orders.index');
         Route::get('/create', [OrderController::class, 'create'])->name('admin.orders.create');
+        Route::post('/store', [OrderController::class, 'store'])->name('admin.orders.store');
 
         Route::get('/{id}', function ($id) {
             return Inertia::render('Admin/Orders/ViewOrder', [

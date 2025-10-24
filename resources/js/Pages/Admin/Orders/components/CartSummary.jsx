@@ -38,11 +38,16 @@ export default function CartSummary({
                                 />
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
+                                    {item.variantTitle && (
+                                        <p className="text-xs text-muted-foreground">
+                                            Variant: {item.variantTitle}
+                                        </p>
+                                    )}
                                     <p className="text-sm text-muted-foreground mt-1">
-                                        ${item.price.toFixed(2)} × {item.quantity}
+                                        ${(item.price || 0).toFixed(2)} × {item.quantity}
                                     </p>
                                     <p className="text-sm font-semibold text-emerald-500 mt-1">
-                                        ${(item.price * item.quantity).toFixed(2)}
+                                        ${((item.price || 0) * item.quantity).toFixed(2)}
                                     </p>
                                 </div>
                             </div>
@@ -92,7 +97,12 @@ export default function CartSummary({
                             />
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm font-bold text-foreground truncate">{item.name}</p>
-                                <p className="text-base font-semibold text-emerald-600 mt-2">${item.price.toFixed(2)}</p>
+                                {item.variantTitle && (
+                                    <p className="text-xs text-muted-foreground">
+                                        Variant: {item.variantTitle}
+                                    </p>
+                                )}
+                                <p className="text-base font-semibold text-emerald-600 mt-2">${(item.price || 0).toFixed(2)}</p>
                                 {item.quantity > item.stock && (
                                     <p className="text-xs text-orange-600 flex items-center gap-1 mt-2 font-medium">
                                         <AlertTriangle className="w-3 h-3" />

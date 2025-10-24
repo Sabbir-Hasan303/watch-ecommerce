@@ -24,7 +24,8 @@ export default function OrderSummary({
     shippingAddress,
     showInvoicePreview,
     setShowInvoicePreview,
-    handlePlaceOrder
+    handlePlaceOrder,
+    isSubmitting = false
 }) {
     if (isCompact) {
         return (
@@ -54,10 +55,12 @@ export default function OrderSummary({
                         <span className="text-muted-foreground">Shipping</span>
                         <span className="font-medium text-foreground">${shippingCost.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Tax (8%)</span>
-                        <span className="font-medium text-foreground">${tax.toFixed(2)}</span>
-                    </div>
+                    {tax > 0 && (
+                        <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Tax (8%)</span>
+                            <span className="font-medium text-foreground">${tax.toFixed(2)}</span>
+                        </div>
+                    )}
                     <div className="pt-4 border-t border-border flex justify-between items-center">
                         <span className="font-semibold text-foreground text-lg">Total</span>
                         <span className="text-3xl font-bold text-emerald-500">${total.toFixed(2)}</span>
@@ -91,10 +94,12 @@ export default function OrderSummary({
                     <span className="text-muted-foreground">Shipping</span>
                     <span className="font-medium text-foreground">${shippingCost.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Tax</span>
-                    <span className="font-medium text-foreground">${tax.toFixed(2)}</span>
-                </div>
+                {tax > 0 && (
+                    <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Tax</span>
+                        <span className="font-medium text-foreground">${tax.toFixed(2)}</span>
+                    </div>
+                )}
                 <div className="pt-4 border-t border-emerald-500/20 flex justify-between items-center">
                     <span className="font-semibold text-foreground text-lg">Total</span>
                     <span className="text-4xl font-bold text-emerald-500">${total.toFixed(2)}</span>
@@ -145,10 +150,19 @@ export default function OrderSummary({
                             <tbody>
                                 {cart.map((item) => (
                                     <tr key={item.id} className="border-b border-gray-200">
-                                        <td className="py-3">{item.name}</td>
+                                        <td className="py-3">
+                                            <div>
+                                                <div className="font-medium">{item.name}</div>
+                                                {item.variantTitle && (
+                                                    <div className="text-sm text-gray-500">
+                                                        Variant: {item.variantTitle}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </td>
                                         <td className="text-right">{item.quantity}</td>
-                                        <td className="text-right">${item.price.toFixed(2)}</td>
-                                        <td className="text-right">${(item.price * item.quantity).toFixed(2)}</td>
+                                        <td className="text-right">${(item.price || 0).toFixed(2)}</td>
+                                        <td className="text-right">${((item.price || 0) * item.quantity).toFixed(2)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -169,10 +183,12 @@ export default function OrderSummary({
                                     <span>Shipping:</span>
                                     <span>${shippingCost.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between">
+                                {tax > 0 && (
+                                    <div className="flex justify-between">
                                     <span>Tax:</span>
-                                    <span>${tax.toFixed(2)}</span>
-                                </div>
+                                        <span>${tax.toFixed(2)}</span>
+                                    </div>
+                                )}
                                 <div className="flex justify-between font-bold text-xl border-t-2 border-gray-300 pt-3 mt-3">
                                     <span>Total:</span>
                                     <span>${total.toFixed(2)}</span>
@@ -198,10 +214,20 @@ export default function OrderSummary({
 
             <Button
                 onClick={handlePlaceOrder}
-                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/30 h-14 text-base font-semibold"
+                disabled={isSubmitting}
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/30 h-14 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
             >
-                <Send className="w-5 h-5 mr-2" />
-                Place Order
+                {isSubmitting ? (
+                    <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                        Processing...
+                    </>
+                ) : (
+                    <>
+                        <Send className="w-5 h-5 mr-2" />
+                        Place Order
+                    </>
+                )}
             </Button>
         </Card>
     )

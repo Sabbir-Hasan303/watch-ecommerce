@@ -1112,10 +1112,12 @@ export default function CreateOrder() {
                                                 <span className='text-muted-foreground'>Shipping</span>
                                                 <span className='font-medium text-foreground'>${shippingCost.toFixed(2)}</span>
                                             </div>
-                                            <div className='flex justify-between text-sm'>
-                                                <span className='text-muted-foreground'>Tax (8%)</span>
-                                                <span className='font-medium text-foreground'>${tax.toFixed(2)}</span>
-                                            </div>
+                                            {tax > 0 && (
+                                                <div className='flex justify-between text-sm'>
+                                                    <span className='text-muted-foreground'>Tax (8%)</span>
+                                                    <span className='font-medium text-foreground'>${tax.toFixed(2)}</span>
+                                                </div>
+                                            )}
                                             <div className='pt-3 border-t border-border flex justify-between'>
                                                 <span className='font-semibold text-foreground'>Total</span>
                                                 <span className='text-2xl font-bold text-emerald-500'>${total.toFixed(2)}</span>

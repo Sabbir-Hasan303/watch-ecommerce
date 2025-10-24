@@ -11,7 +11,11 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
-        'order_number', 'user_id', 'shipping_address_id', 'billing_address_id', 'status', 'subtotal', 'shipping_cost', 'discount_total', 'total', 'payment_method', 'payment_status'
+        'order_number', 'user_id', 'shipping_address_id', 'billing_address_id', 'guest_info', 'status', 'subtotal', 'shipping_cost', 'discount_total', 'tax_total', 'total', 'payment_method', 'shipping_method', 'payment_status', 'notes'
+    ];
+
+    protected $casts = [
+        'guest_info' => 'array',
     ];
 
     protected static function booted(): void

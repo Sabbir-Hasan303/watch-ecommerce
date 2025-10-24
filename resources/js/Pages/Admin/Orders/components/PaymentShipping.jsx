@@ -9,7 +9,9 @@ export default function PaymentShipping({
     paymentMethod,
     setPaymentMethod,
     orderNotes,
-    setOrderNotes
+    setOrderNotes,
+    shippingCosts = {},
+    shippingAddress = {}
 }) {
     return (
         <div className="space-y-6">
@@ -44,7 +46,13 @@ export default function PaymentShipping({
                                             </span>
                                             <span className="text-sm text-text-secondary">5-7 business days</span>
                                         </div>
-                                        <span className="text-lg font-bold text-text-primary">$10.00</span>
+                                        <span className="text-lg font-bold text-text-primary">
+                                            {(() => {
+                                                const area = shippingAddress.area || 'inside_dhaka'
+                                                const cost = shippingCosts[area]?.standard || 0
+                                                return `৳${cost.toFixed(2)}`
+                                            })()}
+                                        </span>
                                     </div>
                                 }
                                 sx={{
