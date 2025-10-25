@@ -1,6 +1,6 @@
 import { React, useState } from 'react'
-import { Search, UserCheck, TrendingUp, Star, Eye, ChevronLeft, ChevronRight, Filter } from 'lucide-react'
-import { Button, Badge, InputAdornment, FormControl, Pagination, Box, Typography } from '@mui/material'
+import { Search, UserCheck, TrendingUp, Star, Eye, MoreVertical } from 'lucide-react'
+import { Button, InputAdornment, FormControl, Box, Typography, IconButton, Menu, MenuItem, Divider, TablePagination } from '@mui/material'
 import { Dialog, DialogContent, DialogTitle, DialogActions } from '@mui/material'
 import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper } from '@mui/material'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
@@ -19,9 +19,6 @@ const mockCustomers = [
     joinDate: '2024-01-15',
     totalOrders: 24,
     totalSpent: 4850.0,
-    averageRating: 4.8,
-    reviewsCount: 18,
-    status: 'vip'
   },
   {
     id: '2',
@@ -32,9 +29,6 @@ const mockCustomers = [
     joinDate: '2024-02-20',
     totalOrders: 15,
     totalSpent: 3200.5,
-    averageRating: 4.5,
-    reviewsCount: 12,
-    status: 'active'
   },
   {
     id: '3',
@@ -45,9 +39,6 @@ const mockCustomers = [
     joinDate: '2024-03-10',
     totalOrders: 8,
     totalSpent: 1580.0,
-    averageRating: 4.2,
-    reviewsCount: 6,
-    status: 'active'
   },
   {
     id: '4',
@@ -58,9 +49,6 @@ const mockCustomers = [
     joinDate: '2024-01-25',
     totalOrders: 32,
     totalSpent: 6750.75,
-    averageRating: 4.9,
-    reviewsCount: 25,
-    status: 'vip'
   },
   {
     id: '5',
@@ -71,9 +59,6 @@ const mockCustomers = [
     joinDate: '2024-04-05',
     totalOrders: 5,
     totalSpent: 890.0,
-    averageRating: 4.0,
-    reviewsCount: 3,
-    status: 'active'
   },
   {
     id: '6',
@@ -84,9 +69,6 @@ const mockCustomers = [
     joinDate: '2023-12-10',
     totalOrders: 2,
     totalSpent: 250.0,
-    averageRating: 3.5,
-    reviewsCount: 1,
-    status: 'inactive'
   }
 ]
 
@@ -94,9 +76,11 @@ export default function CustomerList() {
   const [customers] = useState(mockCustomers)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [currentPage, setCurrentPage] = useState(1)
   const [selectedCustomer, setSelectedCustomer] = useState(null)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [anchorEl, setAnchorEl] = useState(null)
+  const [selectedCustomerId, setSelectedCustomerId] = useState(null)
 
   const filteredCustomers = customers.filter(customer => {
     const matchesSearch =
@@ -109,25 +93,36 @@ export default function CustomerList() {
     return matchesSearch && matchesStatus
   })
 
-  const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const paginatedCustomers = filteredCustomers.slice(startIndex, startIndex + itemsPerPage)
+  // Pagination
+  const startIndex = page * rowsPerPage
+  const paginatedCustomers = filteredCustomers.slice(startIndex, startIndex + rowsPerPage)
 
   const totalCustomers = customers.length
-  const activeCustomers = customers.filter(c => c.status === 'active' || c.status === 'vip').length
-  const vipCustomers = customers.filter(c => c.status === 'vip').length
   const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0)
 
-  const getStatusColor = status => {
-    switch (status) {
-      case 'vip':
-        return 'bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-400 border-amber-500/30'
-      case 'active':
-        return 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border-emerald-500/30'
-      case 'inactive':
-        return 'bg-gradient-to-r from-gray-500/20 to-slate-500/20 text-gray-400 border-gray-500/30'
+  const handleMenuOpen = (event, customerId) => {
+    event.stopPropagation()
+    setAnchorEl(event.currentTarget)
+    setSelectedCustomerId(customerId)
+  }
+
+  const handleMenuClose = () => {
+    setAnchorEl(null)
+    setSelectedCustomerId(null)
+  }
+
+  const handleMenuItemClick = (action, customerId) => {
+    handleMenuClose()
+    switch (action) {
+      case 'view':
+        const customer = customers.find(c => c.id === customerId)
+        setSelectedCustomer(customer)
+        break
+      case 'orders':
+        router.visit(`/customers/${customerId}/orders`)
+        break
       default:
-        return ''
+        break
     }
   }
 
@@ -161,38 +156,6 @@ export default function CustomerList() {
               </div>
             </Card>
 
-            <Card className='p-6 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/10 transition-all duration-300'>
-              <div className='flex items-center justify-between'>
-                <div>
-                  <p className='text-sm text-text-primary'>Active Customers</p>
-                  <p className='text-3xl font-bold mt-1 text-text-primary'>{activeCustomers}</p>
-                  <p className='text-xs text-text-primary mt-1 flex items-center gap-1'>
-                    <TrendingUp className='w-3 h-3' />
-                    +8% this month
-                  </p>
-                </div>
-                <div className='h-14 w-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center backdrop-blur-sm'>
-                  <UserCheck className='h-7 w-7 text-emerald-400' />
-                </div>
-              </div>
-            </Card>
-
-            <Card className='p-6 bg-gradient-to-br from-amber-500/10 to-yellow-500/10 border-amber-500/20 hover:shadow-lg hover:shadow-amber-500/10 transition-all duration-300'>
-              <div className='flex items-center justify-between'>
-                <div>
-                  <p className='text-sm text-text-primary'>VIP Customers</p>
-                  <p className='text-3xl font-bold mt-1 text-text-primary'>{vipCustomers}</p>
-                  <p className='text-xs text-text-primary mt-1 flex items-center gap-1'>
-                    <Star className='w-3 h-3 fill-amber-400' />
-                    Premium tier
-                  </p>
-                </div>
-                <div className='h-14 w-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-yellow-500/20 flex items-center justify-center backdrop-blur-sm'>
-                  <Star className='h-7 w-7 text-amber-400 fill-amber-400' />
-                </div>
-              </div>
-            </Card>
-
             <Card className='p-6 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300'>
               <div className='flex items-center justify-between'>
                 <div>
@@ -210,11 +173,11 @@ export default function CustomerList() {
             </Card>
           </div>
 
-          {/* Search and Filters */}
-          <Card className='p-6'>
-            <div className='flex flex-col md:flex-row gap-4 items-start md:items-center justify-between'>
-              <div className='flex-1 w-full md:max-w-md'>
-                <div className='relative'>
+          {/* Filters and Actions */}
+          <div className='bg-card shadow-lg rounded-lg'>
+            <div className='p-6 flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between'>
+              <div className='flex flex-col sm:flex-row gap-3 w-full lg:w-auto'>
+                <FormControl size='small' sx={{ minWidth: 300 }}>
                   <CustomTextField
                     placeholder='Search customers...'
                     value={searchQuery}
@@ -228,196 +191,175 @@ export default function CustomerList() {
                       )
                     }}
                   />
-                </div>
-              </div>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <FormControl size='small' sx={{ minWidth: 200 }}>
-                  <CustomSelectField
-                    placeholder='Filter by status...'
-                    value={statusFilter}
-                    onChange={e => setStatusFilter(e.target.value)}
-                    label='Status'
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position='start'>
-                          <Filter className='w-4 h-4 mr-2' />
-                        </InputAdornment>
-                      )
-                    }}
-                    options={[
-                      { value: 'all', label: 'All Customers' },
-                      { value: 'vip', label: 'VIP' },
-                      { value: 'active', label: 'Active' },
-                      { value: 'inactive', label: 'Inactive' }
-                    ]}
-                  />
                 </FormControl>
-              </Box>
+              </div>
             </div>
-          </Card>
 
-          {/* Customers Table */}
-          <div className=''>
-            <TableContainer component={Paper} sx={{ maxHeight: '500px' }} className='table-container'>
-              <Table sx={{ minWidth: 650 }} aria-label='customers table'>
-                <TableHead>
-                  <TableRow className='table-header-cell dark:table-header-cell' sx={{ minWidth: 150 }}>
-                    <TableCell className='table-header-cell dark:table-header-cell'>Customer</TableCell>
-                    <TableCell className='table-header-cell dark:table-header-cell'>Contact</TableCell>
-                    <TableCell className='table-header-cell dark:table-header-cell'>Location</TableCell>
-                    <TableCell className='table-header-cell dark:table-header-cell'>Orders</TableCell>
-                    <TableCell className='table-header-cell dark:table-header-cell'>Spent</TableCell>
-                    {/* <TableCell className='table-header-cell dark:table-header-cell'>Rating</TableCell> */}
-                    <TableCell className='table-header-cell dark:table-header-cell'>Status</TableCell>
-                    <TableCell className='table-header-cell dark:table-header-cell'>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {paginatedCustomers.map(customer => (
-                    <TableRow
-                      key={customer.id}
-                      sx={{
-                        '&:last-child td, &:last-child th': { border: 0 },
-                        '&:hover': { bgcolor: 'rgba(55, 65, 81, 0.3)' },
-                        borderColor: '#374151'
-                      }}>
-                      <TableCell className='table-body-cell dark:table-body-cell'>
-                        <div className='flex items-center gap-3'>
-                          <div className='relative'>
-                            <div className='h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-text-primary font-semibold shadow-lg shadow-emerald-500/30'>
-                              {customer.name.charAt(0)}
-                            </div>
-                            {customer.status === 'vip' && (
-                              <div className='absolute -top-1 -right-1 h-4 w-4 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center'>
-                                <Star className='h-2.5 w-2.5 text-text-primary fill-white' />
-                              </div>
-                            )}
-                          </div>
-                          <div>
-                            <p className='font-medium'>{customer.name}</p>
-                            <p className='text-xs text-muted-foreground'>Joined {new Date(customer.joinDate).toLocaleDateString()}</p>
-                          </div>
+            <Paper sx={{ width: '100%' }}>
+              <TableContainer sx={{ maxHeight: '500px' }} className='table-container'>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell className='table-header-cell dark:table-header-cell'>
+                        <div className='flex items-center gap-2'>
+                          Customer
                         </div>
                       </TableCell>
-                      <TableCell className='table-body-cell dark:table-body-cell'>
-                        <div className='space-y-1'>
-                          <p className='text-sm'>{customer.email}</p>
-                          <p className='text-xs text-muted-foreground'>{customer.phone}</p>
+                      <TableCell className='table-header-cell dark:table-header-cell'>
+                        <div className='flex items-center gap-2'>
+                          Contact
                         </div>
                       </TableCell>
-                      <TableCell className='table-body-cell dark:table-body-cell'>
-                        <p className='text-sm'>{customer.location}</p>
-                      </TableCell>
-                      <TableCell className='table-body-cell dark:table-body-cell'>
-                        <p className='font-medium'>{customer.totalOrders}</p>
-                      </TableCell>
-                      <TableCell className='table-body-cell dark:table-body-cell'>
-                        <p className='font-medium text-emerald-400'>${customer.totalSpent.toFixed(2)}</p>
-                      </TableCell>
-                      {/* <TableCell className='table-body-cell dark:table-body-cell'>
-                        <div className='flex items-center gap-1'>
-                          <Star className='h-4 w-4 text-amber-400 fill-amber-400' />
-                          <span className='font-medium'>{customer.averageRating.toFixed(1)}</span>
-                          <span className='text-xs text-muted-foreground'>({customer.reviewsCount})</span>
+                      <TableCell className='table-header-cell dark:table-header-cell'>
+                        <div className='flex items-center gap-2'>
+                          Location
                         </div>
-                      </TableCell> */}
-                      <TableCell className='table-body-cell dark:table-body-cell'>
-                        <Badge
-                          label={customer.status.charAt(0).toUpperCase() + customer.status.slice(1)}
-                          size='small'
-                          sx={{
-                            bgcolor:
-                              customer.status === 'vip'
-                                ? 'rgba(245, 158, 11, 0.1)'
-                                : customer.status === 'active'
-                                ? 'rgba(34, 197, 94, 0.1)'
-                                : 'rgba(107, 114, 128, 0.1)',
-                            color: customer.status === 'vip' ? '#F59E0B' : customer.status === 'active' ? '#22C55E' : '#6B7280',
-                            border: 'none',
-                            '&:hover': {
-                              bgcolor:
-                                customer.status === 'vip'
-                                  ? 'rgba(245, 158, 11, 0.2)'
-                                  : customer.status === 'active'
-                                  ? 'rgba(34, 197, 94, 0.2)'
-                                  : 'rgba(107, 114, 128, 0.2)'
-                            }
-                          }}
-                          className='px-2 py-1 rounded-lg'>
-                          {customer.status.charAt(0).toUpperCase() + customer.status.slice(1)}
-                        </Badge>
                       </TableCell>
-                      <TableCell className='table-body-cell dark:table-body-cell'>
-                        <Button
-                          variant='outlined'
-                          size='small'
-                          startIcon={<Eye size={16} />}
-                          onClick={() => setSelectedCustomer(customer)}
-                          sx={{
-                            padding: '7px 11px',
-                            minWidth: '0px',
-                            '& .MuiButton-startIcon': {
-                              marginRight: 0,
-                              marginLeft: 0
-                            }
-                          }}></Button>
+                      <TableCell className='table-header-cell dark:table-header-cell'>
+                        <div className='flex items-center gap-2'>
+                          Orders
+                        </div>
                       </TableCell>
+                      <TableCell className='table-header-cell dark:table-header-cell'>
+                        <div className='flex items-center gap-2'>
+                          Total Spent
+                        </div>
+                      </TableCell>
+                      <TableCell className='table-header-cell dark:table-header-cell !text-center'>Actions</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                  </TableHead>
+                  <TableBody>
+                    {paginatedCustomers.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className='table-body-cell dark:table-body-cell text-center py-8'>
+                          <Typography variant='body2' className='text-muted-foreground'>
+                            No customers found
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      paginatedCustomers.map(customer => (
+                        <TableRow key={customer.id} hover>
+                          <TableCell className='table-body-cell dark:table-body-cell'>
+                            <div className='flex items-center gap-3'>
+                              <div className='relative'>
+                                <div className='h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-text-primary font-semibold shadow-lg shadow-emerald-500/30'>
+                                  {customer.name.charAt(0)}
+                                </div>
+                                {customer.status === 'vip' && (
+                                  <div className='absolute -top-1 -right-1 h-4 w-4 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center'>
+                                    <Star className='h-2.5 w-2.5 text-text-primary fill-white' />
+                                  </div>
+                                )}
+                              </div>
+                              <div className='min-w-0'>
+                                <Typography variant='body2' className='font-medium text-foreground truncate'>
+                                  {customer.name}
+                                </Typography>
+                                <Typography variant='caption' className='text-muted-foreground'>
+                                  Joined {new Date(customer.joinDate).toLocaleDateString()}
+                                </Typography>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className='table-body-cell dark:table-body-cell'>
+                            <div>
+                              <Typography variant='body2' className='font-medium text-foreground'>
+                                {customer.email}
+                              </Typography>
+                              <Typography variant='caption' className='text-muted-foreground'>
+                                {customer.phone}
+                              </Typography>
+                            </div>
+                          </TableCell>
+                          <TableCell className='table-body-cell dark:table-body-cell'>
+                            <Typography variant='body2' className='text-foreground'>
+                              {customer.location}
+                            </Typography>
+                          </TableCell>
+                          <TableCell className='table-body-cell dark:table-body-cell'>
+                            <Typography variant='body2' className='text-foreground'>
+                              {customer.totalOrders} orders
+                            </Typography>
+                          </TableCell>
+                          <TableCell className='table-body-cell dark:table-body-cell'>
+                            <Typography variant='body2' className='font-semibold text-foreground'>
+                              ${customer.totalSpent.toFixed(2)}
+                            </Typography>
+                          </TableCell>
+                          <TableCell className='table-body-cell dark:table-body-cell'>
+                            <div className='flex items-center justify-center gap-2'>
+                              <IconButton size='small' className='h-8 w-8' onClick={e => handleMenuOpen(e, customer.id)}>
+                                <MoreVertical className='w-4 h-4' />
+                              </IconButton>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              <TablePagination
+                className='table-pagination dark:table-pagination'
+                rowsPerPageOptions={[5, 10, 25, 50, 100]}
+                component='div'
+                count={filteredCustomers.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={(event, newPage) => setPage(newPage)}
+                onRowsPerPageChange={(event) => {
+                  setRowsPerPage(parseInt(event.target.value, 10))
+                  setPage(0) // Reset to first page when changing rows per page
+                }}
+                labelDisplayedRows={({ from, to, count }) => `${from}-${to} of ${count !== -1 ? count : `more than ${to}`}`}
+              />
+            </Paper>
           </div>
 
-          {/* Pagination */}
-          <div className='flex items-center justify-between pt-4'>
-            <div className='flex items-center gap-4'>
-              <p className='text-sm text-muted-foreground'>
-                Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredCustomers.length)} of {filteredCustomers.length} customers
-              </p>
-              <div className='flex items-center gap-2'>
-                <span className='text-sm text-muted-foreground'>Show:</span>
-                <FormControl size='small' sx={{ minWidth: 80 }}>
-                  <CustomSelectField
-                    value={itemsPerPage}
-                    onChange={e => {
-                      setItemsPerPage(Number(e.target.value))
-                      setCurrentPage(1)
-                    }}
-                    options={[
-                      { value: 5, label: '5' },
-                      { value: 10, label: '10' },
-                      { value: 20, label: '20' },
-                      { value: 50, label: '50' }
-                    ]}
-                  />
-                </FormControl>
-              </div>
-            </div>
-            {totalPages > 1 && (
-              <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={(event, page) => setCurrentPage(page)}
-                color='primary'
-                sx={{
-                  '& .MuiPaginationItem-root': {
-                    color: '#9CA3AF',
-                    '&.Mui-selected': {
-                      backgroundColor: '#10B981',
-                      color: 'white',
-                      '&:hover': {
-                        backgroundColor: '#059669'
-                      }
-                    },
-                    '&:hover': {
-                      backgroundColor: 'rgba(16, 185, 129, 0.1)'
-                    }
-                  }
-                }}
-              />
-            )}
-          </div>
+          {/* Dropdown Menu */}
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right'
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right'
+            }}
+            PaperProps={{
+              sx: {
+                mt: 1,
+                minWidth: 180,
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                border: '1px solid rgba(0, 0, 0, 0.1)'
+              }
+            }}>
+            <MenuItem
+              onClick={() => handleMenuItemClick('view', selectedCustomerId)}
+              sx={{
+                fontSize: '0.875rem',
+                py: 1.5,
+                px: 2
+              }}>
+              <Eye className='w-4 h-4 mr-2' />
+              View Details
+            </MenuItem>
+            <MenuItem
+              onClick={() => handleMenuItemClick('orders', selectedCustomerId)}
+              sx={{
+                fontSize: '0.875rem',
+                py: 1.5,
+                px: 2
+              }}>
+              <UserCheck className='w-4 h-4 mr-2' />
+              View Orders
+            </MenuItem>
+          </Menu>
         </div>
 
         {/* Customer Details Dialog */}
@@ -454,32 +396,10 @@ export default function CustomerList() {
                   <div className='h-16 w-16 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-text-primary font-semibold text-2xl shadow-lg shadow-emerald-500/30'>
                     {selectedCustomer.name.charAt(0)}
                   </div>
-                  {selectedCustomer.status === 'vip' && (
-                    <div className='absolute -top-1 -right-1 h-6 w-6 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center shadow-lg'>
-                      <Star className='h-3 w-3 text-text-primary fill-white' />
-                    </div>
-                  )}
                 </div>
                 <div className='flex-1'>
                   <div className='flex items-center gap-2 mb-1'>
                     <h3 className='text-xl font-bold text-text-primary'>{selectedCustomer.name}</h3>
-                    <Badge
-                      label={selectedCustomer.status.charAt(0).toUpperCase() + selectedCustomer.status.slice(1)}
-                      size='small'
-                      sx={{
-                        bgcolor:
-                          selectedCustomer.status === 'vip'
-                            ? 'rgba(245, 158, 11, 0.1)'
-                            : selectedCustomer.status === 'active'
-                            ? 'rgba(34, 197, 94, 0.1)'
-                            : 'rgba(107, 114, 128, 0.1)',
-                        color: selectedCustomer.status === 'vip' ? '#F59E0B' : selectedCustomer.status === 'active' ? '#22C55E' : '#6B7280',
-                        border: 'none',
-                        fontSize: '0.75rem',
-                        fontWeight: 600
-                      }}>
-                      {selectedCustomer.status.charAt(0).toUpperCase() + selectedCustomer.status.slice(1)}
-                    </Badge>
                   </div>
                   <p className='text-muted-foreground text-sm'>Member since {new Date(selectedCustomer.joinDate).toLocaleDateString()}</p>
                 </div>
@@ -516,7 +436,7 @@ export default function CustomerList() {
                       gridColumn: '1 / -1'
                     }}>
                     <Typography variant='body2' sx={{ color: '#9CA3AF', mb: 0.5, fontWeight: 500 }}>
-                      Location
+                      Address
                     </Typography>
                     <Typography variant='body2' className='text-text-primary'>
                       {selectedCustomer.location}
@@ -561,39 +481,6 @@ export default function CustomerList() {
                       ${selectedCustomer.totalSpent.toFixed(2)}
                     </Typography>
                   </Box>
-                  {/* <Box
-                    sx={{
-                      p: 2,
-                      bgcolor: 'rgba(245, 158, 11, 0.05)',
-                      borderRadius: 1,
-                      border: '1px solid rgba(245, 158, 11, 0.1)',
-                      textAlign: 'center'
-                    }}>
-                    <Typography variant='body2' sx={{ color: '#9CA3AF', mb: 0.5, fontWeight: 500 }}>
-                      Average Rating
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
-                      <Star size={16} className='text-amber-400 fill-amber-400' />
-                      <Typography variant='h5' sx={{ color: '#F59E0B', fontWeight: 700 }}>
-                        {selectedCustomer.averageRating.toFixed(1)}
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <Box
-                    sx={{
-                      p: 2,
-                      bgcolor: 'rgba(59, 130, 246, 0.05)',
-                      borderRadius: 1,
-                      border: '1px solid rgba(59, 130, 246, 0.1)',
-                      textAlign: 'center'
-                    }}>
-                    <Typography variant='body2' sx={{ color: '#9CA3AF', mb: 0.5, fontWeight: 500 }}>
-                      Reviews
-                    </Typography>
-                    <Typography variant='h5' sx={{ color: '#3B82F6', fontWeight: 700 }}>
-                      {selectedCustomer.reviewsCount}
-                    </Typography>
-                  </Box> */}
                 </Box>
               </Box>
             </DialogContent>
