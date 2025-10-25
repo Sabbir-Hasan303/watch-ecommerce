@@ -16,7 +16,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@mui/material'
 
-export default function Sidebar({ collapsed, onToggle }) {
+export default function Sidebar({ collapsed, onToggle, user }) {
   const { url } = usePage()
   const [expandedItems, setExpandedItems] = useState([])
 
@@ -287,26 +287,42 @@ export default function Sidebar({ collapsed, onToggle }) {
 
         <div className={cn('p-4 border-t border-border', collapsed && 'px-2')}>
           {!collapsed ? (
-            <div className='flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-300 cursor-pointer group'>
-              <div className='relative flex-shrink-0'>
-                <div className='absolute inset-0 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full blur-md opacity-50 group-hover:opacity-75 transition-opacity duration-300' />
-                <div className='relative w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-lg'>
-                  <User className='w-5 h-5 text-text-primary' />
+              <div className='flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-300 cursor-pointer group'>
+                <div className='relative flex-shrink-0'>
+                  <div className='absolute inset-0 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full blur-md opacity-50 group-hover:opacity-75 transition-opacity duration-300' />
+                  <div className='relative w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-lg overflow-hidden'>
+                    {user?.profile_image ? (
+                      <img
+                        src={`/storage/${user.profile_image}`}
+                        alt={user.name}
+                        className='w-full h-full object-cover'
+                      />
+                    ) : (
+                      <User className='w-5 h-5 text-text-primary' />
+                    )}
+                  </div>
+                  <div className='absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-border rounded-full animate-pulse' />
                 </div>
-                <div className='absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-border rounded-full animate-pulse' />
+                <div className='flex-1 min-w-0'>
+                  <p className='text-sm font-medium text-text-primary truncate group-hover:text-emerald-400 transition-colors'>{user?.name || 'User'}</p>
+                  <p className='text-xs text-text-secondary truncate'>Admin</p>
+                </div>
+                <ChevronRight className='w-4 h-4 text-gray-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all duration-300' />
               </div>
-              <div className='flex-1 min-w-0'>
-                <p className='text-sm font-medium text-text-primary truncate group-hover:text-emerald-400 transition-colors'>John Doe</p>
-                <p className='text-xs text-text-secondary truncate'>Admin</p>
-              </div>
-              <ChevronRight className='w-4 h-4 text-gray-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all duration-300' />
-            </div>
           ) : (
             <div className='flex justify-center group cursor-pointer'>
               <div className='relative'>
                 <div className='absolute inset-0 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full blur-md opacity-50 group-hover:opacity-75 transition-opacity duration-300' />
-                <div className='relative w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300'>
-                  <User className='w-5 h-5 text-text-primary' />
+                <div className='relative w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 overflow-hidden'>
+                  {user?.profile_image ? (
+                    <img
+                      src={`/storage/${user.profile_image}`}
+                      alt={user.name}
+                      className='w-full h-full object-cover'
+                    />
+                  ) : (
+                    <User className='w-5 h-5 text-text-primary' />
+                  )}
                 </div>
                 <div className='absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-border rounded-full animate-pulse' />
               </div>

@@ -22,7 +22,7 @@ import CustomTextField from '@/Components/CustomTextField'
 import { Link, useForm } from '@inertiajs/react'
 // import { HamburgerButton } from "@/Components/hamburger-button"
 
-export default function Navbar({ title, subtitle, collapsed, onToggleSidebar }) {
+export default function Navbar({ title, subtitle, collapsed, onToggleSidebar, user }) {
   const { mode, toggleColorMode, theme } = useThemeContext()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [notificationsAnchor, setNotificationsAnchor] = useState(null)
@@ -191,8 +191,9 @@ export default function Navbar({ title, subtitle, collapsed, onToggleSidebar }) 
                 height: 32,
                 bgcolor: 'primary.main',
                 background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)'
-              }}>
-              <AccountCircle />
+              }}
+              src={user?.profile_image ? `/storage/${user.profile_image}` : undefined}>
+              {!user?.profile_image && <AccountCircle />}
             </Avatar>
             <KeyboardArrowDown
               sx={{
@@ -231,15 +232,16 @@ export default function Navbar({ title, subtitle, collapsed, onToggleSidebar }) 
                     height: 48,
                     bgcolor: 'primary.main',
                     background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)'
-                  }}>
-                  <AccountCircle />
+                  }}
+                  src={user?.profile_image ? `/storage/${user.profile_image}` : undefined}>
+                  {!user?.profile_image && <AccountCircle />}
                 </Avatar>
                 <Box>
                   <Typography variant='subtitle2' color='text.primary'>
-                    John Doe
+                    {user?.name || 'User'}
                   </Typography>
                   <Typography variant='caption' color='text.secondary'>
-                    john.doe@example.com
+                    {user?.email || 'user@example.com'}
                   </Typography>
                 </Box>
               </Box>
