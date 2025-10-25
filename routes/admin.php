@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\AdminProfileController;
 
 
 
@@ -89,9 +90,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('admin.contents.dynamic-banner');
 
     Route::prefix('settings')->group(function () {
-        Route::get('/profile', function () {
-            return Inertia::render('Admin/Settings/Profile');
-        })->name('admin.settings.profile');
+        Route::get('/profile', [AdminProfileController::class, 'index'])->name('admin.settings.profile');
+        Route::put('/profile', [AdminProfileController::class, 'update'])->name('admin.settings.profile.update');
+        Route::post('/profile/image', [AdminProfileController::class, 'updateProfileImage'])->name('admin.settings.profile.image');
     });
 });
 
