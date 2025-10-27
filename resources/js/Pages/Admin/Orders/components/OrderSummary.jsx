@@ -1,4 +1,4 @@
-import { DollarSign, Percent, Eye, Download, Send } from "lucide-react"
+import { Percent, Eye, Download, Send } from "lucide-react"
 import { Button } from "@mui/material"
 import { Card } from "@/components/ui/card"
 import {
@@ -9,6 +9,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import Taka from "@/Components/Taka"
 
 export default function OrderSummary({
     subtotal,
@@ -32,7 +33,7 @@ export default function OrderSummary({
             <Card className="p-6 bg-card border-border shadow-sm sticky top-6">
                 <div className="flex items-center gap-3 mb-6">
                     <div className="p-3 bg-emerald-500/10 rounded-lg">
-                        <DollarSign className="w-6 h-6 text-emerald-500" />
+                        <Taka className="text-2xl p-2" />
                     </div>
                     <h2 className="text-xl leading-8 font-bold text-text-primary">Order Summary</h2>
                 </div>
@@ -40,7 +41,9 @@ export default function OrderSummary({
                 <div className="space-y-3">
                     <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Subtotal</span>
-                        <span className="font-medium text-foreground">${subtotal.toFixed(2)}</span>
+                        <div className="flex items-center gap-1">
+                            <Taka className="text-sm" />{subtotal.toFixed(2)}
+                        </div>
                     </div>
                     {discountAmount > 0 && (
                         <div className="flex justify-between text-sm">
@@ -48,33 +51,42 @@ export default function OrderSummary({
                                 <Percent className="w-3 h-3" />
                                 Discount ({discountAmount}%)
                             </span>
-                            <span className="font-medium text-emerald-500">-${discountValue.toFixed(2)}</span>
+                            <div className="flex items-center gap-1">
+                                <Taka className="text-sm" />{discountValue.toFixed(2)}
+                            </div>
                         </div>
                     )}
                     <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Shipping</span>
-                        <span className="font-medium text-foreground">${shippingCost.toFixed(2)}</span>
+                        <div className="flex items-center gap-1">
+                            <Taka className="text-sm" />{shippingCost.toFixed(2)}
+                        </div>
                     </div>
                     {tax > 0 && (
                         <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground">Tax (8%)</span>
-                            <span className="font-medium text-foreground">${tax.toFixed(2)}</span>
+                            <div className="flex items-center gap-1">
+                                <Taka className="text-sm" />{tax.toFixed(2)}
+                            </div>
                         </div>
                     )}
                     <div className="pt-4 border-t border-border flex justify-between items-center">
                         <span className="font-semibold text-foreground text-lg">Total</span>
-                        <span className="text-3xl font-bold text-emerald-500">${total.toFixed(2)}</span>
+                        <div className="flex items-center gap-1">
+                            <Taka className="text-sm" />{total.toFixed(2)}
+                        </div>
                     </div>
                 </div>
             </Card>
         )
     }
 
+    const area = shippingAddress.area === "inside_dhaka" ? "Inside Dhaka" : "Outside Dhaka";
     return (
-        <Card className="p-6 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-emerald-500/20 shadow-lg sticky top-6">
+        <Card className="p-6 dark:bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-emerald-500/20 shadow-lg sticky top-6">
             <div className="flex items-center gap-3 mb-6">
                 <div className="p-3 bg-emerald-500/20 rounded-lg">
-                    <DollarSign className="w-6 h-6 text-emerald-500" />
+                    <Taka className="text-2xl p-2" />
                 </div>
                 <h2 className="text-xl font-semibold text-foreground">Final Total</h2>
             </div>
@@ -82,27 +94,37 @@ export default function OrderSummary({
             <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span className="font-medium text-foreground">${subtotal.toFixed(2)}</span>
+                    <div className="flex items-center gap-1">
+                        <Taka className="text-sm" />{subtotal.toFixed(2)}
+                    </div>
                 </div>
                 {discountAmount > 0 && (
                     <div className="flex justify-between text-sm">
                         <span className="text-emerald-500">Discount</span>
-                        <span className="font-medium text-emerald-500">-${discountValue.toFixed(2)}</span>
+                        <div className="flex items-center gap-1">
+                            <Taka className="text-sm" />{discountValue.toFixed(2)}
+                        </div>
                     </div>
                 )}
                 <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Shipping</span>
-                    <span className="font-medium text-foreground">${shippingCost.toFixed(2)}</span>
+                    <div className="flex items-center gap-1">
+                        <Taka className="text-sm" />{shippingCost.toFixed(2)}
+                    </div>
                 </div>
                 {tax > 0 && (
                     <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Tax</span>
-                        <span className="font-medium text-foreground">${tax.toFixed(2)}</span>
+                        <div className="flex items-center gap-1">
+                            <Taka className="text-sm" />{tax.toFixed(2)}
+                        </div>
                     </div>
                 )}
                 <div className="pt-4 border-t border-emerald-500/20 flex justify-between items-center">
                     <span className="font-semibold text-foreground text-lg">Total</span>
-                    <span className="text-4xl font-bold text-emerald-500">${total.toFixed(2)}</span>
+                    <div className="flex items-center gap-1">
+                        <Taka className="text-sm" />{total.toFixed(2)}
+                    </div>
                 </div>
             </div>
 
@@ -122,20 +144,25 @@ export default function OrderSummary({
                     <div className="p-8 bg-white text-black rounded-lg">
                         <div className="text-center mb-8">
                             <h2 className="text-3xl font-bold">INVOICE</h2>
-                            <p className="text-sm text-gray-600 mt-2">Order #ORD-{Date.now()}</p>
+                            {/* <p className="text-sm text-gray-600 mt-2">Order #ORD-{Date.now()}</p> */}
                         </div>
                         <div className="grid grid-cols-2 gap-8 mb-8">
                             <div>
                                 <h3 className="font-semibold mb-3">Bill To:</h3>
                                 <p className="font-medium">{selectedCustomer?.name}</p>
                                 <p className="text-sm text-gray-600">{selectedCustomer?.email}</p>
-                                <p className="text-sm text-gray-600">{selectedCustomer?.phone}</p>
+                                {selectedCustomer?.personal_phone ? (
+                                    <p className="text-sm text-gray-600">{selectedCustomer?.personal_phone}</p>
+                                ) : (
+                                    <p className="text-sm text-gray-600">{shippingAddress.phone}</p>
+                                )}
                             </div>
                             <div>
                                 <h3 className="font-semibold mb-3">Ship To:</h3>
-                                <p className="text-sm text-gray-600">{shippingAddress.fullName}</p>
+                                <p className="text-sm font-medium">{shippingAddress.fullName}</p>
+                                <p className="text-sm text-gray-600">{shippingAddress.email}</p>
                                 <p className="text-sm text-gray-600">{shippingAddress.phone}</p>
-                                <p className="text-sm text-gray-600">{shippingAddress.address}</p>
+                                <p className="text-sm text-gray-600">{shippingAddress.address} ({area})</p>
                             </div>
                         </div>
                         <table className="w-full mb-8">
@@ -161,8 +188,8 @@ export default function OrderSummary({
                                             </div>
                                         </td>
                                         <td className="text-right">{item.quantity}</td>
-                                        <td className="text-right">${(item.price || 0).toFixed(2)}</td>
-                                        <td className="text-right">${((item.price || 0) * item.quantity).toFixed(2)}</td>
+                                        <td className="text-right"><span className="text-xl mr-1">৳</span>{(item.price || 0).toFixed(2)}</td>
+                                        <td className="text-right"><span className="text-xl mr-1">৳</span>{((item.price || 0) * item.quantity).toFixed(2)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -171,27 +198,27 @@ export default function OrderSummary({
                             <div className="w-72 space-y-2">
                                 <div className="flex justify-between">
                                     <span>Subtotal:</span>
-                                    <span>${subtotal.toFixed(2)}</span>
+                                    <span><span className="text-xl mr-1">৳</span>{subtotal.toFixed(2)}</span>
                                 </div>
                                 {discountAmount > 0 && (
                                     <div className="flex justify-between text-green-600">
                                         <span>Discount ({discountAmount}%):</span>
-                                        <span>-${discountValue.toFixed(2)}</span>
+                                        <span><span className="text-xl mr-1">৳</span>{-discountValue.toFixed(2)}</span>
                                     </div>
                                 )}
                                 <div className="flex justify-between">
                                     <span>Shipping:</span>
-                                    <span>${shippingCost.toFixed(2)}</span>
+                                    <span><span className="text-xl mr-1">৳</span>{shippingCost.toFixed(2)}</span>
                                 </div>
                                 {tax > 0 && (
                                     <div className="flex justify-between">
                                     <span>Tax:</span>
-                                        <span>${tax.toFixed(2)}</span>
+                                        <span><span className="text-xl mr-1">৳</span>{tax.toFixed(2)}</span>
                                     </div>
                                 )}
                                 <div className="flex justify-between font-bold text-xl border-t-2 border-gray-300 pt-3 mt-3">
                                     <span>Total:</span>
-                                    <span>${total.toFixed(2)}</span>
+                                    <span><span className="text-2xl font-bold mr-1">৳</span>{total.toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>
@@ -204,10 +231,10 @@ export default function OrderSummary({
                         >
                             Close
                         </Button>
-                        <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600">
+                        {/* <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600">
                             <Download className="w-4 h-4 mr-2" />
                             Download PDF
-                        </Button>
+                        </Button> */}
                     </div>
                 </DialogContent>
             </Dialog>
@@ -215,7 +242,7 @@ export default function OrderSummary({
             <Button
                 onClick={handlePlaceOrder}
                 disabled={isSubmitting}
-                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/30 h-14 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg dark:shadow-emerald-500/30 h-14 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {isSubmitting ? (
                     <>

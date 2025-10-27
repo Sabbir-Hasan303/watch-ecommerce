@@ -34,6 +34,7 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
     const [shippingAddress, setShippingAddress] = useState({
         fullName: "",
         phone: "",
+        email: "",
         address: "",
         area: "inside_dhaka",
     })
@@ -132,6 +133,7 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
         setShippingAddress({
             fullName: newCustomerData.fullName,
             phone: newCustomerData.phone,
+            email: newCustomerData.email,
             address: newCustomerData.address,
             area: newCustomerData.area,
         })
@@ -158,6 +160,7 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
             setShippingAddress({
                 fullName: customer.name,
                 phone: customer.phone,
+                email: customer.email,
                 address: customer.defaultShippingAddress.address_line,
                 area: customer.defaultShippingAddress.area,
             })
@@ -182,6 +185,7 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
         setShippingAddress({
             fullName: selectedCustomer?.name || "",
             phone: selectedCustomer?.phone || "",
+            email: selectedCustomer?.email || "",
             address: "",
             area: "inside_dhaka",
         })
@@ -195,6 +199,7 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
                 setShippingAddress({
                     fullName: selectedCustomer.name,
                     phone: selectedCustomer.phone,
+                    email: selectedCustomer.email,
                     address: address.address_line,
                     area: address.area,
                 })
@@ -212,6 +217,7 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
             setShippingAddress({
                 fullName: "",
                 phone: "",
+                email: "",
                 address: "",
                 area: "inside_dhaka",
             })
@@ -234,6 +240,18 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
     const tax = 0 // This will be calculated on the backend
     const total = subtotal - discountValue + shippingCost + tax
 
+    // Validation functions
+    const isValidEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        return emailRegex.test(email)
+    }
+
+    const isValidPhone = (phone) => {
+        // Allow various phone formats: +1234567890, 1234567890, (123) 456-7890, etc.
+        const phoneRegex = /^[\+]?[0-9\s\-\(\)]{10,}$/
+        return phoneRegex.test(phone.replace(/\s/g, ''))
+    }
+
     const handlePlaceOrder = () => {
         // Determine if it's a guest customer
         const isGuestCustomer = selectedCustomer?.type === 'guest'
@@ -244,31 +262,32 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
         // Get selected address ID (if not a new address)
         const selectedAddressId = isNewAddress ? null : selectedAddress
 
-        // Prepare guest customer details (if applicable)
-        const guestCustomerDetails = isGuestCustomer ? {
-            name: selectedCustomer.name,
-            email: selectedCustomer.email,
-            phone: selectedCustomer.phone,
-            address: shippingAddress.address,
+        // Prepare shipping address JSON
+        const shippingAddressData = {
+            full_name: shippingAddress.fullName,
+            phone: shippingAddress.phone,
+            email: shippingAddress.email,
+            address_line: shippingAddress.address,
             area: shippingAddress.area
-        } : null
+        }
+
+        // Prepare billing address JSON (same as shipping for now)
+        const billingAddressData = {
+            full_name: shippingAddress.fullName,
+            phone: shippingAddress.phone,
+            email: shippingAddress.email,
+            address_line: shippingAddress.address,
+            area: shippingAddress.area
+        }
 
         // Clean order data with only essential information
         const orderData = {
             // Customer information
-            customer_id: isGuestCustomer ? null : selectedCustomer?.id || null,
-            is_guest: isGuestCustomer,
-            guest_details: guestCustomerDetails,
+            user_id: isGuestCustomer ? null : selectedCustomer?.id || null,
 
-            // Address information
-            selected_address_id: selectedAddressId,
-            is_new_address: isNewAddress,
-            shipping_address: {
-                full_name: shippingAddress.fullName,
-                phone: shippingAddress.phone,
-                address_line: shippingAddress.address,
-                area: shippingAddress.area
-            },
+            // Address information (JSON format)
+            shipping_address: shippingAddressData,
+            billing_address: billingAddressData,
 
             // Order items
             items: cart.map(item => ({
@@ -281,7 +300,7 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
             // Order details
             payment_method: paymentMethod,
             shipping_method: shippingMethod,
-            order_notes: orderNotes,
+            notes: orderNotes,
             discount_code: discountCode,
             discount_amount: discountAmount,
 
@@ -291,7 +310,9 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
 
             // Totals
             subtotal: subtotal,
-            discount_amount: discountAmount,
+            shipping_cost: shippingCost,
+            discount_total: discountValue,
+            tax_total: tax,
             total: total
         }
 
@@ -327,8 +348,11 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
         selectedCustomer !== null &&
         shippingAddress.fullName.trim() !== "" &&
         shippingAddress.phone.trim() !== "" &&
+        shippingAddress.email.trim() !== "" &&
         shippingAddress.address.trim() !== "" &&
-        shippingAddress.area.trim() !== ""
+        shippingAddress.area.trim() !== "" &&
+        isValidEmail(shippingAddress.email) &&
+        isValidPhone(shippingAddress.phone)
 
     const canProceedToStep4 = paymentMethod !== "" && shippingMethod !== ""
 

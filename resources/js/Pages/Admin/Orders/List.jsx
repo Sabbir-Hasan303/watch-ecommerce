@@ -170,7 +170,12 @@ export default function OrdersList({ orders = [], flash }) {
                                             </TableCell>
                                             <TableCell className='table-header-cell dark:table-header-cell'>
                                                 <div className='flex items-center gap-2'>
-                                                    Customer
+                                                    Order From
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className='table-header-cell dark:table-header-cell'>
+                                                <div className='flex items-center gap-2'>
+                                                    Area
                                                 </div>
                                             </TableCell>
                                             <TableCell className='table-header-cell dark:table-header-cell'>
@@ -220,12 +225,20 @@ export default function OrdersList({ orders = [], flash }) {
                                                         <TableCell className='table-body-cell dark:table-body-cell'>
                                                             <div>
                                                                 <Typography variant='body2' className='font-medium text-foreground'>
-                                                                    {order.customer.name}
+                                                                    {order.shipping_address.full_name}
                                                                 </Typography>
                                                                 <Typography variant='caption' className='text-muted-foreground'>
-                                                                    {order.customer.email}
+                                                                    {order.shipping_address.email}
+                                                                </Typography><br />
+                                                                <Typography variant='caption' className='text-muted-foreground'>
+                                                                    {order.shipping_address.address_line}
                                                                 </Typography>
                                                             </div>
+                                                        </TableCell>
+                                                        <TableCell className='table-body-cell dark:table-body-cell'>
+                                                            <Typography variant='body2' className='text-foreground'>
+                                                                {order.shipping_address.area === 'inside_dhaka' ? 'Inside Dhaka' : order.shipping_address.area === 'outside_dhaka' ? 'Outside Dhaka' : 'N/A'}
+                                                            </Typography>
                                                         </TableCell>
                                                         <TableCell className='table-body-cell dark:table-body-cell'>
                                                             <Typography variant='body2' className='text-foreground'>

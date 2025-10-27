@@ -239,9 +239,9 @@
                 <h2 class="invoice-title">INVOICE</h2>
                 <div class="order-info">Order #{{ $order->order_number }}</div>
                 <div class="order-info">{{ $order->created_at->format('M d, Y') }}</div>
-                <div class="status status-{{ $order->status }}">
+                {{-- <div class="status status-{{ $order->status }}">
                     {{ ucfirst($order->status) }}
-                </div>
+                </div> --}}
             </div>
         </div>
 
@@ -252,46 +252,32 @@
                     <div class="section-title">Bill To</div>
                     @if ($order->user)
                         <div class="detail-item"><strong>{{ $order->user->name }}</strong></div>
-                        @php
+                        <div class="detail-item">{{ $order->user->phone }}</div>
+                        {{-- @php
                             $defaultAddress = $order->user->addresses->where('is_default', 1)->first();
                         @endphp
                         @if ($defaultAddress)
                             <div class="detail-item">{{ $defaultAddress->phone }}</div>
-                        @endif
+                        @endif --}}
                         <div class="detail-item">{{ $order->user->email }}</div>
-                    @elseif($order->guest_info && isset($order->guest_info['address']))
-                        <div class="detail-item"><strong>{{ $order->guest_info['name'] ?? 'Guest' }}</strong></div>
-                        <div class="detail-item">{{ $order->guest_info['phone'] }}</div>
-                        <div class="detail-item">{{ $order->guest_info['email'] }}</div>
                     @else
-                        <div class="detail-item">No billing address provided</div>
+                        <div class="detail-item"><strong>{{ $order->shipping_address['full_name'] ?? 'Guest' }}</strong>
+                        </div>
+                        <div class="detail-item">{{ $order->shipping_address['phone'] }}</div>
+                        <div class="detail-item">{{ $order->shipping_address['email'] }}</div>
                     @endif
                 </div>
 
                 <div class="details-col">
                     <div class="section-title">Ship To</div>
-                    @if ($order->shippingAddress)
-                        <div class="detail-item">
-                            <strong>{{ $order->shippingAddress->full_name ?? $order->user->name }}</strong>
-                        </div>
-                        <div class="detail-item">{{ $order->shippingAddress->phone }}</div>
-                        @if ($order->shippingAddress->area == 'inside_dhaka')
-                            <div class="detail-item">Inside Dhaka</div>
-                        @else
-                            <div class="detail-item">Outside Dhaka</div>
-                        @endif
-                        <div class="detail-item">{{ $order->shippingAddress->address_line }}</div>
-                    @elseif($order->guest_info && isset($order->guest_info['address']))
-                        <div class="detail-item"><strong>{{ $order->guest_info['name'] ?? 'Guest' }}</strong></div>
-                        <div class="detail-item">{{ $order->guest_info['phone'] }}</div>
-                        <div class="detail-item">{{ $order->guest_info['email'] }}</div>
-                        <div class="detail-item">
-                            {{ $order->guest_info['area'] === 'inside_dhaka' ? 'Inside Dhaka' : 'Outside Dhaka' }}
-                        </div>
-                        <div class="detail-item">{{ $order->guest_info['address'] }}</div>
-                    @else
-                        <div class="detail-item">No shipping address provided</div>
-                    @endif
+                    <div class="detail-item"><strong>{{ $order->shipping_address['full_name'] ?? 'Guest' }}</strong>
+                    </div>
+                    <div class="detail-item">{{ $order->shipping_address['phone'] }}</div>
+                    <div class="detail-item">{{ $order->shipping_address['email'] }}</div>
+                    @php
+                        $area = $order->shipping_address['area'] === 'inside_dhaka' ? 'Inside Dhaka' : 'Outside Dhaka';
+                    @endphp
+                    <div class="detail-item">{{ $order->shipping_address['address_line'] }} ({{ $area }})</div>
                 </div>
             </div>
         </div>

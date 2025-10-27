@@ -2,6 +2,7 @@ import { User, Package, Truck, Mail } from "lucide-react"
 import { Switch } from "@mui/material"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import Taka from "@/Components/Taka"
 
 export default function OrderReview({
     selectedCustomer,
@@ -35,7 +36,11 @@ export default function OrderReview({
                         )}
                     </div>
                     <p className="text-muted-foreground">{selectedCustomer?.email}</p>
-                    <p className="text-muted-foreground">{selectedCustomer?.phone}</p>
+                    {selectedCustomer?.personal_phone ? (
+                        <p className="text-muted-foreground">{selectedCustomer?.personal_phone}</p>
+                    ) : (
+                        <p className="text-muted-foreground">{shippingAddress.phone}</p>
+                    )}
                 </div>
             </Card>
 
@@ -66,7 +71,10 @@ export default function OrderReview({
                                     Quantity: {item.quantity} • SKU: {item.sku}
                                 </p>
                                 <p className="text-sm font-semibold text-emerald-500 mt-2">
-                                    ${((item.price || 0) * item.quantity).toFixed(2)}
+                                    {/* ${((item.price || 0) * item.quantity).toFixed(2)} */}
+                                    <div className="flex items-center gap-1">
+                                        <Taka color="text-emerald-500" className="text-sm" />{((item.price || 0) * item.quantity).toFixed(2)}
+                                    </div>
                                 </p>
                             </div>
                         </div>

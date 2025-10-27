@@ -26,6 +26,28 @@ export default function CustomerSelection({
     setIsAddressFieldsDisabled,
     handleShippingAddressChange
 }) {
+    // Validation functions
+    const isValidEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        return emailRegex.test(email)
+    }
+
+    const isValidPhone = (phone) => {
+        // Allow various phone formats: +1234567890, 1234567890, (123) 456-7890, etc.
+        const phoneRegex = /^[\+]?[0-9\s\-\(\)]{10,}$/
+        return phoneRegex.test(phone.replace(/\s/g, ''))
+    }
+
+    const isFormValid = () => {
+        return (
+            newCustomerData.fullName.trim() !== "" &&
+            newCustomerData.phone.trim() !== "" &&
+            newCustomerData.email.trim() !== "" &&
+            newCustomerData.address.trim() !== "" &&
+            isValidEmail(newCustomerData.email) &&
+            isValidPhone(newCustomerData.phone)
+        )
+    }
     return (
         <div className="space-y-6">
             <Card className="p-8 bg-card border-border shadow-sm">
@@ -96,6 +118,7 @@ export default function CustomerSelection({
                                         setShippingAddress({
                                             fullName: "",
                                             phone: "",
+                                            email: "",
                                             address: "",
                                             area: "inside_dhaka",
                                         })
@@ -131,6 +154,8 @@ export default function CustomerSelection({
                                     value={newCustomerData.phone}
                                     onChange={(e) => setNewCustomerData({ ...newCustomerData, phone: e.target.value })}
                                     placeholder="+1 (123) 456-7890"
+                                    error={newCustomerData.phone.trim() !== "" && !isValidPhone(newCustomerData.phone)}
+                                    helperText={newCustomerData.phone.trim() !== "" && !isValidPhone(newCustomerData.phone) ? "Please enter a valid phone number" : ""}
                                 />
                             </div>
                             <div>
@@ -141,6 +166,8 @@ export default function CustomerSelection({
                                     value={newCustomerData.email}
                                     onChange={(e) => setNewCustomerData({ ...newCustomerData, email: e.target.value })}
                                     placeholder="john.doe@example.com"
+                                    error={newCustomerData.email.trim() !== "" && !isValidEmail(newCustomerData.email)}
+                                    helperText={newCustomerData.email.trim() !== "" && !isValidEmail(newCustomerData.email) ? "Please enter a valid email address" : ""}
                                 />
                             </div>
                             <div>
@@ -170,8 +197,8 @@ export default function CustomerSelection({
                         <div className="flex gap-3">
                             <Button
                                 onClick={handleCreateCustomer}
-                                disabled={!newCustomerData.fullName || !newCustomerData.phone || !newCustomerData.address}
-                                className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                                disabled={!isFormValid()}
+                                className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Create Guest
                             </Button>
@@ -265,10 +292,25 @@ export default function CustomerSelection({
                                         onChange={(e) => handleShippingAddressChange("phone", e.target.value)}
                                         placeholder="+1 (123) 456-7890"
                                         disabled={isAddressFieldsDisabled}
+                                        error={shippingAddress.phone.trim() !== "" && !isValidPhone(shippingAddress.phone)}
+                                        helperText={shippingAddress.phone.trim() !== "" && !isValidPhone(shippingAddress.phone) ? "Please enter a valid phone number" : ""}
                                     />
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <CustomTextField
+                                        label="Email"
+                                        name="email"
+                                        type="email"
+                                        value={shippingAddress.email}
+                                        onChange={(e) => handleShippingAddressChange("email", e.target.value)}
+                                        placeholder="john.doe@example.com"
+                                        disabled={isAddressFieldsDisabled}
+                                        error={shippingAddress.email.trim() !== "" && !isValidEmail(shippingAddress.email)}
+                                        helperText={shippingAddress.email.trim() !== "" && !isValidEmail(shippingAddress.email) ? "Please enter a valid email address" : ""}
+                                    />
+                                </div>
                                 <div>
                                     <CustomSelectField
                                         label="Area"
@@ -283,6 +325,8 @@ export default function CustomerSelection({
                                         disabled={isAddressFieldsDisabled}
                                     />
                                 </div>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
                                 <div>
                                     <CustomTextField
                                         label="Full Address"

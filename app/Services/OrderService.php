@@ -68,6 +68,7 @@ class OrderService
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
+                    'personal_phone' => $user->phone,
                     'phone' => $defaultAddress ? $defaultAddress->phone : '',
                     'address' => $defaultAddress ? $defaultAddress->address_line : '',
                     'totalOrders' => $totalOrders,
@@ -114,20 +115,11 @@ class OrderService
      */
     public static function createOrder(array $validated): Order
     {
-        // Handle customer and address logic
-        $customerId = $validated['customer_id'];
-        $shippingAddressId = $validated['selected_address_id'];
-
-        // Create new address if needed
-        if ($validated['is_new_address'] && $validated['customer_id'] != null) {
-            $shippingAddressId = self::createShippingAddress($validated['shipping_address'], $customerId);
-        }
-
-        // Calculate totals with dynamic tax
-        $totals = self::calculateTotals($validated);
+        // Get user ID (can be null for guest customers)
+        $userId = $validated['user_id'] ?? null;
 
         // Create the order
-        $order = self::createOrderRecord($validated, $customerId, $shippingAddressId, $totals);
+        $order = self::createOrderRecord($validated, $userId);
 
         // Create order items
         self::createOrderItems($order, $validated['items']);
@@ -138,95 +130,28 @@ class OrderService
         return $order;
     }
 
-    /**
-     * Calculate order totals with dynamic tax and shipping
-     */
-    public static function calculateTotals(array $validated): array
-    {
-        $subtotal = $validated['subtotal'];
-        $discountAmount = $validated['discount_amount'] ?? 0;
 
-        // Calculate shipping cost from options
-        $shippingCost = self::calculateShippingCost($validated);
 
-        // Calculate tax based on options
-        $taxAmount = 0;
-        if (OptionService::isTaxEnabled()) {
-            $taxAmount = OptionService::calculateTax($subtotal - $discountAmount);
-        }
-
-        $total = $subtotal - $discountAmount + $shippingCost + $taxAmount;
-
-        return [
-            'subtotal' => $subtotal,
-            'shipping_cost' => $shippingCost,
-            'discount_total' => $discountAmount,
-            'tax_total' => $taxAmount,
-            'total' => $total
-        ];
-    }
-
-    /**
-     * Calculate shipping cost from options
-     */
-    private static function calculateShippingCost(array $validated): float
-    {
-        $shippingMethod = $validated['shipping_method'] ?? 'standard';
-
-        // If free shipping, return 0
-        if ($shippingMethod === 'free') {
-            return 0.0;
-        }
-
-        // For standard shipping, get cost from options
-        $shippingSettings = OptionService::getShippingSettings();
-        $area = $validated['shipping_address']['area'] ?? 'inside_dhaka';
-
-        // Get shipping cost from options for standard shipping
-        if (isset($shippingSettings[$area]['standard'])) {
-            return (float) $shippingSettings[$area]['standard'];
-        }
-
-        // Fallback to default cost if not found in options
-        return 10.0;
-    }
-
-    /**
-     * Create shipping address
-     */
-    private static function createShippingAddress(array $addressData, ?int $customerId): int
-    {
-        $address = Address::create([
-            'user_id' => $customerId,
-            'full_name' => $addressData['full_name'],
-            'phone' => $addressData['phone'],
-            'address_line' => $addressData['address_line'],
-            'area' => $addressData['area'],
-            'is_default' => false,
-        ]);
-
-        return $address->id;
-    }
 
     /**
      * Create order record
      */
-    private static function createOrderRecord(array $validated, ?int $customerId, ?int $shippingAddressId, array $totals): Order
+    private static function createOrderRecord(array $validated, ?int $userId): Order
     {
         $orderData = [
-            'user_id' => $customerId,
-            'shipping_address_id' => $shippingAddressId,
-            'billing_address_id' => $shippingAddressId, // Same as shipping for now
-            'guest_info' => $validated['is_guest'] ? $validated['guest_details'] : null,
+            'user_id' => $userId,
+            'shipping_address' => $validated['shipping_address'],
+            'billing_address' => $validated['billing_address'],
             'status' => 'pending',
-            'subtotal' => $totals['subtotal'],
-            'shipping_cost' => $totals['shipping_cost'],
-            'discount_total' => $totals['discount_total'],
-            'tax_total' => $totals['tax_total'],
-            'total' => $totals['total'],
+            'subtotal' => $validated['subtotal'],
+            'shipping_cost' => $validated['shipping_cost'],
+            'discount_total' => $validated['discount_total'] ?? 0,
+            'tax_total' => $validated['tax_total'] ?? 0,
+            'total' => $validated['total'],
             'payment_method' => $validated['payment_method'],
+            'shipping_method' => $validated['shipping_method'],
             'payment_status' => 'unpaid',
-            'notes' => $validated['order_notes'],
+            'notes' => $validated['notes'] ?? null,
         ];
 
         return Order::create($orderData);

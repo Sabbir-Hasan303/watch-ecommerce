@@ -12,9 +12,8 @@ return new class extends Migration
             $table->id();
             $table->string('order_number')->unique();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('shipping_address_id')->nullable()->constrained('addresses')->nullOnDelete();
-            $table->foreignId('billing_address_id')->nullable()->constrained('addresses')->nullOnDelete();
-            $table->json('guest_info')->nullable()->comment('Guest info (when user_id is null)');
+            $table->json('shipping_address');
+            $table->json('billing_address');
             $table->enum('status', ['pending','confirmed','shipped','delivered','cancelled'])->default('pending')->index();
             $table->decimal('subtotal', 10, 2);
             $table->decimal('shipping_cost', 10, 2)->default(0);

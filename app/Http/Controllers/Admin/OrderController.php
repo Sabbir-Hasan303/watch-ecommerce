@@ -21,7 +21,7 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::with(['user', 'items.product', 'shippingAddress'])
+        $orders = Order::with(['user', 'items.product'])
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($order) {
@@ -29,20 +29,21 @@ class OrderController extends Controller
                     'id' => $order->id,
                     'order_number' => $order->order_number,
                     'customer' => [
-                        'name' => $order->user ? $order->user->name : ($order->guest_info['name'] ?? 'Guest'),
-                        'email' => $order->user ? $order->user->email : ($order->guest_info['email'] ?? 'N/A'),
-                        'phone' => $order->user ? $order->user->phone : ($order->guest_info['phone'] ?? 'N/A')
+                        'name' => $order->user ? $order->user->name : ($order->shipping_address['full_name'] ?? 'Guest'),
+                        'email' => $order->user ? $order->user->email : ($order->shipping_address['email'] ?? 'N/A'),
+                        'phone' => $order->user ? $order->user->phone : ($order->shipping_address['phone'] ?? 'N/A')
                     ],
                     'date' => $order->created_at->format('Y-m-d'),
                     'status' => $order->status ?? 'pending',
                     'total' => (float) $order->total,
                     'items_count' => $order->items->sum('quantity'),
                     'payment_method' => ucfirst($order->payment_method),
-                    'shipping_address' => $order->shippingAddress ? [
-                        'full_name' => $order->shippingAddress->full_name,
-                        'phone' => $order->shippingAddress->phone,
-                        'address_line' => $order->shippingAddress->address_line,
-                        'area' => $order->shippingAddress->area
+                    'shipping_address' => $order->shipping_address ? [
+                        'full_name' => $order->shipping_address['full_name'],
+                        'phone' => $order->shipping_address['phone'],
+                        'email' => $order->shipping_address['email'],
+                        'address_line' => $order->shipping_address['address_line'],
+                        'area' => $order->shipping_address['area']
                     ] : null
                 ];
             });
@@ -65,16 +66,19 @@ class OrderController extends Controller
         try {
             // Validate the request
             $validated = $request->validate([
-                'customer_id' => 'nullable|integer',
-                'is_guest' => 'required|boolean',
-                'guest_details' => 'nullable|array',
-                'selected_address_id' => 'nullable|integer|exists:addresses,id',
-                'is_new_address' => 'required|boolean',
+                'user_id' => 'nullable|integer|exists:users,id',
                 'shipping_address' => 'required|array',
                 'shipping_address.full_name' => 'required|string|max:255',
                 'shipping_address.phone' => 'required|string|max:32',
+                'shipping_address.email' => 'required|email|max:255',
                 'shipping_address.address_line' => 'required|string|max:500',
                 'shipping_address.area' => 'required|string|in:inside_dhaka,outside_dhaka',
+                'billing_address' => 'required|array',
+                'billing_address.full_name' => 'required|string|max:255',
+                'billing_address.phone' => 'required|string|max:32',
+                'billing_address.email' => 'required|email|max:255',
+                'billing_address.address_line' => 'required|string|max:500',
+                'billing_address.area' => 'required|string|in:inside_dhaka,outside_dhaka',
                 'items' => 'required|array|min:1',
                 'items.*.product_id' => 'required|integer|exists:products,id',
                 'items.*.variant_id' => 'required|integer|exists:product_variants,id',
@@ -82,37 +86,16 @@ class OrderController extends Controller
                 'items.*.price' => 'required|numeric|min:0',
                 'payment_method' => 'required|string|in:cod,card,bkash,nagad,rocket',
                 'shipping_method' => 'required|string|in:standard,free',
-                'order_notes' => 'nullable|string|max:1000',
+                'notes' => 'nullable|string|max:1000',
                 'discount_code' => 'nullable|string|max:50',
                 'discount_amount' => 'nullable|numeric|min:0',
                 'send_confirmation_email' => 'boolean',
                 'send_invoice' => 'boolean',
                 'subtotal' => 'required|numeric|min:0',
-                // 'shipping_cost' => 'required|numeric|min:0',
+                'shipping_cost' => 'required|numeric|min:0',
                 'total' => 'required|numeric|min:0',
             ]);
 
-            // Additional validation for customer logic
-            if (!$validated['is_guest'] && !$validated['customer_id']) {
-                throw new \Illuminate\Validation\ValidationException(
-                    validator([], []),
-                    ['customer_id' => ['Customer ID is required for registered customers.']]
-                );
-            }
-
-            if (!$validated['is_guest'] && $validated['customer_id'] && !User::where('id', $validated['customer_id'])->exists()) {
-                throw new \Illuminate\Validation\ValidationException(
-                    validator([], []),
-                    ['customer_id' => ['The selected customer does not exist.']]
-                );
-            }
-
-            if ($validated['is_guest'] && $validated['customer_id']) {
-                throw new \Illuminate\Validation\ValidationException(
-                    validator([], []),
-                    ['customer_id' => ['Customer ID should be null for guest customers.']]
-                );
-            }
 
             // Use database transaction for data consistency
             return DB::transaction(function () use ($validated) {
@@ -137,9 +120,7 @@ class OrderController extends Controller
         $order = Order::with([
             'user.addresses',
             'items.product.images',
-            'items.variant',
-            'shippingAddress',
-            'billingAddress'
+            'items.variant'
         ])->find($id);
 
         if (!$order) {
@@ -181,7 +162,7 @@ class OrderController extends Controller
     // Download invoice
     public function downloadInvoice($id)
     {
-        $order = Order::with(['user.addresses', 'items.product', 'items.variant', 'shippingAddress', 'billingAddress'])
+        $order = Order::with(['user.addresses', 'items.product', 'items.variant'])
             ->find($id);
 
         if (!$order) {
@@ -191,7 +172,6 @@ class OrderController extends Controller
         // Generate PDF invoice using DomPDF
         $pdf = PDF::loadView('invoices.order', [
             'order' => $order,
-            'customer' => $order->user ? $order->user : (object) $order->guest_info
         ]);
 
         // Set PDF options for better compatibility

@@ -43,20 +43,19 @@ export default function ViewOrder({ order }) {
     const { isDarkMode } = useThemeContext()
     // Helper function to get customer info
     const getCustomerInfo = () => {
-        if (order?.user && order?.shipping_address) {
+        if (order?.user) {
             return {
                 name: order.user.name,
                 email: order.user.email,
-                phone: order.user.addresses.find(address => address.is_default)?.phone || 'N/A'
+                phone: order.user.phone
             }
-        } else if (order?.guest_info) {
+        } else {
             return {
-                name: order.guest_info.name || 'Guest',
-                email: order.guest_info.email || 'N/A',
-                phone: order.guest_info.phone || 'N/A'
+                name: order.shipping_address.full_name || 'Guest',
+                email: order.shipping_address.email || 'N/A',
+                phone: order.shipping_address.phone || 'N/A'
             }
         }
-        return { name: 'Guest', email: 'N/A', phone: 'N/A' }
     }
 
     const customer = getCustomerInfo()
