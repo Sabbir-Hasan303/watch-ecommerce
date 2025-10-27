@@ -8,6 +8,7 @@ import CustomSelectField from '@/Components/CustomSelectField'
 import CustomTextField from '@/Components/CustomTextField'
 import CancelOrderDialog from '@/Components/CancelOrderDialog'
 import { Head } from '@inertiajs/react'
+import Taka from '@/Components/Taka'
 
 const statusConfig = {
     pending: {
@@ -258,9 +259,12 @@ export default function OrdersList({ orders = [], flash }) {
                                                             </Typography>
                                                         </TableCell>
                                                         <TableCell className='table-body-cell dark:table-body-cell'>
-                                                            <Typography variant='body2' className='font-semibold text-foreground'>
+                                                            {/* <Typography variant='body2' className='font-semibold text-foreground'>
                                                                 ${order.total.toFixed(2)}
-                                                            </Typography>
+                                                            </Typography> */}
+                                                            <div className='flex items-center gap-1'>
+                                                                <Taka className='text-sm' />{(Number(order.total).toFixed(2) || 0)}
+                                                            </div>
                                                         </TableCell>
                                                         <TableCell className='table-body-cell dark:table-body-cell'>
                                                             <div className='flex items-center justify-center gap-2'>

@@ -21,15 +21,15 @@ class CustomerController extends Controller
                 // Get primary address for location
                 $primaryAddress = $customer->addresses->where('is_default', true)->first() ?? $customer->addresses->first();
 
-                $location = $primaryAddress ? ($primaryAddress->address_line . ', ' . $primaryAddress->area) : 'No address provided';
-
+                $address = $primaryAddress ? ($primaryAddress->address_line) : 'No address provided';
+                $area = $primaryAddress ? ($primaryAddress->area == 'inside_dhaka' ? 'Inside Dhaka' : 'Outside Dhaka') : 'No area provided';
                 return [
                     'id' => $customer->id,
                     'name' => $customer->name,
                     'email' => $customer->email,
                     'phone' => $customer->phone,
-                    'customer' => $customer,
-                    'location' => $location,
+                    'address' => $address,
+                    'area' => $area,
                     'joinDate' => $customer->created_at,
                     'totalOrders' => $customer->total_orders,
                     'totalSpent' => $customer->total_spent,

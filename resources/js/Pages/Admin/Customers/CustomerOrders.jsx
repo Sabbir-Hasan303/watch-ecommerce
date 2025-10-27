@@ -6,6 +6,7 @@ import { Card } from '@/Components/ui/card'
 import { Link, router } from '@inertiajs/react'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Head } from '@inertiajs/react'
+import Taka from '@/Components/Taka'
 
 const statusColors = {
   pending: 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-500/30',
@@ -57,10 +58,10 @@ export default function CustomerOrders({ customer, totalOrders, totalSpent }) {
               <div className='flex items-center justify-between'>
                 <div>
                   <p className='text-sm text-muted-foreground'>Total Spent</p>
-                  <p className='text-3xl font-bold mt-1'>${(totalSpent || 0).toFixed(2)}</p>
+                  <p className='text-2xl md:text-xl xl:text-3xl font-bold mt-1 flex items-center gap-1'><Taka color='text-green-600 dark:text-green-400' className='font-bold text-2xl md:text-xl xl:text-2xl' />{(totalSpent || 0).toFixed(2)}</p>
                 </div>
                 <div className='h-12 w-12 rounded-full bg-green-500/20 flex items-center justify-center'>
-                  <DollarSign className='h-6 w-6 text-green-600 dark:text-green-400' />
+                  <Taka color='text-green-600 dark:text-green-400' className='font-bold text-xl xl:text-3xl' />
                 </div>
               </div>
             </Card>
@@ -68,10 +69,10 @@ export default function CustomerOrders({ customer, totalOrders, totalSpent }) {
               <div className='flex items-center justify-between'>
                 <div>
                   <p className='text-sm text-muted-foreground'>Avg Order Value</p>
-                  <p className='text-3xl font-bold mt-1'>${totalOrders > 0 ? ((totalSpent || 0) / totalOrders).toFixed(2) : '0.00'}</p>
+                  <p className='text-2xl md:text-xl xl:text-3xl font-bold mt-1 flex items-center gap-2'><Taka color='text-purple-600 dark:text-purple-400' className='font-bold text-2xl md:text-xl xl:text-2xl' />{totalOrders > 0 ? ((totalSpent || 0) / totalOrders).toFixed(2) : '0.00'}</p>
                 </div>
                 <div className='h-12 w-12 rounded-full bg-purple-500/20 flex items-center justify-center'>
-                  <DollarSign className='h-6 w-6 text-purple-600 dark:text-purple-400' />
+                  <Taka color='text-purple-600 dark:text-purple-400' className='font-bold text-2xl md:text-xl xl:text-3xl' />
                 </div>
               </div>
             </Card>
@@ -89,9 +90,7 @@ export default function CustomerOrders({ customer, totalOrders, totalSpent }) {
               <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
                 {orders.map(order => {
                   const totalItems = order.items ? order.items.reduce((sum, item) => sum + item.quantity, 0) : 0
-                  const shippingAddress = order.shipping_address
-                    ? `${order.shipping_address.address_line}, ${order.shipping_address.area}`
-                    : 'No address provided'
+                  const shippingAddress = order.shipping_address ? order.shipping_address.address_line : 'No address provided'
 
                   return (
                     <Card
@@ -120,11 +119,10 @@ export default function CustomerOrders({ customer, totalOrders, totalSpent }) {
                             </div>
                           </div>
                           <div className='flex items-center gap-2'>
-                            <DollarSign className='h-5 w-5 text-green-600 dark:text-green-400' />
-                            <span className='text-xl font-bold text-green-600 dark:text-green-400'>${(order.total || 0).toFixed(2)}</span>
+                            <p className='text-xl font-bold text-green-600 dark:text-green-400 flex items-center gap-1'><Taka color='text-green-600 dark:text-green-400 text-xl' />{(Number(order.total).toFixed(2) || 0)}</p>
                           </div>
                         </div>
-                        <Link href={`/admin/orders/${order.id}`}>
+                        <Link href={`/orders/${order.id}/details`}>
                           <Button
                             variant='outline'
                             className='w-full lg:w-auto hover:bg-blue-500/10 hover:border-blue-500/50 hover:text-blue-600 dark:hover:text-blue-400 transition-all bg-transparent'>

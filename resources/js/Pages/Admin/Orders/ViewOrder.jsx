@@ -197,8 +197,8 @@ export default function ViewOrder({ order }) {
                                                         <p className='text-sm text-muted-foreground mt-2'>Quantity: {item.quantity}</p>
                                                     </div>
                                                     <div className='text-right'>
-                                                        <p className='font-semibold text-foreground'>
-                                                            <Taka />
+                                                        <p className='font-semibold text-foreground text-base flex items-center gap-1'>
+                                                            <Taka className='text-base' />
                                                             {Number(item.total_price || 0).toFixed(2)}
                                                         </p>
                                                     </div>
@@ -214,31 +214,31 @@ export default function ViewOrder({ order }) {
                                     <div className='mt-6 pt-6 border-t border-border space-y-2'>
                                         <div className='flex justify-between text-sm'>
                                             <span className='text-muted-foreground'>Subtotal</span>
-                                            <span className='text-foreground'>
-                                                <Taka />
+                                            <div className='text-foreground text-base flex items-center gap-1'>
+                                                <Taka className='text-base' />
                                                 {Number(order.subtotal || 0).toFixed(2)}
-                                            </span>
+                                            </div>
                                         </div>
                                         <div className='flex justify-between text-sm'>
                                             <span className='text-muted-foreground'>Shipping</span>
-                                            <span className='text-foreground'>
-                                                <Taka />
+                                            <div className='text-foreground text-base flex items-center gap-1'>
+                                                <Taka className='text-base' />
                                                 {Number(order.shipping_cost || 0).toFixed(2)}
-                                            </span>
+                                            </div>
                                         </div>
                                         <div className='flex justify-between text-sm'>
                                             <span className='text-muted-foreground'>Tax</span>
-                                            <span className='text-foreground'>
-                                                <Taka />
+                                            <div className='text-foreground text-base flex items-center gap-1'>
+                                                <Taka className='text-base' />
                                                 {Number(order.tax_total || 0).toFixed(2)}
-                                            </span>
+                                            </div>
                                         </div>
                                         <div className='flex justify-between text-lg font-semibold pt-2 border-t border-border'>
                                             <span className='text-foreground'>Total</span>
-                                            <span className='text-foreground'>
-                                                <Taka />
+                                            <div className='text-foreground text-base flex items-center gap-1'>
+                                                <Taka className='text-base' />
                                                 {Number(order.total || 0).toFixed(2)}
-                                            </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
