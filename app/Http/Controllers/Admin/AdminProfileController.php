@@ -26,10 +26,11 @@ class AdminProfileController extends Controller
         $user = Auth::user();
 
         // Handle profile information update
-        if ($request->has('name') || $request->has('email')) {
+        if ($request->has('name') || $request->has('email') || $request->has('phone')) {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+                'phone' => 'required|string|max:255',
             ]);
 
             $user->update($validated);

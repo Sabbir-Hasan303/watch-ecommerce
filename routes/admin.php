@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Admin\CustomerController;
 
 
 
@@ -53,15 +54,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Customers
     Route::prefix('customers')->group(function () {
-        Route::get('/', function () {
-            return Inertia::render('Admin/Customers/List');
-        })->name('admin.customers.index');
+        Route::get('/', [CustomerController::class, 'index'])->name('admin.customers.index');
 
-        Route::get('/{id}/orders', function ($id) {
-            return Inertia::render('Admin/Customers/CustomerOrders', [
-                'customerId' => $id
-            ]);
-        })->name('admin.customers.orders');
+        Route::get('/{id}/orders', [CustomerController::class, 'allOrders'])->name('admin.customers.orders');
 
         Route::get('/ratings', function () {
             return Inertia::render('Admin/Customers/Ratings');

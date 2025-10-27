@@ -21,10 +21,10 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'profile_image',
         'password',
         'role',
-        'profile_image',
     ];
 
     /**
@@ -73,5 +73,21 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Get the total number of orders for this user
+     */
+    public function getTotalOrdersAttribute()
+    {
+        return $this->orders()->count();
+    }
+
+    /**
+     * Get the total amount spent by this user
+     */
+    public function getTotalSpentAttribute()
+    {
+        return $this->orders()->sum('total') ?? 0;
     }
 }

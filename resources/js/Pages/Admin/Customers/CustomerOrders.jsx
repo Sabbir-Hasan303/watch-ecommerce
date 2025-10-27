@@ -1,60 +1,11 @@
-import { React, useState } from 'react'
-import { Menu, ArrowLeft, Package, Calendar, DollarSign, MapPin, ChevronRight } from 'lucide-react'
+import { React } from 'react'
+import { ArrowLeft, Package, Calendar, DollarSign, MapPin, ChevronRight } from 'lucide-react'
 import { Button } from '@mui/material'
 import { Badge } from '@/Components/ui/badge'
 import { Card } from '@/Components/ui/card'
 import { Link, router } from '@inertiajs/react'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Head } from '@inertiajs/react'
-
-// Mock data - this would typically come from props or API
-const getMockUser = customerId => ({
-  id: customerId,
-  name: 'John Doe',
-  email: 'john.doe@example.com',
-  phone: '+1 (555) 123-4567',
-  totalOrders: 12,
-  totalSpent: 2450.0
-})
-
-const mockOrders = [
-  {
-    id: '1',
-    orderNumber: 'ORD-2024-001',
-    date: '2024-10-15',
-    status: 'delivered',
-    total: 299.99,
-    items: 3,
-    shippingAddress: '123 Main St, New York, NY 10001'
-  },
-  {
-    id: '2',
-    orderNumber: 'ORD-2024-045',
-    date: '2024-09-28',
-    status: 'delivered',
-    total: 149.5,
-    items: 2,
-    shippingAddress: '123 Main St, New York, NY 10001'
-  },
-  {
-    id: '3',
-    orderNumber: 'ORD-2024-089',
-    date: '2024-09-10',
-    status: 'cancelled',
-    total: 89.99,
-    items: 1,
-    shippingAddress: '123 Main St, New York, NY 10001'
-  },
-  {
-    id: '4',
-    orderNumber: 'ORD-2024-123',
-    date: '2024-08-22',
-    status: 'delivered',
-    total: 449.99,
-    items: 5,
-    shippingAddress: '123 Main St, New York, NY 10001'
-  }
-]
 
 const statusColors = {
   pending: 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-500/30',
@@ -64,9 +15,8 @@ const statusColors = {
   cancelled: 'bg-red-500/20 text-red-700 dark:text-red-400 border-red-500/30'
 }
 
-export default function CustomerOrders({ customerId }) {
-  const [orders] = useState(mockOrders)
-  const mockUser = getMockUser(customerId)
+export default function CustomerOrders({ customer, totalOrders, totalSpent }) {
+  const orders = customer.orders || []
 
   return (
     <AuthenticatedLayout>
@@ -78,7 +28,7 @@ export default function CustomerOrders({ customerId }) {
               <div>
                 <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Order History</h2>
                 <p className='text-sm text-muted-foreground'>
-                  {mockUser.name} - {mockUser.email}
+                  {customer.name} - {customer.email}
                 </p>
               </div>
               <div>
@@ -96,7 +46,7 @@ export default function CustomerOrders({ customerId }) {
               <div className='flex items-center justify-between'>
                 <div>
                   <p className='text-sm text-muted-foreground'>Total Orders</p>
-                  <p className='text-3xl font-bold mt-1'>{mockUser.totalOrders}</p>
+                  <p className='text-3xl font-bold mt-1'>{totalOrders || 0}</p>
                 </div>
                 <div className='h-12 w-12 rounded-full bg-blue-500/20 flex items-center justify-center'>
                   <Package className='h-6 w-6 text-blue-600 dark:text-blue-400' />
@@ -107,7 +57,7 @@ export default function CustomerOrders({ customerId }) {
               <div className='flex items-center justify-between'>
                 <div>
                   <p className='text-sm text-muted-foreground'>Total Spent</p>
-                  <p className='text-3xl font-bold mt-1'>${mockUser.totalSpent.toFixed(2)}</p>
+                  <p className='text-3xl font-bold mt-1'>${(totalSpent || 0).toFixed(2)}</p>
                 </div>
                 <div className='h-12 w-12 rounded-full bg-green-500/20 flex items-center justify-center'>
                   <DollarSign className='h-6 w-6 text-green-600 dark:text-green-400' />
@@ -118,7 +68,7 @@ export default function CustomerOrders({ customerId }) {
               <div className='flex items-center justify-between'>
                 <div>
                   <p className='text-sm text-muted-foreground'>Avg Order Value</p>
-                  <p className='text-3xl font-bold mt-1'>${(mockUser.totalSpent / mockUser.totalOrders).toFixed(2)}</p>
+                  <p className='text-3xl font-bold mt-1'>${totalOrders > 0 ? ((totalSpent || 0) / totalOrders).toFixed(2) : '0.00'}</p>
                 </div>
                 <div className='h-12 w-12 rounded-full bg-purple-500/20 flex items-center justify-center'>
                   <DollarSign className='h-6 w-6 text-purple-600 dark:text-purple-400' />
@@ -137,46 +87,55 @@ export default function CustomerOrders({ customerId }) {
               </Card>
             ) : (
               <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
-                {orders.map(order => (
-                  <Card
-                    key={order.id}
-                    className='p-6 hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-card to-card/50 border-border/50 group'>
-                    <div className='flex flex-col xl:flex-row xl:items-center flex-wrap justify-between gap-4'>
-                      <div className='flex-1 space-y-3'>
-                        <div className='flex items-center gap-3 flex-wrap'>
-                          <h3 className='text-lg font-semibold'>{order.orderNumber}</h3>
-                          <Badge className={statusColors[order.status]}>{order.status.charAt(0).toUpperCase() + order.status.slice(1)}</Badge>
-                        </div>
-                        <div className='flex flex-wrap gap-2 text-sm text-muted-foreground'>
-                          <div className='flex items-center gap-2'>
-                            <Calendar className='h-4 w-4' />
-                            <span>{new Date(order.date).toLocaleDateString()}</span>
+                {orders.map(order => {
+                  const totalItems = order.items ? order.items.reduce((sum, item) => sum + item.quantity, 0) : 0
+                  const shippingAddress = order.shipping_address
+                    ? `${order.shipping_address.address_line}, ${order.shipping_address.area}`
+                    : 'No address provided'
+
+                  return (
+                    <Card
+                      key={order.id}
+                      className='p-6 hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-card to-card/50 border-border/50 group'>
+                      <div className='flex flex-col xl:flex-row xl:items-center flex-wrap justify-between gap-4'>
+                        <div className='flex-1 space-y-3'>
+                          <div className='flex items-center gap-3 flex-wrap'>
+                            <h3 className='text-lg font-semibold'>#{order.id}</h3>
+                            <Badge className={statusColors[order.status] || statusColors.pending}>
+                              {order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : 'Pending'}
+                            </Badge>
+                          </div>
+                          <div className='flex flex-wrap gap-2 text-sm text-muted-foreground'>
+                            <div className='flex items-center gap-2'>
+                              <Calendar className='h-4 w-4' />
+                              <span>{new Date(order.created_at).toLocaleDateString()}</span>
+                            </div>
+                            <div className='flex items-center gap-2'>
+                              <Package className='h-4 w-4' />
+                              <span>{totalItems} items</span>
+                            </div>
+                            <div className='flex items-center gap-2 md:col-span-2'>
+                              <MapPin className='h-4 w-4' />
+                              <span className='truncate'>{shippingAddress}</span>
+                            </div>
                           </div>
                           <div className='flex items-center gap-2'>
-                            <Package className='h-4 w-4' />
-                            <span>{order.items} items</span>
-                          </div>
-                          <div className='flex items-center gap-2 md:col-span-2'>
-                            <MapPin className='h-4 w-4' />
-                            <span className='truncate'>{order.shippingAddress}</span>
+                            <DollarSign className='h-5 w-5 text-green-600 dark:text-green-400' />
+                            <span className='text-xl font-bold text-green-600 dark:text-green-400'>${(order.total || 0).toFixed(2)}</span>
                           </div>
                         </div>
-                        <div className='flex items-center gap-2'>
-                          <DollarSign className='h-5 w-5 text-green-600 dark:text-green-400' />
-                          <span className='text-xl font-bold text-green-600 dark:text-green-400'>${order.total.toFixed(2)}</span>
-                        </div>
+                        <Link href={`/admin/orders/${order.id}`}>
+                          <Button
+                            variant='outline'
+                            className='w-full lg:w-auto hover:bg-blue-500/10 hover:border-blue-500/50 hover:text-blue-600 dark:hover:text-blue-400 transition-all bg-transparent'>
+                            View Details
+                            <ChevronRight className='h-4 w-4 ml-2' />
+                          </Button>
+                        </Link>
                       </div>
-                      <Link href={`/orders/${order.id}`}>
-                        <Button
-                          variant='outline'
-                          className='w-full lg:w-auto hover:bg-blue-500/10 hover:border-blue-500/50 hover:text-blue-600 dark:hover:text-blue-400 transition-all bg-transparent'>
-                          View Details
-                          <ChevronRight className='h-4 w-4 ml-2' />
-                        </Button>
-                      </Link>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  )
+                })}
               </div>
             )}
           </div>

@@ -1,81 +1,16 @@
 import { React, useState } from 'react'
-import { Search, UserCheck, TrendingUp, Star, Eye, MoreVertical } from 'lucide-react'
-import { Button, InputAdornment, FormControl, Box, Typography, IconButton, Menu, MenuItem, Divider, TablePagination } from '@mui/material'
+import { Search, UserCheck, TrendingUp, Eye, MoreVertical } from 'lucide-react'
+import { Button, InputAdornment, FormControl, Box, Typography, IconButton, Menu, MenuItem, TablePagination } from '@mui/material'
 import { Dialog, DialogContent, DialogTitle, DialogActions } from '@mui/material'
 import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper } from '@mui/material'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import CustomTextField from '@/Components/CustomTextField'
-import CustomSelectField from '@/Components/CustomSelectField'
 import { Head, router } from '@inertiajs/react'
 import { Card } from '@/Components/ui/card'
 
-const mockCustomers = [
-  {
-    id: '1',
-    name: 'Sarah Johnson',
-    email: 'sarah.j@example.com',
-    phone: '+1 (555) 123-4567',
-    location: 'New York, USA',
-    joinDate: '2024-01-15',
-    totalOrders: 24,
-    totalSpent: 4850.0,
-  },
-  {
-    id: '2',
-    name: 'Michael Chen',
-    email: 'm.chen@example.com',
-    phone: '+1 (555) 234-5678',
-    location: 'San Francisco, USA',
-    joinDate: '2024-02-20',
-    totalOrders: 15,
-    totalSpent: 3200.5,
-  },
-  {
-    id: '3',
-    name: 'Emma Williams',
-    email: 'emma.w@example.com',
-    phone: '+1 (555) 345-6789',
-    location: 'Los Angeles, USA',
-    joinDate: '2024-03-10',
-    totalOrders: 8,
-    totalSpent: 1580.0,
-  },
-  {
-    id: '4',
-    name: 'James Rodriguez',
-    email: 'james.r@example.com',
-    phone: '+1 (555) 456-7890',
-    location: 'Miami, USA',
-    joinDate: '2024-01-25',
-    totalOrders: 32,
-    totalSpent: 6750.75,
-  },
-  {
-    id: '5',
-    name: 'Olivia Brown',
-    email: 'olivia.b@example.com',
-    phone: '+1 (555) 567-8901',
-    location: 'Chicago, USA',
-    joinDate: '2024-04-05',
-    totalOrders: 5,
-    totalSpent: 890.0,
-  },
-  {
-    id: '6',
-    name: 'David Kim',
-    email: 'david.k@example.com',
-    phone: '+1 (555) 678-9012',
-    location: 'Seattle, USA',
-    joinDate: '2023-12-10',
-    totalOrders: 2,
-    totalSpent: 250.0,
-  }
-]
 
-export default function CustomerList() {
-  const [customers] = useState(mockCustomers)
+export default function CustomerList({ customers = [] }) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
   const [selectedCustomer, setSelectedCustomer] = useState(null)
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
@@ -86,11 +21,9 @@ export default function CustomerList() {
     const matchesSearch =
       customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       customer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      customer.phone.includes(searchQuery)
+      (customer.phone && customer.phone.includes(searchQuery))
 
-    const matchesStatus = statusFilter === 'all' || customer.status === statusFilter
-
-    return matchesSearch && matchesStatus
+    return matchesSearch
   })
 
   // Pagination
@@ -98,7 +31,7 @@ export default function CustomerList() {
   const paginatedCustomers = filteredCustomers.slice(startIndex, startIndex + rowsPerPage)
 
   const totalCustomers = customers.length
-  const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0)
+  const totalRevenue = customers.reduce((sum, c) => sum + (c.totalSpent || 0), 0)
 
   const handleMenuOpen = (event, customerId) => {
     event.stopPropagation()
@@ -160,7 +93,8 @@ export default function CustomerList() {
               <div className='flex items-center justify-between'>
                 <div>
                   <p className='text-sm text-text-primary'>Total Revenue</p>
-                  <p className='text-3xl font-bold mt-1 text-text-primary'>${totalRevenue.toFixed(0)}</p>
+                  {/* <p className='text-3xl font-bold mt-1 text-text-primary'>${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p> */}
+                  <p className='text-3xl font-bold mt-1 text-text-primary'>${totalRevenue}</p>
                   <p className='text-xs text-text-primary mt-1 flex items-center gap-1'>
                     <TrendingUp className='w-3 h-3' />
                     +15% this month
@@ -246,11 +180,6 @@ export default function CustomerList() {
                                 <div className='h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-text-primary font-semibold shadow-lg shadow-emerald-500/30'>
                                   {customer.name.charAt(0)}
                                 </div>
-                                {customer.status === 'vip' && (
-                                  <div className='absolute -top-1 -right-1 h-4 w-4 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center'>
-                                    <Star className='h-2.5 w-2.5 text-text-primary fill-white' />
-                                  </div>
-                                )}
                               </div>
                               <div className='min-w-0'>
                                 <Typography variant='body2' className='font-medium text-foreground truncate'>
@@ -268,13 +197,13 @@ export default function CustomerList() {
                                 {customer.email}
                               </Typography>
                               <Typography variant='caption' className='text-muted-foreground'>
-                                {customer.phone}
+                                {customer.phone || 'N/A'}
                               </Typography>
                             </div>
                           </TableCell>
                           <TableCell className='table-body-cell dark:table-body-cell'>
                             <Typography variant='body2' className='text-foreground'>
-                              {customer.location}
+                              {customer.location || 'No address provided'}
                             </Typography>
                           </TableCell>
                           <TableCell className='table-body-cell dark:table-body-cell'>
@@ -284,7 +213,8 @@ export default function CustomerList() {
                           </TableCell>
                           <TableCell className='table-body-cell dark:table-body-cell'>
                             <Typography variant='body2' className='font-semibold text-foreground'>
-                              ${customer.totalSpent.toFixed(2)}
+                              {/* ${customer.totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} */}
+                              ${(customer.totalSpent || 0).toFixed(2)}
                             </Typography>
                           </TableCell>
                           <TableCell className='table-body-cell dark:table-body-cell'>
@@ -424,7 +354,7 @@ export default function CustomerList() {
                       Phone
                     </Typography>
                     <Typography variant='body2' className='text-text-primary'>
-                      {selectedCustomer.phone}
+                      {selectedCustomer.phone || 'N/A'}
                     </Typography>
                   </Box>
                   <Box
@@ -439,7 +369,7 @@ export default function CustomerList() {
                       Address
                     </Typography>
                     <Typography variant='body2' className='text-text-primary'>
-                      {selectedCustomer.location}
+                      {selectedCustomer.location || 'No address provided'}
                     </Typography>
                   </Box>
                 </Box>
@@ -478,7 +408,8 @@ export default function CustomerList() {
                       Total Spent
                     </Typography>
                     <Typography variant='h5' sx={{ color: '#22C55E', fontWeight: 700 }}>
-                      ${selectedCustomer.totalSpent.toFixed(2)}
+                      {/* ${selectedCustomer.totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} */}
+                      ${(selectedCustomer.totalSpent || 0).toFixed(2)}
                     </Typography>
                   </Box>
                 </Box>

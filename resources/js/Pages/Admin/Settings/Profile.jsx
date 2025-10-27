@@ -1,7 +1,7 @@
 import { React, useState } from 'react'
 import { Button, InputAdornment } from '@mui/material'
 import { Card } from '@/Components/ui/card'
-import { User, Mail, Lock, Upload, Save, Eye, EyeOff } from 'lucide-react'
+import { User, Mail, Lock, Upload, Save, Eye, EyeOff, Phone } from 'lucide-react'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Head, router } from '@inertiajs/react'
 import CustomTextField from '@/Components/CustomTextField'
@@ -14,6 +14,7 @@ export default function Profile({ user }) {
     const [profileImage, setProfileImage] = useState(user?.profile_image || '/placeholder.svg?height=120&width=120')
     const [name, setName] = useState(user?.name || '')
     const [email, setEmail] = useState(user?.email || '')
+    const [phone, setPhone] = useState(user?.phone || '')
     const [currentPassword, setCurrentPassword] = useState('')
     const [newPassword, setNewPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
@@ -50,6 +51,7 @@ export default function Profile({ user }) {
         router.put(route('admin.settings.profile.update'), {
             name,
             email,
+            phone,
             current_password: currentPassword || undefined,
             password: newPassword || undefined,
             password_confirmation: confirmPassword || undefined
@@ -62,8 +64,23 @@ export default function Profile({ user }) {
                 setIsSubmitting(false)
             },
             onError: (errors) => {
-                console.error('Error updating profile:', errors)
-                toast.error('Failed to update profile')
+                // console.error('Error updating profile:', errors)
+
+                // Display specific validation errors
+                if (errors.phone) {
+                    toast.error(errors.phone)
+                } else if (errors.name) {
+                    toast.error(errors.name)
+                } else if (errors.email) {
+                    toast.error(errors.email)
+                } else if (errors.password) {
+                    toast.error(errors.password)
+                } else if (errors.current_password) {
+                    toast.error(errors.current_password)
+                } else {
+                    toast.error('Failed to update profile')
+                }
+
                 setIsSubmitting(false)
             }
         })
@@ -126,6 +143,21 @@ export default function Profile({ user }) {
                                             startAdornment: (
                                                 <InputAdornment position='start'>
                                                     <Mail className='w-4 h-4 mr-2' />
+                                                </InputAdornment>
+                                            )
+                                        }}
+                                    />
+                                </div>
+                                <div className='space-y-2'>
+                                    <CustomTextField
+                                        label='Phone'
+                                        name='phone'
+                                        value={phone}
+                                        onChange={e => setPhone(e.target.value)}
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position='start'>
+                                                    <Phone className='w-4 h-4 mr-2' />
                                                 </InputAdornment>
                                             )
                                         }}
