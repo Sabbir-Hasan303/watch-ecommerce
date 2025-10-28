@@ -44,7 +44,7 @@ class CustomerController extends Controller
     public function allOrders($id)
     {
         $customer = User::where('role', 'customer')
-            ->with(['orders.items.product', 'orders.shippingAddress', 'addresses'])
+            ->with(['orders.items.product', 'orders', 'addresses'])
             ->findOrFail($id);
 
         // Calculate totals explicitly
