@@ -1,27 +1,99 @@
-import { useState } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import { Package, Plus, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react"
-import { Button } from "@mui/material"
+import { Button, Box, Typography } from "@mui/material"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import CustomTextField from "@/components/CustomTextField"
+import AsynchronousInput from "@/Components/AsynchronousInput"
 
 export default function ProductSelection({
-    productSearch,
-    setProductSearch,
-    filteredProducts,
+    products = [],
     addToCart,
     cart
 }) {
     const [selectedProduct, setSelectedProduct] = useState(null)
     const [selectedVariant, setSelectedVariant] = useState(null)
     const [imageLoading, setImageLoading] = useState(false)
+    const [productOptions, setProductOptions] = useState([])
+    const [loadingProducts, setLoadingProducts] = useState(false)
+
+    // Debounce timer ref
+    const searchTimeoutRef = useRef(null)
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current)
+            }
+        }
+    }, [])
 
     const isLowStock = (variant) => variant.quantity <= 10 // Using lowStockThreshold from product
 
-    const handleProductSelect = (product) => {
-        setSelectedProduct(product)
-        setSelectedVariant(null) // Reset variant selection when product changes
-        setProductSearch("") // Clear search
+    const handleProductSearchOpen = () => {
+        // Don't fetch anything on open, wait for user input
+    }
+
+    const handleProductSearchClose = () => {
+        setProductOptions([])
+        // Clear any pending search
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current)
+            searchTimeoutRef.current = null
+        }
+    }
+
+    const debouncedSearch = useCallback((searchTerm) => {
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current)
+        }
+
+        searchTimeoutRef.current = setTimeout(() => {
+            if (searchTerm && searchTerm.length >= 2) {
+                setLoadingProducts(true)
+
+                // Simulate API call - replace with actual API call
+                setTimeout(() => {
+                    // Filter products based on search term
+                    const filteredProducts = products.filter(product =>
+                        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        product.variants?.some(variant =>
+                            variant.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            variant.sku.toLowerCase().includes(searchTerm.toLowerCase())
+                        )
+                    )
+
+                    // Flatten filtered products with their variants
+                    const flattenedOptions = filteredProducts.flatMap(product =>
+                        product.variants?.map(variant => ({
+                            ...variant,
+                            product: product,
+                            productName: product.name,
+                            productImage: product.image,
+                            productCategory: product.category
+                        })) || []
+                    )
+
+                    setProductOptions(flattenedOptions)
+                    setLoadingProducts(false)
+                }, 300)
+            } else {
+                setProductOptions([])
+                setLoadingProducts(false)
+            }
+        }, 300) // 300ms debounce
+    }, [products])
+
+    const handleProductSearchInput = (event, newInputValue, reason) => {
+        if (reason === 'input') {
+            debouncedSearch(newInputValue)
+        }
+    }
+
+    const handleProductVariantSelect = (variant) => {
+        setSelectedProduct(variant.product)
+        setSelectedVariant(variant)
     }
 
     const selectVariant = (variant) => {
@@ -64,19 +136,42 @@ export default function ProductSelection({
             </div>
 
             <div className="mb-10">
-                <CustomTextField
+                <AsynchronousInput
+                    options={productOptions}
+                    loading={loadingProducts}
+                    onOpen={handleProductSearchOpen}
+                    onClose={handleProductSearchClose}
+                    onInputChange={handleProductSearchInput}
+                    onChange={(event, newValue) => handleProductVariantSelect(newValue)}
+                    value={null}
+                    getOptionLabel={(option) => option ? `${option.productName} - ${option.title}` : ''}
+                    isOptionEqualToValue={(option, value) => option?.id === value?.id}
                     label="Search Products"
-                    placeholder="Search by name, SKU, or category..."
-                    value={productSearch}
-                    onChange={(e) => setProductSearch(e.target.value)}
-                    suggestion={true}
-                    suggestions={filteredProducts.map((product) => product.name)}
-                    onSelect={(selectedProductName) => {
-                        const product = filteredProducts.find((p) => p.name === selectedProductName)
-                        if (product) {
-                            handleProductSelect(product)
-                        }
-                    }}
+                    placeholder="Type at least 2 characters to search..."
+                    noOptionsText={productOptions.length === 0 && !loadingProducts ? "Type to search for products..." : "No products found"}
+                    sx={{ width: '100%' }}
+                    renderOption={(props, option) => (
+                        <Box component="li" {...props} className="flex items-center gap-3 p-3">
+                            <img
+                                src={option.productImage || '/placeholder.svg'}
+                                alt={option.productName}
+                                className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
+                            />
+                            <div className="flex-1 min-w-0">
+                                <Typography variant="body2" className="font-medium text-foreground truncate">
+                                    {option.productName}
+                                </Typography>
+                                <Typography variant="caption" className="text-muted-foreground">
+                                    {option.title} • SKU: {option.sku}
+                                </Typography>
+                            </div>
+                            <div className="flex items-center gap-1 flex-shrink-0">
+                                <Typography variant="body2" className="font-medium">
+                                    ${Number(option.price || 0).toFixed(2)}
+                                </Typography>
+                            </div>
+                        </Box>
+                    )}
                 />
             </div>
 
@@ -190,7 +285,7 @@ export default function ProductSelection({
             )}
 
             {/* Show message when no product is selected */}
-            {!selectedProduct && productSearch.length === 0 && (
+            {!selectedProduct && (
                 <div className="text-center py-12">
                     <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-foreground mb-2">No Product Selected</h3>

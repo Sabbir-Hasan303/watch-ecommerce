@@ -47,6 +47,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/create', [OrderController::class, 'create'])->name('admin.orders.create');
         Route::post('/store', [OrderController::class, 'store'])->name('admin.orders.store');
         Route::get('/{id}/details', [OrderController::class, 'show'])->name('admin.orders.show');
+        Route::get('/{id}/edit', [OrderController::class, 'edit'])->name('admin.orders.edit');
+        Route::post('/update', [OrderController::class, 'update'])->name('admin.orders.update');
         Route::get('/{id}/invoice', [OrderController::class, 'downloadInvoice'])->name('admin.orders.invoice');
         Route::post('/change-status', [OrderController::class, 'changeOrderStatus'])->name('admin.orders.change-status');
         Route::post('/cancel', [OrderController::class, 'cancelOrder'])->name('admin.orders.cancel');

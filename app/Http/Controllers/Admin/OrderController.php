@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\OrderRequest;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
@@ -61,40 +62,10 @@ class OrderController extends Controller
         return Inertia::render('Admin/Orders/CreateOrder', $data);
     }
 
-    public function store(Request $request)
+    public function store(OrderRequest $request)
     {
         try {
-            // Validate the request
-            $validated = $request->validate([
-                'user_id' => 'nullable|integer|exists:users,id',
-                'shipping_address' => 'required|array',
-                'shipping_address.full_name' => 'required|string|max:255',
-                'shipping_address.phone' => 'required|string|max:32',
-                'shipping_address.email' => 'required|email|max:255',
-                'shipping_address.address_line' => 'required|string|max:500',
-                'shipping_address.area' => 'required|string|in:inside_dhaka,outside_dhaka',
-                'billing_address' => 'required|array',
-                'billing_address.full_name' => 'required|string|max:255',
-                'billing_address.phone' => 'required|string|max:32',
-                'billing_address.email' => 'required|email|max:255',
-                'billing_address.address_line' => 'required|string|max:500',
-                'billing_address.area' => 'required|string|in:inside_dhaka,outside_dhaka',
-                'items' => 'required|array|min:1',
-                'items.*.product_id' => 'required|integer|exists:products,id',
-                'items.*.variant_id' => 'required|integer|exists:product_variants,id',
-                'items.*.quantity' => 'required|integer|min:1',
-                'items.*.price' => 'required|numeric|min:0',
-                'payment_method' => 'required|string|in:cod,card,bkash,nagad,rocket',
-                'shipping_method' => 'required|string|in:standard,free',
-                'notes' => 'nullable|string|max:1000',
-                'discount_code' => 'nullable|string|max:50',
-                'discount_amount' => 'nullable|numeric|min:0',
-                'send_confirmation_email' => 'boolean',
-                'send_invoice' => 'boolean',
-                'subtotal' => 'required|numeric|min:0',
-                'shipping_cost' => 'required|numeric|min:0',
-                'total' => 'required|numeric|min:0',
-            ]);
+            $validated = $request->validated();
 
 
             // Use database transaction for data consistency
@@ -130,6 +101,45 @@ class OrderController extends Controller
         return Inertia::render('Admin/Orders/ViewOrder', [
             'order' => $order
         ]);
+    }
+
+    public function edit($id)
+    {
+        $order = Order::with([
+            'user.addresses',
+            'items.product.images',
+            'items.variant'
+        ])->find($id);
+
+        if (!$order) {
+            abort(404, 'Order not found');
+        }
+
+        $data = OrderService::getCreatePageData();
+        $data['order'] = $order;
+        // dd($data);
+
+        return Inertia::render('Admin/Orders/Edit', $data);
+    }
+
+    public function update(OrderRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+
+            // Use database transaction for data consistency
+            return DB::transaction(function () use ($validated) {
+                // Update the order using OrderService
+                $order = OrderService::updateOrder($validated);
+
+                return redirect()->route('admin.orders.show', $order->id)->with('success', 'Order updated successfully');
+            });
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            return back()->with('error', 'Order update failed: ' . $e->getMessage())->withInput();
+        }
     }
 
     public function changeOrderStatus(Request $request)

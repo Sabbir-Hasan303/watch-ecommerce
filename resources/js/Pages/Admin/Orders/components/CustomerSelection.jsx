@@ -1,13 +1,13 @@
+import { useState, useCallback, useRef, useEffect } from "react"
 import { User, MapPin, UserPlus, X, Package, Plus } from "lucide-react"
-import { Button, Avatar } from "@mui/material"
+import { Button, Avatar, Box, Typography } from "@mui/material"
 import { Card } from "@/components/ui/card"
 import CustomTextField from "@/components/CustomTextField"
 import CustomSelectField from "@/Components/CustomSelectField"
+import AsynchronousInput from "@/Components/AsynchronousInput"
 
 export default function CustomerSelection({
-    customerSearch,
-    setCustomerSearch,
-    filteredCustomers,
+    customers = [],
     selectedCustomer,
     setSelectedCustomer,
     showNewCustomerForm,
@@ -26,6 +26,71 @@ export default function CustomerSelection({
     setIsAddressFieldsDisabled,
     handleShippingAddressChange
 }) {
+    const [customerOptions, setCustomerOptions] = useState([])
+    const [loadingCustomers, setLoadingCustomers] = useState(false)
+
+    // Debounce timer ref
+    const searchTimeoutRef = useRef(null)
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current)
+            }
+        }
+    }, [])
+
+    const handleCustomerSearchOpen = () => {
+        // Don't fetch anything on open, wait for user input
+    }
+
+    const handleCustomerSearchClose = () => {
+        setCustomerOptions([])
+        // Clear any pending search
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current)
+            searchTimeoutRef.current = null
+        }
+    }
+
+    const debouncedSearch = useCallback((searchTerm) => {
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current)
+        }
+
+        searchTimeoutRef.current = setTimeout(() => {
+            if (searchTerm && searchTerm.length >= 2) {
+                setLoadingCustomers(true)
+
+                // Simulate API call - replace with actual API call
+                setTimeout(() => {
+                    // Filter customers based on search term
+                    const filteredCustomers = customers.filter(customer =>
+                        customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        customer.phone.toLowerCase().includes(searchTerm.toLowerCase())
+                    )
+
+                    setCustomerOptions(filteredCustomers)
+                    setLoadingCustomers(false)
+                }, 300)
+            } else {
+                setCustomerOptions([])
+                setLoadingCustomers(false)
+            }
+        }, 300) // 300ms debounce
+    }, [customers])
+
+    const handleCustomerSearchInput = (event, newInputValue, reason) => {
+        if (reason === 'input') {
+            debouncedSearch(newInputValue)
+        }
+    }
+
+    const handleCustomerVariantSelect = (customer) => {
+        handleCustomerSelect(customer)
+    }
     // Validation functions
     const isValidEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -70,19 +135,40 @@ export default function CustomerSelection({
                 {/* Customer Search */}
                 {!showNewCustomerForm && !selectedCustomer && (
                     <div className="mb-6">
-                        <CustomTextField
+                        <AsynchronousInput
+                            options={customerOptions}
+                            loading={loadingCustomers}
+                            onOpen={handleCustomerSearchOpen}
+                            onClose={handleCustomerSearchClose}
+                            onInputChange={handleCustomerSearchInput}
+                            onChange={(event, newValue) => handleCustomerVariantSelect(newValue)}
+                            value={null}
+                            getOptionLabel={(option) => option ? `${option.name} - ${option.email}` : ''}
+                            isOptionEqualToValue={(option, value) => option?.id === value?.id}
                             label="Search Customers"
-                            placeholder="Search by name, email, or phone..."
-                            value={customerSearch}
-                            onChange={(e) => setCustomerSearch(e.target.value)}
-                            suggestion={true}
-                            suggestions={filteredCustomers.map((customer) => customer.name)}
-                            onSelect={(selectedCustomerName) => {
-                                const customer = filteredCustomers.find((c) => c.name === selectedCustomerName)
-                                if (customer) {
-                                    handleCustomerSelect(customer)
-                                }
-                            }}
+                            placeholder="Type at least 2 characters to search..."
+                            noOptionsText={customerOptions.length === 0 && !loadingCustomers ? "Type to search for customers..." : "No customers found"}
+                            sx={{ width: '100%' }}
+                            renderOption={(props, option) => (
+                                <Box component="li" {...props} className="flex items-center gap-3 p-3">
+                                    <Avatar className="w-10 h-10 bg-emerald-500 text-white text-sm">
+                                        {option.name.charAt(0)}
+                                    </Avatar>
+                                    <div className="flex-1 min-w-0">
+                                        <Typography variant="body2" className="font-medium text-foreground truncate">
+                                            {option.name}
+                                        </Typography>
+                                        <Typography variant="caption" className="text-muted-foreground">
+                                            {option.email} • {option.phone}
+                                        </Typography>
+                                    </div>
+                                    <div className="flex items-center gap-1 flex-shrink-0">
+                                        <Typography variant="caption" className="text-muted-foreground">
+                                            {option.totalOrders} orders
+                                        </Typography>
+                                    </div>
+                                </Box>
+                            )}
                         />
                     </div>
                 )}

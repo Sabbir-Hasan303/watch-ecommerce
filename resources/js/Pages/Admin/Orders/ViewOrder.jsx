@@ -1,7 +1,7 @@
 import { React, useState } from 'react'
-import { ArrowLeft, Package, MapPin, CreditCard, Truck, CheckCircle, XCircle, Clock, Download, Printer, User, XCircleIcon } from 'lucide-react'
+import { ArrowLeft, Package, MapPin, CreditCard, Truck, CheckCircle, XCircle, Clock, Download, Printer, User, XCircleIcon, Edit } from 'lucide-react'
 import { Button, FormControl } from '@mui/material'
-import { router } from '@inertiajs/react'
+import { router, Link } from '@inertiajs/react'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import CustomSelectField from '@/Components/CustomSelectField'
 import Taka from '@/Components/Taka'
@@ -110,6 +110,22 @@ export default function ViewOrder({ order }) {
                         <div className='flex flex-col md:flex-row justify-between items-center mb-6'>
                             <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Order Details</h2>
                             <div className='flex items-center gap-3'>
+                                <Link href={`/orders/${order.id}/edit`}>
+                                    <Button
+                                        variant='outlined'
+                                        size='sm'
+                                        sx={{
+                                            color: isDarkMode ? '#9CA3AF' : '#374151',
+                                            borderColor: isDarkMode ? '#374151' : '#9CA3AF',
+                                            '&:hover': {
+                                                bgcolor: isDarkMode ? 'rgba(55, 65, 81, 0.3)' : '#9CA3AF',
+                                                borderColor: isDarkMode ? '#6B7280' : '#9CA3AF'
+                                            }
+                                        }}>
+                                        <Edit className='w-4 h-4 mr-2' />
+                                        <span className='hidden sm:inline'>Edit Order</span>
+                                    </Button>
+                                </Link>
                                 <Button
                                     variant='outlined'
                                     size='sm'

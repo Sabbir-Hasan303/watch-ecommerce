@@ -15,11 +15,9 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
     const [currentStep, setCurrentStep] = useState(1)
 
     // Step 1: Product Selection
-    const [productSearch, setProductSearch] = useState("")
     const [cart, setCart] = useState([])
 
     // Step 2: Customer Selection & Address
-    const [customerSearch, setCustomerSearch] = useState("")
     const [selectedCustomer, setSelectedCustomer] = useState(null)
     const [showNewCustomerForm, setShowNewCustomerForm] = useState(false)
 
@@ -57,26 +55,6 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
     const [isAddressFieldsDisabled, setIsAddressFieldsDisabled] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const filteredCustomers =
-        customerSearch.length > 0
-            ? customers.filter((customer) => {
-                const matchesSearch =
-                    customer.name.toLowerCase().includes(customerSearch.toLowerCase()) ||
-                    customer.email.toLowerCase().includes(customerSearch.toLowerCase()) ||
-                    customer.phone.includes(customerSearch)
-                return matchesSearch
-            })
-            : []
-
-    const filteredProducts =
-        productSearch.length > 0
-            ? products.filter(
-                (product) =>
-                    product.name.toLowerCase().includes(productSearch.toLowerCase()) ||
-                    product.sku.toLowerCase().includes(productSearch.toLowerCase()) ||
-                    product.category.toLowerCase().includes(productSearch.toLowerCase()),
-            )
-            : []
 
     const addToCart = (product) => {
         const existingItem = cart.find((item) => item.id === product.id)
@@ -153,7 +131,6 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
 
     const handleCustomerSelect = (customer) => {
         setSelectedCustomer(customer)
-        setCustomerSearch("")
 
         // Auto-fill shipping address with customer's default address
         if (customer.defaultShippingAddress) {
@@ -165,6 +142,17 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
                 area: customer.defaultShippingAddress.area,
             })
             setIsAddressFieldsDisabled(true)
+            setIsCreatingNewAddress(false)
+        } else {
+            // If no default address, fill basic info but keep address fields editable
+            setShippingAddress({
+                fullName: customer.name,
+                phone: customer.phone,
+                email: customer.email,
+                address: "",
+                area: "inside_dhaka",
+            })
+            setIsAddressFieldsDisabled(false)
             setIsCreatingNewAddress(false)
         }
 
@@ -316,7 +304,7 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
             total: total
         }
 
-        console.log("Clean order data:", orderData)
+        // console.log("Clean order data:", orderData)
 
         // Submit order using Inertia
         setIsSubmitting(true)
@@ -427,9 +415,7 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
                                 <div className="flex md:flex-row flex-col-reverse justify-center flex-wrap gap-8">
                                     <div className="w-full md:max-w-[900px] space-y-6">
                                         <ProductSelection
-                                            productSearch={productSearch}
-                                            setProductSearch={setProductSearch}
-                                            filteredProducts={filteredProducts}
+                                            products={products}
                                             addToCart={addToCart}
                                             cart={cart}
                                         />
@@ -452,9 +438,7 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                     <div className="lg:col-span-2 space-y-6">
                                         <CustomerSelection
-                                            customerSearch={customerSearch}
-                                            setCustomerSearch={setCustomerSearch}
-                                            filteredCustomers={filteredCustomers}
+                                            customers={customers}
                                             selectedCustomer={selectedCustomer}
                                             setSelectedCustomer={setSelectedCustomer}
                                             showNewCustomerForm={showNewCustomerForm}

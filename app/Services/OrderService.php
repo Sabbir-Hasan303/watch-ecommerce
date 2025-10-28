@@ -163,13 +163,16 @@ class OrderService
     private static function createOrderItems(Order $order, array $items): void
     {
         foreach ($items as $item) {
+            // Handle both 'price' (create) and 'unit_price' (update) field names
+            $unitPrice = $item['unit_price'] ?? $item['price'];
+
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_id' => $item['product_id'],
                 'product_variant_id' => $item['variant_id'],
                 'quantity' => $item['quantity'],
-                'unit_price' => $item['price'],
-                'total_price' => $item['price'] * $item['quantity'],
+                'unit_price' => $unitPrice,
+                'total_price' => $unitPrice * $item['quantity'],
             ]);
         }
     }
@@ -182,6 +185,130 @@ class OrderService
         foreach ($items as $item) {
             ProductVariant::where('id', $item['variant_id'])
                 ->decrement('quantity', $item['quantity']);
+        }
+    }
+
+    /**
+     * Update an existing order with all related data
+     */
+    public static function updateOrder(array $validated): Order
+    {
+        $order = Order::find($validated['order_id']);
+
+        if (!$order) {
+            throw new \Exception('Order not found');
+        }
+
+        // Store original items for stock adjustment
+        $originalItems = $order->items->toArray();
+
+        // Update the order record
+        self::updateOrderRecord($order, $validated);
+
+        // Update order items
+        self::updateOrderItems($order, $validated['items']);
+
+        // Adjust product stock based on changes
+        self::adjustProductStock($originalItems, $validated['items']);
+
+        return $order;
+    }
+
+    /**
+     * Update order record
+     */
+    private static function updateOrderRecord(Order $order, array $validated): void
+    {
+        $order->update([
+            'user_id' => $validated['user_id'],
+            'shipping_address' => $validated['shipping_address'],
+            'billing_address' => $validated['billing_address'],
+            'status' => $validated['status'],
+            'subtotal' => $validated['subtotal'],
+            'shipping_cost' => $validated['shipping_cost'],
+            'discount_total' => $validated['discount_total'],
+            'tax_total' => $validated['tax_total'],
+            'total' => $validated['total'],
+            'payment_method' => $validated['payment_method'],
+            'shipping_method' => $validated['shipping_method'],
+            'notes' => $validated['notes'],
+        ]);
+    }
+
+    /**
+     * Update order items
+     */
+    private static function updateOrderItems(Order $order, array $items): void
+    {
+        // Get existing item IDs (only non-null IDs)
+        $existingItemIds = collect($items)->pluck('id')->filter(function($id) {
+            return $id !== null && $id !== '';
+        })->toArray();
+
+        // Delete items that are no longer in the order
+        if (!empty($existingItemIds)) {
+            $order->items()->whereNotIn('id', $existingItemIds)->delete();
+        } else {
+            // If no existing items, delete all current items
+            $order->items()->delete();
+        }
+
+        // Update or create items
+        foreach ($items as $item) {
+            if ($item['id'] && $item['id'] !== null && $item['id'] !== '') {
+                // Update existing item
+                OrderItem::where('id', $item['id'])->update([
+                    'product_id' => $item['product_id'],
+                    'product_variant_id' => $item['variant_id'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
+                    'total_price' => $item['unit_price'] * $item['quantity'],
+                ]);
+            } else {
+                // Create new item
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product_id'],
+                    'product_variant_id' => $item['variant_id'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
+                    'total_price' => $item['unit_price'] * $item['quantity'],
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Adjust product stock based on order changes
+     */
+    private static function adjustProductStock(array $originalItems, array $newItems): void
+    {
+        // Create maps for easier comparison
+        $originalMap = collect($originalItems)->keyBy('product_variant_id');
+        $newMap = collect($newItems)->keyBy('variant_id');
+
+        // Get all variant IDs that were affected
+        $allVariantIds = collect($originalItems)->pluck('product_variant_id')
+            ->merge(collect($newItems)->pluck('variant_id'))
+            ->unique();
+
+        foreach ($allVariantIds as $variantId) {
+            $originalQuantity = $originalMap->get($variantId)['quantity'] ?? 0;
+            $newQuantity = $newMap->get($variantId)['quantity'] ?? 0;
+
+            $quantityDifference = $newQuantity - $originalQuantity;
+
+            if ($quantityDifference !== 0) {
+                if ($quantityDifference > 0) {
+                    // Stock decreased (more items ordered)
+                    ProductVariant::where('id', $variantId)
+                        ->decrement('quantity', $quantityDifference);
+                } else {
+                    // Stock increased (fewer items ordered)
+                    ProductVariant::where('id', $variantId)
+                        ->increment('quantity', abs($quantityDifference));
+                }
+            }
         }
     }
 
