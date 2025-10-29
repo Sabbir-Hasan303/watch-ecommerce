@@ -6,13 +6,30 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    // return Inertia::render('Welcome', [
+    //     'canLogin' => Route::has('login'),
+    //     'canRegister' => Route::has('register'),
+    //     'laravelVersion' => Application::VERSION,
+    //     'phpVersion' => PHP_VERSION,
+    // ]);
+    return Inertia::render('Web/Home');
 });
+
+Route::get('/watches', function () {
+    return Inertia::render('Web/ProductList');
+})->name('watches-list');
+
+Route::get('/watches/{id}', function () {
+    return Inertia::render('Web/SingleProduct');
+})->name('single-product');
+
+Route::get('/contact', function () {
+    return Inertia::render('Web/Contact');
+})->name('contact');
+
+Route::get('/terms', function () {
+    return Inertia::render('Web/Terms');
+})->name('terms');
 
 
 Route::middleware('auth')->group(function () {

@@ -33,7 +33,16 @@ export default function CustomMultiSelect({
   ...rest
 }) {
   const theme = useTheme()
-  const { isDark } = useThemeContext()
+
+  // Safely check if ThemeContext is available (admin) or not (web)
+  let isDark = false;
+  try {
+    const themeContext = useThemeContext();
+    isDark = themeContext?.isDark || false;
+  } catch (error) {
+    // No theme context available (web pages) - default to light mode
+    isDark = false;
+  }
 
   // Get colors from Tailwind config
   const colors = {

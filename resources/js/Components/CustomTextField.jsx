@@ -2,6 +2,7 @@ import { TextField, Autocomplete } from '@mui/material';
 // import { useTheme } from '../Contexts/ThemeContext';
 import { useThemeContext } from '@/contexts/ThemeContext';
 import { inputLabelClasses } from '@mui/material/InputLabel';
+import { useContext } from 'react';
 
 
 const CustomTextField = ({
@@ -13,7 +14,15 @@ const CustomTextField = ({
     suggestions = [],
     ...rest
 }) => {
-    const { isDark } = useThemeContext();
+    // Safely check if ThemeContext is available (admin) or not (web)
+    let isDark = false;
+    try {
+        const themeContext = useThemeContext();
+        isDark = themeContext?.isDark || false;
+    } catch (error) {
+        // No theme context available (web pages) - default to light mode
+        isDark = false;
+    }
 
     // Get colors from Tailwind config
     const colors = {

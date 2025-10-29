@@ -2,7 +2,15 @@ import { Select, FormControl, InputLabel, MenuItem } from '@mui/material'
 import { useThemeContext } from '@/contexts/ThemeContext'
 
 const CustomSelectField = ({ borderColor = 'gray', customSx = {}, fullWidth = true, variant = 'outlined', label, options = [], menuMaxHeight = '300px', ...rest }) => {
-  const { isDark } = useThemeContext()
+  // Safely check if ThemeContext is available (admin) or not (web)
+  let isDark = false;
+  try {
+    const themeContext = useThemeContext();
+    isDark = themeContext?.isDark || false;
+  } catch (error) {
+    // No theme context available (web pages) - default to light mode
+    isDark = false;
+  }
 
   // Get colors from Tailwind config
   const colors = {

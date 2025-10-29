@@ -1,18 +1,34 @@
-// import ApplicationLogo from '@/Components/ApplicationLogo';
-import { Link } from '@inertiajs/react';
+import React, { useEffect } from "react"
+import Navbar from "@/Pages/Web/Navbar"
+import Footer from "@/Pages/Web/Footer"
+import { CartProvider } from "@/contexts/CartContext"
+// import { AuthProvider } from "@/contexts/AuthContext"
+import CartSidebar from "@/Components/CartSidebar"
+import '../../css/app.css'
 
 export default function GuestLayout({ children }) {
-    return (
-        <div className="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0">
-            {/* <div>
-                <Link href="/">
-                    <ApplicationLogo className="h-20 w-20 fill-current text-gray-500" />
-                </Link>
-            </div> */}
+  useEffect(() => {
+    // Force light mode for web pages by removing dark class
+    document.documentElement.classList.remove('dark')
 
-            <div className="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg">
-                {children}
-            </div>
-        </div>
-    );
+    // Set Inter font for web pages
+    const previous = document.body.style.getPropertyValue("--font-primary")
+    document.body.style.setProperty(
+      "--font-primary",
+      "'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif"
+    )
+
+    return () => {
+      document.body.style.setProperty("--font-primary", previous)
+    }
+  }, [])
+
+  return (
+    <CartProvider>
+      <Navbar />
+      {children}
+      <Footer />
+      <CartSidebar />
+    </CartProvider>
+  )
 }

@@ -26,7 +26,16 @@ export default function AsynchronousInput({
     ...props
 }) {
     const [open, setOpen] = React.useState(false);
-    const { isDark } = useThemeContext();
+
+    // Safely check if ThemeContext is available (admin) or not (web)
+    let isDark = false;
+    try {
+        const themeContext = useThemeContext();
+        isDark = themeContext?.isDark || false;
+    } catch (error) {
+        // No theme context available (web pages) - default to light mode
+        isDark = false;
+    }
     const handleOpen = () => {
         setOpen(true);
         if (onOpen) {
