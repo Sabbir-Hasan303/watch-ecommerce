@@ -7,10 +7,10 @@ import { BarChart } from '@/Components/BarChart'
 import { DonutChart } from '@/Components/DonutChart'
 import { LineChart } from '@/Components/LineChart'
 import { NewAreaChart } from '@/Components/NewAreaChart'
-import { FeaturedProducts } from '@/Components/FeaturedProducts'
+// import { FeaturedProducts } from '@/Components/FeaturedProducts'
 import { useState } from 'react'
-import { InventoryManagement } from './Admin/Inventory/InventoryDashboard'
-import { AccountsManagement } from './Admin/Accounts/AccountManagement'
+// import { InventoryManagement } from './Admin/Inventory/InventoryDashboard'
+// import { AccountsManagement } from './Admin/Accounts/AccountManagement'
 import { Card } from '@mui/material'
 
 export default function Dashboard() {
