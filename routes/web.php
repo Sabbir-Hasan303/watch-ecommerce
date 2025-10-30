@@ -31,6 +31,10 @@ Route::get('/terms', function () {
     return Inertia::render('Web/Terms');
 })->name('terms');
 
+Route::get('/checkout', function () {
+    return Inertia::render('Web/Checkout');
+})->name('checkout');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
