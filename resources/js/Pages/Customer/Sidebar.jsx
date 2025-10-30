@@ -1,8 +1,14 @@
 import React from 'react'
-import { User } from 'lucide-react'
+import { User, Home, Package, LogOut } from 'lucide-react'
 import { Link, usePage } from '@inertiajs/react'
 
-export default function Sidebar( { sidebarOpen, setSidebarOpen, navItems } ) {
+export default function Sidebar( { sidebarOpen, setSidebarOpen } ) {
+    const navItems = [
+        { href: "/customer/dashboard", label: "Dashboard", icon: Home },
+        { href: "/customer/profile", label: "Personal Details", icon: User },
+        { href: "/customer/orders", label: "My Orders", icon: Package },
+        { href: "/customer/logout", label: "Logout", icon: LogOut },
+    ]
     const page = usePage()
     const currentPathname = page.url
     return (

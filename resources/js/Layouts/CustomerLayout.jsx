@@ -1,7 +1,6 @@
 import React from "react"
 import { useState } from "react"
-import { Menu, X, Home, User, Package } from "lucide-react"
-import { Link, usePage } from "@inertiajs/react"
+import { Menu, X } from "lucide-react"
 import Navbar from "@/Pages/Web/Navbar"
 import Footer from "@/Pages/Web/Footer"
 import { CartProvider } from "@/contexts/CartContext"
@@ -10,17 +9,6 @@ import Sidebar from "@/Pages/Customer/Sidebar"
 
 export default function CustomerLayout({ children }) {
     const [sidebarOpen, setSidebarOpen] = useState(false)
-    //   const { user } = useAuth()
-
-
-    const page = usePage()
-    const pathname = page.url
-
-    const navItems = [
-        { href: "/customer/dashboard", label: "Dashboard", icon: Home },
-        { href: "/customer/profile", label: "Personal Details", icon: User },
-        { href: "/customer/orders", label: "My Orders", icon: Package },
-    ]
 
     return (
         <CartProvider>
@@ -36,7 +24,7 @@ export default function CustomerLayout({ children }) {
                     </button>
                     {/* Two Column Grid Layout */}
                     <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
-                        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} navItems={navItems} />
+                        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
                         {/* Main Content */}
                         <main className="bg-white border border-gray-200 rounded-lg p-6 lg:p-8">{children}</main>

@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\OrderController;
@@ -11,7 +10,7 @@ use App\Http\Controllers\Admin\CustomerController;
 
 
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
     Route::get('/dashboard', function () {
         return Inertia::render('Admin/Dashboard');
@@ -92,34 +91,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/profile', [AdminProfileController::class, 'update'])->name('admin.settings.profile.update');
         Route::post('/profile/image', [AdminProfileController::class, 'updateProfileImage'])->name('admin.settings.profile.image');
     });
-});
-
-// Customer Routes
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/customer/dashboard', function () {
-        $user = Auth::user();
-        return Inertia::render('Customer/Dashboard', [
-            'user' => $user,
-        ]);
-    })->name('customer.dashboard');
-
-    Route::get('/customer/profile', function () {
-        $user = Auth::user();
-        return Inertia::render('Customer/Profile', [
-            'user' => $user,
-        ]);
-    })->name('customer.profile');
-
-    Route::get('/customer/orders', function () {
-        return Inertia::render('Customer/Orders');
-    })->name('customer.orders');
-
-    Route::get('/customer/orders/{order}', function ($order) {
-        return Inertia::render('Customer/ShowOrder', [
-            'order' => $order,
-        ]);
-    })->name('customer.orders.show');
-
 });
 
 require __DIR__ . '/auth.php';
