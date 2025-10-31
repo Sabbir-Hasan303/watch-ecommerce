@@ -263,7 +263,7 @@ export default function OrderEdit({ order, products = [], customers = [], shippi
         setIsSubmitting(true)
         const loadingToast = toast.loading('Updating order...')
 
-        router.post('/orders/update', updateData, {
+        router.post(route('admin.orders.update', { id: order.id }), updateData, {
             onSuccess: () => {
                 setIsSubmitting(false)
                 toast.dismiss(loadingToast)
@@ -308,7 +308,7 @@ export default function OrderEdit({ order, products = [], customers = [], shippi
                             <p className="text-sm text-text-secondary mt-2">Order #{order.order_number}</p>
                         </div>
                         <div className="flex items-center gap-3">
-                            <Link href="/orders">
+                            <Link href={route('admin.orders.index')}>
                                 <Button
                                     variant="outline"
                                     className="gap-2 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 transition-all bg-transparent"

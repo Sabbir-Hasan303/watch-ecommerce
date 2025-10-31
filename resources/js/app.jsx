@@ -5,6 +5,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { CssBaseline } from '@mui/material';
+import { ThemeContextProvider } from '@/contexts/ThemeContext'
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -18,12 +19,16 @@ createInertiaApp({
     setup({ el, App, props }) {
         const root = createRoot(el);
 
-        root.render(
-            <>
-                <CssBaseline />
+        const isAuthenticatedPage = props.initialPage.url.startsWith('/admin')
+
+        const content = isAuthenticatedPage ? (
+            <ThemeContextProvider>
                 <App {...props} />
-            </>
+            </ThemeContextProvider>
+        ) : (
+            <App {...props} />
         );
+        root.render(content);
     },
     progress: {
         color: '#4B5563',

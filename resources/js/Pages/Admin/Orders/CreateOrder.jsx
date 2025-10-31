@@ -309,7 +309,7 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
         // Submit order using Inertia
         setIsSubmitting(true)
         const loadingToast = toast.loading('Creating order...')
-        router.post('/orders/store', orderData, {
+        router.post(route('admin.orders.store'), orderData, {
             onStart: () => {
             },
             onSuccess: (page) => {
@@ -363,7 +363,7 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
                                 <h2 className="text-2xl leading-9 font-bold text-text-primary">Create New Order</h2>
                                 <p className="text-sm text-text-secondary mt-2">Place an order on behalf of a customer</p>
                             </div>
-                            <Link href="/orders">
+                            <Link href={route('admin.orders.index')}>
                                 <Button
                                     variant="outline"
                                     className="gap-2 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 transition-all bg-transparent"

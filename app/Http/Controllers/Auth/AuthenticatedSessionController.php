@@ -64,14 +64,14 @@ class AuthenticatedSessionController extends Controller
         }
 
         if ($user->role === 'admin') {
-            return redirect()->route('dashboard');
+            return redirect()->route('admin.dashboard');
         }
 
         if ($user->role === 'customer') {
             return redirect()->intended(route('customer.dashboard', absolute: false));
         }
 
-        return redirect()->route('dashboard');
+        return redirect()->route('customer.dashboard');
     }
 
     /**

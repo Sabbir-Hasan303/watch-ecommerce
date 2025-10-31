@@ -29,6 +29,14 @@ export const ThemeContextProvider = ({ children }) => {
     setMode(prevMode => {
       const newMode = prevMode === 'light' ? 'dark' : 'light'
       localStorage.setItem('themeMode', newMode)
+
+      // Dispatch custom event for log viewer and other components
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('theme-changed', {
+          detail: { theme: newMode }
+        }))
+      }
+
       return newMode
     })
   }
@@ -38,6 +46,13 @@ export const ThemeContextProvider = ({ children }) => {
     if (typeof document === 'undefined') return
     const root = document.documentElement
     root.classList.toggle('dark', mode === 'dark')
+
+    // Dispatch custom event when mode changes (for log viewer and other components)
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('theme-changed', {
+        detail: { theme: mode }
+      }))
+    }
   }, [mode])
 
   const theme = useMemo(() => {
@@ -106,6 +121,7 @@ export const ThemeContextProvider = ({ children }) => {
               textTransform: 'none',
               fontWeight: 600,
               background: 'none',
+              color: mode === 'dark' ? '#ffffff' : '#1c252e',
               '&:hover': {
                 backgroundColor: 'transparent',
                 transform: 'scale(1.05)',

@@ -31,21 +31,21 @@ export default function Sidebar({ collapsed, onToggle, user }) {
     return managementItems.find(item => hasActiveChild(item))
   }
 
-  const menuItems = [{ icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' }]
+  const menuItems = [{ icon: LayoutDashboard, label: 'Dashboard', href: route('admin.dashboard') }]
 
   const managementItems = [
     {
       icon: LayoutDashboard,
       label: 'Dashboard',
-      href: '/dashboard'
+      href: route('admin.dashboard')
     },
     {
       icon: Package,
       label: 'Product',
       subItems: [
-        { label: 'Product List', href: '/products' },
-        { label: 'Add Product', href: '/products/create' },
-        { label: 'Categories', href: '/products/categories' }
+        { label: 'Product List', href: route('admin.products.index') },
+        { label: 'Add Product', href: route('admin.products.create') },
+        { label: 'Categories', href: route('admin.products.categories') }
         // { label: 'Tags', href: '/products/tags' }
         // { label: 'Featured Products', href: '/products/featured' }
       ]
@@ -54,8 +54,8 @@ export default function Sidebar({ collapsed, onToggle, user }) {
       icon: ShoppingBag,
       label: 'Order',
       subItems: [
-        { label: 'All Orders', href: '/orders' },
-        { label: 'Create Order', href: '/orders/create' }
+        { label: 'All Orders', href: route('admin.orders.index') },
+        { label: 'Create Order', href: route('admin.orders.create') }
       ]
     },
     // {
@@ -72,8 +72,8 @@ export default function Sidebar({ collapsed, onToggle, user }) {
       icon: ImageIcon,
       label: 'Content',
       subItems: [
-        { label: 'Newsletter', href: '/newsletters' },
-        { label: 'Contact List', href: '/contact-list' }
+        { label: 'Newsletter', href: route('admin.contents.newsletters') },
+        { label: 'Contact List', href: route('admin.contents.contact-list') }
         // { label: 'Banners', href: '/dynamic-banner' },
         // { label: 'FAQs', href: '/faqs' }
       ]
@@ -87,7 +87,7 @@ export default function Sidebar({ collapsed, onToggle, user }) {
       icon: UserCheck,
       label: 'Customers',
       subItems: [
-        { label: 'All Customers', href: '/customers' }
+        { label: 'All Customers', href: route('admin.customers.index') }
         // { label: 'Customer Reviews', href: '/customers/reviews' },
         // { label: 'Customer Ratings', href: '/customers/ratings' }
       ]
@@ -96,7 +96,7 @@ export default function Sidebar({ collapsed, onToggle, user }) {
       icon: Settings,
       label: 'Settings',
       subItems: [
-        { label: 'Profile', href: '/settings/profile' }
+        { label: 'Profile', href: route('admin.settings.profile') }
         // { label: 'Security', href: '/settings/security' },
         // { label: 'Payment Methods', href: '/settings/payment' },
         // { label: 'API Configuration', href: '/settings/api' },

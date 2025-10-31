@@ -85,7 +85,7 @@ export default function OrdersList({ orders = [], flash }) {
                 break
             case 'download':
                 // Handle download invoice
-                window.open(`/orders/${orderId}/invoice`, '_blank')
+                window.open(route('admin.orders.invoice', { id: orderId }), '_blank')
                 break
             case 'cancel':
                 // Handle cancel order

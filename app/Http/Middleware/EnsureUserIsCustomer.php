@@ -23,7 +23,7 @@ class EnsureUserIsCustomer
                 abort(403);
             }
 
-            return redirect()->route('dashboard');
+            return redirect()->route('admin.dashboard');
         }
 
         return $next($request);

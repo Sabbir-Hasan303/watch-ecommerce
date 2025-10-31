@@ -50,12 +50,12 @@ export default function ProductList({ products = [], categories = [], statuses =
 
     const handleDelete = productId => {
         if (window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
-            router.delete(`/products/${productId}`)
+            router.delete(route('admin.products.destroy', { id: productId }))
         }
     }
 
     const handleEdit = productId => {
-        router.visit(`/products/edit/${productId}`)
+        router.visit(route('admin.products.edit', { id: productId }))
     }
 
     const formatPrice = (minPrice, maxPrice) => {
@@ -85,7 +85,7 @@ export default function ProductList({ products = [], categories = [], statuses =
                 <div className='flex flex-col md:flex-row justify-between items-center mb-6'>
                     <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Product Management</h2>
                     <div>
-                        <Link href='/products/create'>
+                        <Link href={route('admin.products.create')}>
                             <Button variant='outlined' size='md' startIcon={<Plus className='w-4 h-4' />}>
                                 Add Product
                             </Button>

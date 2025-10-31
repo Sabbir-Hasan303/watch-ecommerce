@@ -37,7 +37,7 @@ const statusConfig = {
     }
 }
 
-export default function ViewOrder({ order }) {
+function OrderContent({ order }) {
     const [orderStatus, setOrderStatus] = useState(order?.status || 'pending')
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
     const { isDarkMode } = useThemeContext()
@@ -64,7 +64,7 @@ export default function ViewOrder({ order }) {
         // Find the key that matches the selected label
         const statusKey = Object.keys(statusConfig).find(key => statusConfig[key].label === newStatus)
         if (statusKey) {
-            router.post('/orders/change-status', {
+            router.post(route('admin.orders.change-status', { id: order.id }), {
                 id: order.id,
                 status: statusKey
             }, {
@@ -89,7 +89,7 @@ export default function ViewOrder({ order }) {
     // Show loading state if order is not loaded
     if (!order) {
         return (
-            <AuthenticatedLayout>
+            <>
                 <div className='py-4'>
                     <div className='flex items-center justify-center min-h-[400px]'>
                         <div className='text-center'>
@@ -98,19 +98,19 @@ export default function ViewOrder({ order }) {
                         </div>
                     </div>
                 </div>
-            </AuthenticatedLayout>
+            </>
         )
     }
 
     return (
-        <AuthenticatedLayout>
+        <>
             <div className='py-4'>
                 <div className='space-y-6 custom-container mx-auto md:px-[40px] md:py-[18px]'>
                     <div className='bg-card rounded-xl p-6 space-y-6'>
                         <div className='flex flex-col md:flex-row justify-between items-center mb-6'>
                             <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Order Details</h2>
                             <div className='flex items-center gap-3'>
-                                <Link href={`/orders/${order.id}/edit`}>
+                                <Link href={route('admin.orders.edit', { id: order.id })}>
                                     <Button
                                         variant='outlined'
                                         size='sm'
@@ -129,7 +129,7 @@ export default function ViewOrder({ order }) {
                                 <Button
                                     variant='outlined'
                                     size='sm'
-                                    onClick={() => window.open(`/orders/${order.id}/invoice`, '_blank')}
+                                    onClick={() => window.open(route('admin.orders.invoice', { id: order.id }), '_blank')}
                                     sx={{
                                         color: isDarkMode ? '#9CA3AF' : '#374151',
                                     borderColor: isDarkMode ? '#374151' : '#9CA3AF',
@@ -351,6 +351,14 @@ export default function ViewOrder({ order }) {
                 orderId={order.id}
                 onSuccess={handleCancelOrderSuccess}
             />
+        </>
+    )
+}
+
+export default function ViewOrder({ order }) {
+    return (
+        <AuthenticatedLayout>
+            <OrderContent order={order} />
         </AuthenticatedLayout>
     )
 }

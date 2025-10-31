@@ -5,7 +5,8 @@ import { toast } from 'react-hot-toast'
 
 export default function CancelOrderDialog({ open, onClose, orderId, onSuccess }) {
     const handleCancelOrder = () => {
-        router.post('/orders/cancel', {
+        // router.post('/orders/cancel', {
+        router.post(route('admin.orders.cancel', { id: orderId }), {
             id: orderId
         }, {
             onSuccess: () => {

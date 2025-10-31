@@ -257,8 +257,7 @@ export default function Profile({ user }) {
                              {/* Single Update Button */}
                              <div className='flex justify-end mt-6'>
                                  <Button
-                                     variant='contained'
-                                     className='!bg-text-primary !text-primary-foreground'
+                                     variant='outlined'
                                      onClick={handleProfileUpdate}
                                      disabled={isSubmitting}
                                  >

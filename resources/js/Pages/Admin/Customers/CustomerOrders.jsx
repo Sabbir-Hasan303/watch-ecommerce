@@ -33,7 +33,7 @@ export default function CustomerOrders({ customer, totalOrders, totalSpent }) {
                 </p>
               </div>
               <div>
-                <Button variant='outline' onClick={() => router.visit('/customers')} className='flex items-center gap-2'>
+                <Button variant='outline' onClick={() => router.visit(route('admin.customers.index'))} className='flex items-center gap-2'>
                   <ArrowLeft className='h-4 w-4' />
                   Back to Customers
                 </Button>
@@ -122,7 +122,7 @@ export default function CustomerOrders({ customer, totalOrders, totalSpent }) {
                             <p className='text-xl font-bold text-green-600 dark:text-green-400 flex items-center gap-1'><Taka color='text-green-600 dark:text-green-400 text-xl' />{(Number(order.total).toFixed(2) || 0)}</p>
                           </div>
                         </div>
-                        <Link href={`/orders/${order.id}/details`}>
+                        <Link href={route('admin.orders.show', { id: order.id })}>
                           <Button
                             variant='outline'
                             className='w-full lg:w-auto hover:bg-blue-500/10 hover:border-blue-500/50 hover:text-blue-600 dark:hover:text-blue-400 transition-all bg-transparent'>

@@ -53,7 +53,7 @@ export default function CustomerList({ customers = [] }) {
                 setSelectedCustomer(customer)
                 break
             case 'orders':
-                router.visit(`/customers/${customerId}/orders`)
+                router.visit(route('admin.customers.orders', { id: customerId }))
                 break
             default:
                 break
@@ -432,11 +432,9 @@ export default function CustomerList({ customers = [] }) {
                             Close
                         </Button>
                         <Button
-                            variant='contained'
-                            //   startIcon={<Eye size={16} />}
-                            className='!bg-text-primary !text-primary-foreground'
+                            variant='outlined'
                             onClick={() => {
-                                router.visit(`/customers/${selectedCustomer.id}/orders`)
+                                router.visit(route('admin.customers.orders', { id: selectedCustomer.id }))
                                 setSelectedCustomer(null)
                             }}>
                             View Orders

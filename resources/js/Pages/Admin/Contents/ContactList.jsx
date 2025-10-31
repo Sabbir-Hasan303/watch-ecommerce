@@ -396,7 +396,7 @@ export default function ContactList() {
             }}>
             Close
           </Button>
-          <Button variant='contained' startIcon={<Mail size={16} />} className='!bg-text-primary !text-primary-foreground'>
+          <Button variant='outlined' startIcon={<Mail size={16} />} className=''>
             Reply
           </Button>
         </DialogActions>

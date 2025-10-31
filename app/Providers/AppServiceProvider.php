@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
@@ -30,6 +31,11 @@ class AppServiceProvider extends ServiceProvider
             return [
                 'user' => $user
             ];
+        });
+
+        // Gate for Log Viewer access - only admins can access
+        Gate::define('viewLogViewer', function ($user) {
+            return $user && $user->role === 'admin';
         });
     }
 }

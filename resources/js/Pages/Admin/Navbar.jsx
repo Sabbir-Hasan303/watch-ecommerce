@@ -247,7 +247,7 @@ export default function Navbar({ title, subtitle, collapsed, onToggleSidebar, us
               </Box>
             </Box>
             <Box sx={{ p: 1 }}>
-              <Link href='/settings/profile'>
+              <Link href={route('admin.settings.profile')}>
                 <MenuItem onClick={handleClose}>
                   <ListItemIcon>
                     <AccountCircle fontSize='small' />
