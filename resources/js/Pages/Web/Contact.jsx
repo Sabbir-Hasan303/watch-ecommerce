@@ -1,8 +1,32 @@
 import { Phone, Mail, MapPin } from "lucide-react"
-import { Head } from "@inertiajs/react"
+import { Head, useForm, usePage } from "@inertiajs/react"
 import GuestLayout from "@/Layouts/GuestLayout"
+import { toast } from "react-hot-toast"
 
 export default function Contact() {
+    const { data, setData, post, processing, errors, reset } = useForm({
+        name: "",
+        phone: "",
+        email: "",
+        subject: "",
+        message: "",
+    })
+
+    const { flash } = usePage().props
+
+    const submit = (e) => {
+        e.preventDefault()
+        post(route("contact.store"), {
+            onSuccess: () => {
+                reset("name", "email", "subject", "message")
+                toast.success("Message sent successfully")
+            },
+            onError: () => {
+                toast.error("Failed to send message")
+            },
+        })
+    }
+
     return (
         <GuestLayout>
             <Head title="Contact" />
@@ -52,15 +76,6 @@ export default function Contact() {
                                 </div>
                             </div>
 
-                            {/* Phone Card */}
-                            <div className="bg-[#6e828a] text-white p-6 rounded-xl relative min-h-[74px]">
-                                <div className="absolute top-5 right-5">
-                                    <Phone className="w-5 h-5 text-white/60" />
-                                </div>
-                                <h3 className="text-base font-semibold mb-1">+1 (415) 555-0132</h3>
-                                <p className="text-sm text-white/70">Call us</p>
-                            </div>
-
                             {/* Email Card */}
                             <div className="bg-[#6e828a] text-white p-6 rounded-xl relative min-h-[74px]">
                                 <div className="absolute top-5 right-5">
@@ -78,45 +93,74 @@ export default function Contact() {
                     <div className="max-w-[640px] mx-auto">
                         <h2 className="text-3xl font-bold text-black mb-8">Send your message</h2>
 
-                        <form className="space-y-5">
-                            {/* Full Name */}
+                        {flash?.success && (
+                            <div className="mb-6 rounded-xl bg-green-50 text-green-700 px-4 py-3">
+                                {flash.success}
+                            </div>
+                        )}
+
+                        <form className="space-y-5" onSubmit={submit}>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Full Name */}
+                                <div>
+                                    <label htmlFor="fullName" className="block text-sm text-[#6e828a] mb-2">
+                                        Full name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="fullName"
+                                        name="name"
+                                        placeholder="Enter your name"
+                                        className="w-full px-5 py-3.5 bg-[#f2f2f2] rounded-xl text-[#6e828a] placeholder:text-[#6e828a]/60 focus:outline-none focus:ring-2 focus:ring-black/10"
+                                        value={data.name}
+                                        onChange={(e) => setData("name", e.target.value)}
+                                        required
+                                    />
+                                    {errors.name && (
+                                        <p className="mt-2 text-sm text-red-600">{errors.name}</p>
+                                    )}
+                                </div>
+
+                                {/* Email Address */}
+                                <div>
+                                    <label htmlFor="email" className="block text-sm text-[#6e828a] mb-2">
+                                        Email address
+                                    </label>
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        placeholder="Enter your email address"
+                                        className="w-full px-5 py-3.5 bg-[#f2f2f2] rounded-xl text-[#6e828a] placeholder:text-[#6e828a]/60 focus:outline-none focus:ring-2 focus:ring-black/10"
+                                        value={data.email}
+                                        onChange={(e) => setData("email", e.target.value)}
+                                        required
+                                    />
+                                    {errors.email && (
+                                        <p className="mt-2 text-sm text-red-600">{errors.email}</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Subject */}
                             <div>
-                                <label htmlFor="fullName" className="block text-sm text-[#6e828a] mb-2">
-                                    Full name
+                                <label htmlFor="subject" className="block text-sm text-[#6e828a] mb-2">
+                                    Subject
                                 </label>
                                 <input
                                     type="text"
-                                    id="fullName"
-                                    placeholder="Enter your name"
+                                    id="subject"
+                                    name="subject"
+                                    placeholder="Enter your subject"
                                     className="w-full px-5 py-3.5 bg-[#f2f2f2] rounded-xl text-[#6e828a] placeholder:text-[#6e828a]/60 focus:outline-none focus:ring-2 focus:ring-black/10"
+                                    value={data.subject}
+                                    onChange={(e) => setData("subject", e.target.value)}
+                                    required
                                 />
                             </div>
-
-                            {/* Phone Number */}
-                            <div>
-                                <label htmlFor="phone" className="block text-sm text-[#6e828a] mb-2">
-                                    Phone number
-                                </label>
-                                <input
-                                    type="tel"
-                                    id="phone"
-                                    placeholder="Enter your phone number"
-                                    className="w-full px-5 py-3.5 bg-[#f2f2f2] rounded-xl text-[#6e828a] placeholder:text-[#6e828a]/60 focus:outline-none focus:ring-2 focus:ring-black/10"
-                                />
-                            </div>
-
-                            {/* Email Address */}
-                            <div>
-                                <label htmlFor="email" className="block text-sm text-[#6e828a] mb-2">
-                                    Email address
-                                </label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    placeholder="Enter your email address"
-                                    className="w-full px-5 py-3.5 bg-[#f2f2f2] rounded-xl text-[#6e828a] placeholder:text-[#6e828a]/60 focus:outline-none focus:ring-2 focus:ring-black/10"
-                                />
-                            </div>
+                            {errors.subject && (
+                                <p className="mt-2 text-sm text-red-600">{errors.subject}</p>
+                            )}
 
                             {/* Message */}
                             <div>
@@ -125,18 +169,26 @@ export default function Contact() {
                                 </label>
                                 <textarea
                                     id="message"
+                                    name="message"
                                     rows={5}
                                     placeholder="Tell us more"
                                     className="w-full px-5 py-3.5 bg-[#f2f2f2] rounded-xl text-[#6e828a] placeholder:text-[#6e828a]/60 focus:outline-none focus:ring-2 focus:ring-black/10 resize-none"
+                                    value={data.message}
+                                    onChange={(e) => setData("message", e.target.value)}
+                                    required
                                 />
+                                {errors.message && (
+                                    <p className="mt-2 text-sm text-red-600">{errors.message}</p>
+                                )}
                             </div>
 
                             {/* Submit Button */}
                             <button
                                 type="submit"
-                                className="w-full bg-black text-white py-4 rounded-xl font-semibold hover:bg-black/90 transition-colors"
+                                className="w-full bg-black text-white py-4 rounded-xl font-semibold hover:bg-black/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                                disabled={processing}
                             >
-                                Send Your Request
+                                {processing ? "Sending..." : "Send Your Request"}
                             </button>
                         </form>
                     </div>

@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\ContactController;
 
 
 
@@ -74,9 +75,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
             return Inertia::render('Admin/Contents/Newsletters');
         })->name('admin.contents.newsletters');
 
-        Route::get('/contact-list', function () {
-            return Inertia::render('Admin/Contents/ContactList');
-        })->name('admin.contents.contact-list');
+        Route::get('/contact-list', [ContactController::class, 'list'])->name('admin.contents.contact-list');
 
         Route::get('/faqs', function () {
             return Inertia::render('Admin/Contents/FaqList');

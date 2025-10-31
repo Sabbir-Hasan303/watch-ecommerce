@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -24,9 +25,8 @@ Route::get('/watches/{id}', function () {
     return Inertia::render('Web/SingleProduct');
 })->name('single-product');
 
-Route::get('/contact', function () {
-    return Inertia::render('Web/Contact');
-})->name('contact');
+Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 Route::get('/terms', function () {
     return Inertia::render('Web/Terms');
