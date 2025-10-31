@@ -14,8 +14,16 @@ class EnsureUserIsCustomer
     {
         $user = $request->user();
 
-        if (! $user || $user->role !== 'customer') {
-            abort(403);
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        if ($user->role !== 'customer') {
+            if ($request->expectsJson()) {
+                abort(403);
+            }
+
+            return redirect()->route('dashboard');
         }
 
         return $next($request);

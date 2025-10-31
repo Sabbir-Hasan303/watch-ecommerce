@@ -14,8 +14,16 @@ class EnsureUserIsAdmin
     {
         $user = $request->user();
 
-        if (! $user || $user->role !== 'admin') {
-            abort(403);
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        if ($user->role !== 'admin') {
+            if ($request->expectsJson()) {
+                abort(403);
+            }
+
+            return redirect()->route('customer.dashboard');
         }
 
         return $next($request);

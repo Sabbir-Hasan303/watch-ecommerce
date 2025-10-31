@@ -52,7 +52,7 @@ export default function Navbar() {
                             {/*<button className="text-black hover:text-gray-600" aria-label="Search">
                 <Search className="h-5 w-5" />
               </button>*/}
-                            <Link href="customer/dashboard" className="text-black hover:text-gray-600" aria-label="User dashboard">
+                            <Link href={route('customer.dashboard')} className="text-black hover:text-gray-600" aria-label="User dashboard">
                                 <User className="h-5 w-5" />
                             </Link>
                             <button onClick={openCart} className="relative text-black hover:text-gray-600" aria-label="Shopping cart">
