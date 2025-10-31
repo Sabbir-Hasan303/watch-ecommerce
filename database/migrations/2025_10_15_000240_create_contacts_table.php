@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('email');
             $table->string('subject')->nullable();
             $table->text('message');
+            $table->enum('status', ['new', 'replied'])->default('new');
             $table->timestamps();
         });
     }

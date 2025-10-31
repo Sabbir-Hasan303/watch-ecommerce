@@ -31,7 +31,7 @@ export default function AuthenticatedLayout({ header, children, flash }) {
                 />
                 <div className='flex-1 flex flex-col overflow-auto  scrollbar-thin'>
                     <Navbar
-                        title='Dashboard'
+                        // title='Dashboard'
                         collapsed={sidebarCollapsed}
                         onToggleSidebar={() =>
                             setSidebarCollapsed(!sidebarCollapsed)

@@ -15,7 +15,32 @@ class ContactController extends Controller
 
     public function list()
     {
-        return Inertia::render('Admin/Contents/ContactList');
+        $contacts = Contact::orderByDesc('created_at')->get()->map(function ($contact) {
+            return [
+                'id' => $contact->id,
+                'name' => $contact->name ?? '',
+                'email' => $contact->email ?? '',
+                'subject' => $contact->subject ?? '',
+                'message' => $contact->message ?? '',
+                'status' => $contact->status ?? 'new',
+                'date' => optional($contact->created_at)->toIso8601String(),
+            ];
+        });
+
+        return Inertia::render('Admin/Contents/ContactList', [
+            'contacts' => $contacts,
+        ]);
+    }
+
+    public function markAsReplied(Request $request)
+    {
+        $contact = Contact::find($request->id);
+        if (!$contact) {
+            return redirect()->back()->with('error', 'Contact not found');
+        }
+        $contact->status = 'replied';
+        $contact->save();
+        return redirect()->back()->with('success', 'Contact marked as replied successfully');
     }
 
     public function store(Request $request)

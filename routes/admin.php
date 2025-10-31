@@ -76,6 +76,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         })->name('admin.contents.newsletters');
 
         Route::get('/contact-list', [ContactController::class, 'list'])->name('admin.contents.contact-list');
+        Route::post('/contact-list/mark-as-replied', [ContactController::class, 'markAsReplied'])->name('admin.contents.contact-list.mark-as-replied');
 
         Route::get('/faqs', function () {
             return Inertia::render('Admin/Contents/FaqList');
