@@ -6,7 +6,13 @@ import TechnicalSpecs from "@/Pages/Web/SingleProductSections/TechnicalSpecs"
 import { useCart } from "@/contexts/CartContext"
 
 const watchImages = [
-    "/https://hebbkx1anhila5yf.public.blob.vercel-storage.com/6.png-BjH9bZa4L8hL6aPetLTJeXiTSnwt8m.webp",
+    "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/6.png-BjH9bZa4L8hL6aPetLTJeXiTSnwt8m.webp",
+    "https://stx-v3-static-assets.obs.as-south-208.rcloud.reddotdigitalit.com/banglanest/images/products/5bf1bc429b7c4ef4aa1f/1758994407893_Starry-Sky-Diamond-Mens-Watch-1.webp",
+    "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/6.png-BjH9bZa4L8hL6aPetLTJeXiTSnwt8m.webp",
+    "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/6.png-BjH9bZa4L8hL6aPetLTJeXiTSnwt8m.webp",
+    "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/6.png-BjH9bZa4L8hL6aPetLTJeXiTSnwt8m.webp",
+    "https://stx-v3-static-assets.obs.as-south-208.rcloud.reddotdigitalit.com/banglanest/images/products/5bf1bc429b7c4ef4aa1f/1758994407893_Starry-Sky-Diamond-Mens-Watch-1.webp",
+    "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/6.png-BjH9bZa4L8hL6aPetLTJeXiTSnwt8m.webp",
     "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/6.png-BjH9bZa4L8hL6aPetLTJeXiTSnwt8m.webp",
     "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/6.png-BjH9bZa4L8hL6aPetLTJeXiTSnwt8m.webp",
     "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/6.png-BjH9bZa4L8hL6aPetLTJeXiTSnwt8m.webp",
@@ -54,7 +60,7 @@ export default function Overview() {
         <section className="w-full max-w-[1440px] mx-auto px-4 py-12 md:py-16">
             <div className="grid grid-cols-1 lg:[grid-template-columns:1fr_400px] gap-8 lg:gap-12">
                 {/* Left Column - Overview Content */}
-                <div className="space-y-8">
+                <div className="md:space-y-8">
                     <div>
                         <h2 className="text-2xl font-bold mb-4">Overview</h2>
                         <div className="space-y-4 text-gray-600 leading-relaxed">
@@ -75,57 +81,53 @@ export default function Overview() {
                     </div>
 
                     {/* Image Gallery */}
-                    <div className="flex gap-4">
+                    <div className="flex flex-col md:flex-row gap-6 max-w-[700px] mx-auto">
                         {/* Main Image with Zoom */}
                         <div
-                            className="flex-1 relative overflow-hidden rounded-lg cursor-zoom-in"
+                            className="relative w-full md:flex-1 overflow-hidden rounded-lg bg-gray-50 cursor-zoom-in"
                             onMouseEnter={() => setShowZoom(true)}
                             onMouseLeave={() => setShowZoom(false)}
                             onMouseMove={handleMouseMove}
                         >
-                            {/* <Image
-                src={watchImages[selectedImage] || "/placeholder.svg"}
-                alt="RUIMAS Digital Sport"
-                width={800}
-                height={600}
-                className="w-full h-auto object-cover"
-              /> */}
-                            <img src={watchImages[selectedImage]} alt="RUIMAS Digital Sport" className="w-full h-auto object-cover" />
+                            <div className="relative w-full aspect-[4/5] md:aspect-[1/1]">
+                                <img
+                                    src={watchImages[selectedImage]}
+                                    alt="RUIMAS Digital Sport"
+                                    className="absolute inset-0 w-full h-full object-contain"
+                                />
 
-                            {/* Zoom Window */}
-                            {showZoom && (
-                                <div className="absolute inset-0 pointer-events-none">
-                                    <div
-                                        className="absolute w-full h-full bg-no-repeat"
-                                        style={{
-                                            backgroundImage: `url(${watchImages[selectedImage]})`,
-                                            backgroundSize: "200%",
-                                            backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
-                                        }}
-                                    />
-                                </div>
-                            )}
+                                {/* Zoom Window */}
+                                {showZoom && (
+                                    <div className="absolute inset-0 pointer-events-none">
+                                        <div
+                                            className="absolute w-full h-full bg-no-repeat"
+                                            style={{
+                                                backgroundImage: `url(${watchImages[selectedImage]})`,
+                                                backgroundSize: "200%",
+                                                backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
+                                            }}
+                                        />
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {/* Thumbnail Images */}
-                        <div className="flex flex-col gap-4">
-                            {watchImages.slice(1).map((image, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setSelectedImage(index + 1)}
-                                    className={`w-24 h-24 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === index + 1 ? "border-black" : "border-gray-200 hover:border-gray-400"
+                        <div className="order-last md:order-none">
+                            <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto md:max-h-[530px] pr-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                                {watchImages.map((image, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setSelectedImage(index)}
+                                        aria-label={`Select image ${index + 1}`}
+                                        className={`relative flex-shrink-0 w-28 h-28 md:w-36 md:h-36 rounded-lg overflow-hidden border-2 transition-colors ${
+                                            selectedImage === index ? "border-black" : "border-gray-200 hover:border-gray-400"
                                         }`}
-                                >
-                                    {/* <Image
-                    src={image || "/placeholder.svg"}
-                    alt={`Thumbnail ${index + 1}`}
-                    width={96}
-                    height={96}
-                    className="w-full h-full object-cover"
-                  /> */}
-                                    <img src={image} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-cover" />
-                                </button>
-                            ))}
+                                    >
+                                        <img src={image} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-cover" />
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
