@@ -66,6 +66,12 @@ class WebProductController extends Controller
             return redirect()->route('watches-list')->with('error', 'Product not found');
         }
 
+        $cardRelationships = [
+            'categories:id,name',
+            'variants:id,product_id,price,compare_at_price,color,material,size,status',
+            'images:id,product_id,image_path,is_primary',
+        ];
+
         $primaryImage = $product->primary_image_url;
 
         $variants = $product->variants->map(function ($variant) use ($product, $primaryImage) {
@@ -121,6 +127,59 @@ class WebProductController extends Controller
             ];
         })->values();
 
+        $relatedCategoryIds = $product->categories->pluck('id');
+
+        $similarProductsQuery = Product::with($cardRelationships)
+            ->where('id', '!=', $product->id);
+
+        if ($relatedCategoryIds->isNotEmpty()) {
+            $similarProductsQuery->whereHas('categories', function ($query) use ($relatedCategoryIds) {
+                $query->whereIn('categories.id', $relatedCategoryIds);
+            });
+        }
+
+        $similarProducts = $similarProductsQuery
+            ->orderBy('created_at', 'desc')
+            ->take(4)
+            ->get();
+
+        if ($similarProducts->count() < 4) {
+            $additionalProducts = Product::with($cardRelationships)
+                ->where('id', '!=', $product->id)
+                ->whereNotIn('id', $similarProducts->pluck('id'))
+                ->orderBy('created_at', 'desc')
+                ->take(4 - $similarProducts->count())
+                ->get();
+
+            $similarProducts = $similarProducts->concat($additionalProducts);
+        }
+
+        $similarProducts = $similarProducts->map(function ($similar) {
+            return [
+                'id' => $similar->id,
+                'name' => $similar->name,
+                'slug' => $similar->slug,
+                'category' => $similar->primary_category,
+                'primaryImage' => $similar->primary_image_url,
+                'priceRange' => [
+                    'min' => $similar->min_price,
+                    'max' => $similar->max_price,
+                ],
+                'compareAtRange' => [
+                    'min' => $similar->min_compare_at_price,
+                    'max' => $similar->max_compare_at_price,
+                ],
+                'discount' => [
+                    'amount' => $similar->discount_amount,
+                    'percentage' => $similar->discount_percentage,
+                ],
+                'colors' => $similar->color_options,
+                'materials' => $similar->material_options,
+                'sizes' => $similar->size_options,
+                'status' => $similar->status,
+            ];
+        })->values();
+
         $payload = [
             'id' => $product->id,
             'name' => $product->name,
@@ -153,6 +212,7 @@ class WebProductController extends Controller
 
         return Inertia::render('Web/SingleProduct', [
             'product' => $payload,
+            'similarProducts' => $similarProducts,
         ]);
     }
 }

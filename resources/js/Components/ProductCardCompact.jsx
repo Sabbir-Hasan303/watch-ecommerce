@@ -4,7 +4,7 @@ import { formatMoney, formatRange } from "@/utils/productFormatters"
 
 const placeholderImage = "/placeholder.svg?height=400&width=600"
 
-export default function ProductCardCompact({ product }) {
+export default function ProductCardCompact({ product, showCategory = true, showColors = true }) {
     const priceDisplay = formatRange(product.priceRange)
     const compareDisplay = formatRange(product.compareAtRange)
     const discountPercentage = typeof product.discount?.percentage === "number" ? product.discount.percentage : null
@@ -45,7 +45,9 @@ export default function ProductCardCompact({ product }) {
             <div className="mt-4 mb-2 min-h-[60px]">
                 <h3 className="text-xl font-bold text-black line-clamp-2">{product.name}</h3>
             </div>
-            <p className="inline-block text-xs bg-blue-100 px-4 py-1 rounded-full mb-2">{categoryLabel}</p>
+            {showCategory && categoryLabel && (
+                <p className="inline-block text-xs bg-blue-100 px-4 py-1 rounded-full mb-2">{categoryLabel}</p>
+            )}
 
             <div className="flex items-center justify-between">
                 <div>
@@ -58,25 +60,27 @@ export default function ProductCardCompact({ product }) {
                 </div>
             </div>
 
-            <div className="mb-6 space-y-3 text-sm">
-                <div className="flex gap-4">
-                    <span className="min-w-[120px] text-gray-600">Available colors</span>
-                    {colors.length ? (
-                        <div className="flex flex-wrap items-center gap-3">
-                            {colors.map((color, index) => (
-                                <div key={`${product.id}-color-${index}`} className="flex items-center gap-2">
-                                    <span
-                                        className="h-5 w-5 rounded-full border border-gray-200"
-                                        style={{ backgroundColor: color }}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <span className="font-bold">—</span>
-                    )}
+            {showColors && (
+                <div className="mb-6 space-y-3 text-sm">
+                    <div className="flex gap-4">
+                        <span className="min-w-[120px] text-gray-600">Available colors</span>
+                        {colors.length ? (
+                            <div className="flex flex-wrap items-center gap-3">
+                                {colors.map((color, index) => (
+                                    <div key={`${product.id}-color-${index}`} className="flex items-center gap-2">
+                                        <span
+                                            className="h-5 w-5 rounded-full border border-gray-200"
+                                            style={{ backgroundColor: color }}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <span className="font-bold">—</span>
+                        )}
+                    </div>
                 </div>
-            </div>
+            )}
         </Link>
     )
 }
