@@ -865,7 +865,7 @@ function ProductCreateFields({ categories }) {
                                         </div>
 
                                         <div className='flex gap-2'>
-                                            <Button variant='contained' onClick={addVariant} className='!bg-text-primary !text-primary-foreground'>
+                                            <Button variant='outlined' onClick={addVariant}>
                                                 Add
                                             </Button>
                                             <Button variant='outlined' onClick={handleVariantCancel}

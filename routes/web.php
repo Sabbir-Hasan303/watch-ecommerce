@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\WebProductController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -17,13 +18,13 @@ Route::get('/', function () {
     return Inertia::render('Web/Home');
 });
 
-Route::get('/watches', function () {
-    return Inertia::render('Web/ProductList');
-})->name('watches-list');
+// Route::get('/watches', function () {
+//     return Inertia::render('Web/ProductList');
+// })->name('watches-list');
 
-Route::get('/watches/{id}', function () {
-    return Inertia::render('Web/SingleProduct');
-})->name('single-product');
+Route::get('/watches', [WebProductController::class, 'productList'])->name('watches-list');
+
+Route::get('/watches/{slug}', [WebProductController::class, 'singleProduct'])->name('single-product');
 
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');

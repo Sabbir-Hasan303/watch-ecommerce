@@ -356,9 +356,8 @@ export default function Categories({ categories = [] }) {
               </Button>
               <Button
                 onClick={handleSubmit}
-                variant='contained'
+                variant='outlined'
                 size='md'
-                className='!bg-text-primary !text-primary-foreground'
                 startIcon={<Save className='w-4 h-4' />}>
                 {editingCategory ? 'Update Category' : 'Create Category'}
               </Button>
