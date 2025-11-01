@@ -1,42 +1,133 @@
-import React from "react"
-import { createContext, useContext, useState, useCallback } from "react"
+/* global route */
+
+import { createContext, useContext, useState, useCallback, useEffect, useMemo } from "react"
+import axios from "axios"
+import { toast } from "react-hot-toast"
 
 const CartContext = createContext(undefined)
 
 export function CartProvider({ children }) {
     const [items, setItems] = useState([])
     const [isOpen, setIsOpen] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
 
-    const addItem = useCallback((item) => {
-        setItems((prevItems) => {
-            // Check if item with same color already exists
-            const existingItemIndex = prevItems.findIndex((i) => i.name === item.name && i.color === item.color)
+    const syncCart = useCallback((cart) => {
+        if (!cart) {
+            setItems([])
+            return
+        }
 
-            if (existingItemIndex > -1) {
-                // Update quantity of existing item
-                const newItems = [...prevItems]
-                newItems[existingItemIndex].quantity += item.quantity
-                return newItems
-            } else {
-                // Add new item with unique id
-                return [...prevItems, { ...item, id: `${Date.now()}-${Math.random()}` }]
+        setItems(Array.isArray(cart.items) ? cart.items : [])
+    }, [])
+
+    useEffect(() => {
+        let isMounted = true
+
+        const fetchCart = async () => {
+            try {
+                const { data } = await axios.get(route("cart.show"))
+                if (!isMounted) return
+                syncCart(data.cart)
+            } catch (error) {
+                if (import.meta.env?.DEV) {
+                    console.error("Failed to load cart", error)
+                }
+                if (isMounted) {
+                    setItems([])
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false)
+                }
             }
-        })
-        setIsOpen(true)
-    }, [])
+        }
 
-    const removeItem = useCallback((id) => {
-        setItems((prevItems) => prevItems.filter((item) => item.id !== id))
-    }, [])
+        fetchCart()
 
-    const updateQuantity = useCallback((id, quantity) => {
-        if (quantity < 1) return
-        setItems((prevItems) => prevItems.map((item) => (item.id === id ? { ...item, quantity } : item)))
-    }, [])
+        return () => {
+            isMounted = false
+        }
+    }, [syncCart])
 
-    const clearCart = useCallback(() => {
-        setItems([])
-    }, [])
+    const addItem = useCallback(
+        async ({ productId, productVariantId = null, quantity = 1 }) => {
+            try {
+                const { data } = await axios.post(route("cart.items.store"), {
+                    product_id: productId,
+                    product_variant_id: productVariantId,
+                    quantity,
+                })
+
+                syncCart(data.cart)
+                setIsOpen(true)
+                toast.success("Added to cart")
+
+                return data.cart
+            } catch (error) {
+                if (import.meta.env?.DEV) {
+                    console.error("Unable to add item to cart", error)
+                }
+                const message = error?.response?.data?.message ?? "Unable to add item to cart."
+                toast.error(message)
+                throw error
+            }
+        },
+        [syncCart],
+    )
+
+    const removeItem = useCallback(
+        async (id) => {
+            try {
+                const { data } = await axios.delete(route("cart.items.destroy", id))
+                syncCart(data.cart)
+            } catch (error) {
+                if (import.meta.env?.DEV) {
+                    console.error("Unable to remove item from cart", error)
+                }
+                const message = error?.response?.data?.message ?? "Unable to remove item from cart."
+                toast.error(message)
+                throw error
+            }
+        },
+        [syncCart],
+    )
+
+    const updateQuantity = useCallback(
+        async (id, quantity) => {
+            if (quantity < 1) {
+                return
+            }
+
+            try {
+                const { data } = await axios.patch(route("cart.items.update", id), {
+                    quantity,
+                })
+                syncCart(data.cart)
+            } catch (error) {
+                if (import.meta.env?.DEV) {
+                    console.error("Unable to update cart item quantity", error)
+                }
+                const message = error?.response?.data?.message ?? "Unable to update quantity."
+                toast.error(message)
+                throw error
+            }
+        },
+        [syncCart],
+    )
+
+    const clearCart = useCallback(async () => {
+        try {
+            const { data } = await axios.delete(route("cart.clear"))
+            syncCart(data.cart)
+        } catch (error) {
+            if (import.meta.env?.DEV) {
+                console.error("Unable to clear cart", error)
+            }
+            const message = error?.response?.data?.message ?? "Unable to clear cart."
+            toast.error(message)
+            throw error
+        }
+    }, [syncCart])
 
     const openCart = useCallback(() => {
         setIsOpen(true)
@@ -47,20 +138,24 @@ export function CartProvider({ children }) {
     }, [])
 
     const isInCart = useCallback(
-        (name, color) => {
-            return items.some((item) => item.name === name && item.color === color)
+        (productId, productVariantId) => {
+            return items.some(
+                (item) => item.productId === productId && (item.productVariantId ?? null) === (productVariantId ?? null),
+            )
         },
         [items],
     )
 
-    const itemCount = items.reduce((total, item) => total + item.quantity, 0)
+    const itemCount = useMemo(() => items.reduce((total, item) => total + item.quantity, 0), [items])
 
-    const subtotal = items.reduce((total, item) => {
-        // Extract numeric value from price string (e.g., "$43.000-$48.500" -> 43000)
-        const priceMatch = item.price.match(/\$?([\d,]+)/)
-        const price = priceMatch ? Number.parseFloat(priceMatch[1].replace(/,/g, "")) : 0
-        return total + price * item.quantity
-    }, 0)
+    const subtotal = useMemo(() => {
+        const total = items.reduce((sum, item) => {
+            const lineTotal = (Number(item.unitPrice) || 0) * item.quantity
+            return sum + lineTotal
+        }, 0)
+
+        return Math.round(total * 100) / 100
+    }, [items])
 
     return (
         <CartContext.Provider
@@ -76,6 +171,7 @@ export function CartProvider({ children }) {
                 closeCart,
                 itemCount,
                 subtotal,
+                isLoading,
             }}
         >
             {children}

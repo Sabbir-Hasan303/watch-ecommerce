@@ -1,24 +1,50 @@
-import React from "react"
-import { useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { Link, Head } from "@inertiajs/react"
 import { ChevronLeft } from "lucide-react"
 import GuestLayout from "@/Layouts/GuestLayout"
 import { useCart } from "@/contexts/CartContext"
 
-function CheckoutContent() {
+function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false, rate: 0 } }) {
     const { items, subtotal } = useCart()
 
-    const [formData, setFormData] = useState({
-        email: "",
-        firstName: "",
-        lastName: "",
+    const areaOptions = useMemo(() => {
+        return Object.keys(shippingOptions).map((key) => {
+            const label = key
+                .split("_")
+                .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+                .join(" ")
+
+            return {
+                value: key,
+                label,
+            }
+        })
+    }, [shippingOptions])
+
+    const defaultArea = areaOptions[0]?.value ?? ""
+
+    const [formData, setFormData] = useState(() => ({
+        fullName: "",
         phone: "",
-        address: "",
-        city: "",
-        state: "",
-        zipCode: "",
-        country: "",
-    })
+        email: "",
+        area: defaultArea,
+        fullAddress: "",
+    }))
+
+    useEffect(() => {
+        if (!areaOptions.length) {
+            return
+        }
+
+        const hasCurrentArea = areaOptions.some((option) => option.value === formData.area)
+
+        if (!hasCurrentArea) {
+            setFormData((prev) => ({
+                ...prev,
+                area: defaultArea,
+            }))
+        }
+    }, [areaOptions, defaultArea, formData.area])
 
     const handleInputChange = (e) => {
         setFormData({
@@ -34,9 +60,54 @@ function CheckoutContent() {
         alert("Order placed successfully! You will receive a confirmation email shortly.")
     }
 
-    const shippingCost = 0 // Free shipping
-    const tax = subtotal * 0.08 // 8% tax
-    const total = subtotal + shippingCost + tax
+    const numericSubtotal = Number(subtotal) || 0
+
+    const shippingCost = useMemo(() => {
+        if (!formData.area) {
+            return 0
+        }
+
+        const areaSetting = shippingOptions?.[formData.area]
+
+        if (!areaSetting) {
+            return 0
+        }
+
+        const standard = typeof areaSetting === "number" ? areaSetting : areaSetting?.standard
+
+        const value = Number.parseFloat(standard ?? 0)
+
+        if (!Number.isFinite(value)) {
+            return 0
+        }
+
+        return Number(Number(value).toFixed(2))
+    }, [formData.area, shippingOptions])
+
+    const taxRate = Number.parseFloat(taxSettings?.rate ?? 0)
+    const taxEnabled = Boolean(taxSettings?.enabled)
+
+    const tax = useMemo(() => {
+        if (!taxEnabled) {
+            return 0
+        }
+
+        return Number(((numericSubtotal * taxRate) / 100).toFixed(2))
+    }, [numericSubtotal, taxEnabled, taxRate])
+
+    const formatCurrency = (value) => {
+        const numericValue = Number(value) || 0
+        return `$${numericValue.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        })}`
+    }
+
+    const total = useMemo(() => Number((numericSubtotal + shippingCost + tax).toFixed(2)), [numericSubtotal, shippingCost, tax])
+
+    const shippingDisplay = shippingCost <= 0 ? "Free" : formatCurrency(shippingCost)
+    const taxLabel = taxEnabled ? `Tax (${taxRate}% )` : "Tax"
+    const taxDisplay = formatCurrency(tax)
 
     return (
         <div className="max-w-[1440px] mx-auto px-4 py-8">
@@ -55,153 +126,107 @@ function CheckoutContent() {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="bg-white rounded-lg p-6 shadow-sm">
-                            <h2 className="text-xl font-bold mb-4">Shipping Information</h2>
+                        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+                                <div>
+                                    <h2 className="text-xl font-bold leading-tight">Shipping Address</h2>
+                                    <p className="text-sm text-gray-500 mt-1">Enter delivery address</p>
+                                </div>
+                            </div>
+
                             <div className="space-y-4">
-                                <div>
-                                    <label htmlFor="email" className="block text-sm font-semibold mb-2">
-                                        Email Address
-                                    </label>
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleInputChange}
-                                        required
-                                        className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
-                                        placeholder="your@email.com"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label htmlFor="firstName" className="block text-sm font-semibold mb-2">
-                                            First Name
+                                        <label htmlFor="fullName" className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Full Name
                                         </label>
                                         <input
                                             type="text"
-                                            id="firstName"
-                                            name="firstName"
-                                            value={formData.firstName}
+                                            id="fullName"
+                                            name="fullName"
+                                            value={formData.fullName}
                                             onChange={handleInputChange}
                                             required
-                                            className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
-                                            placeholder="John"
+                                            className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
+                                            placeholder="Full Name"
                                         />
                                     </div>
                                     <div>
-                                        <label htmlFor="lastName" className="block text-sm font-semibold mb-2">
-                                            Last Name
+                                        <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Phone
                                         </label>
                                         <input
-                                            type="text"
-                                            id="lastName"
-                                            name="lastName"
-                                            value={formData.lastName}
+                                            type="tel"
+                                            id="phone"
+                                            name="phone"
+                                            value={formData.phone}
                                             onChange={handleInputChange}
                                             required
-                                            className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
-                                            placeholder="Doe"
+                                            className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
+                                            placeholder="Phone Number"
                                         />
                                     </div>
                                 </div>
-                                <div>
-                                    <label htmlFor="phone" className="block text-sm font-semibold mb-2">
-                                        Phone Number
-                                    </label>
-                                    <input
-                                        type="tel"
-                                        id="phone"
-                                        name="phone"
-                                        value={formData.phone}
-                                        onChange={handleInputChange}
-                                        required
-                                        className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
-                                        placeholder="+1 (555) 000-0000"
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="address" className="block text-sm font-semibold mb-2">
-                                        Street Address
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="address"
-                                        name="address"
-                                        value={formData.address}
-                                        onChange={handleInputChange}
-                                        required
-                                        className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
-                                        placeholder="123 Main Street"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label htmlFor="city" className="block text-sm font-semibold mb-2">
-                                            City
+                                        <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Email
                                         </label>
                                         <input
-                                            type="text"
-                                            id="city"
-                                            name="city"
-                                            value={formData.city}
+                                            type="email"
+                                            id="email"
+                                            name="email"
+                                            value={formData.email}
                                             onChange={handleInputChange}
                                             required
-                                            className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
-                                            placeholder="New York"
+                                            className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
+                                            placeholder="example@gmail.com"
                                         />
                                     </div>
+
                                     <div>
-                                        <label htmlFor="state" className="block text-sm font-semibold mb-2">
-                                            State
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="state"
-                                            name="state"
-                                            value={formData.state}
-                                            onChange={handleInputChange}
-                                            required
-                                            className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
-                                            placeholder="NY"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label htmlFor="zipCode" className="block text-sm font-semibold mb-2">
-                                            ZIP Code
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="zipCode"
-                                            name="zipCode"
-                                            value={formData.zipCode}
-                                            onChange={handleInputChange}
-                                            required
-                                            className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
-                                            placeholder="10001"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="country" className="block text-sm font-semibold mb-2">
-                                            Country
+                                        <label htmlFor="area" className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Area
                                         </label>
                                         <select
-                                            id="country"
-                                            name="country"
-                                            value={formData.country}
+                                            id="area"
+                                            name="area"
+                                            value={formData.area}
                                             onChange={handleInputChange}
-                                            required
-                                            className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
+                                            className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
+                                            disabled={!areaOptions.length}
                                         >
-                                            <option value="">Select Country</option>
-                                            <option value="US">United States</option>
-                                            <option value="CA">Canada</option>
-                                            <option value="UK">United Kingdom</option>
-                                            <option value="AU">Australia</option>
+                                            {areaOptions.length ? (
+                                                areaOptions.map((option) => (
+                                                    <option key={option.value} value={option.value}>
+                                                        {option.label}
+                                                    </option>
+                                                ))
+                                            ) : (
+                                                <option value="">No shipping areas configured</option>
+                                            )}
                                         </select>
+                                        <span className="text-xs text-gray-500">
+                                            Shipping fees may differ by area
+                                        </span>
                                     </div>
+                                </div>
+
+                                <div>
+                                    <label htmlFor="fullAddress" className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Full Address
+                                    </label>
+                                    <textarea
+                                        id="fullAddress"
+                                        name="fullAddress"
+                                        value={formData.fullAddress}
+                                        onChange={handleInputChange}
+                                        required
+                                        rows={3}
+                                        className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black resize-none"
+                                        placeholder="123 Main Street, City, Country"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -225,7 +250,7 @@ function CheckoutContent() {
                             type="submit"
                             className="w-full bg-black text-white py-4 px-6 rounded font-semibold hover:bg-gray-800 transition-colors text-lg"
                         >
-                            Place Order - ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            Place Order - {formatCurrency(total)}
                         </button>
                     </form>
                 </div>
@@ -240,13 +265,6 @@ function CheckoutContent() {
                             {items.map((item) => (
                                 <div key={item.id} className="flex gap-4">
                                     <div className="w-20 h-20 rounded overflow-hidden bg-gray-100 flex-shrink-0">
-                                        {/* <Image
-                src={item.image || "/placeholder.svg"}
-                alt={item.name}
-                width={80}
-                height={80}
-                className="w-full h-full object-cover"
-              /> */}
                                         <img
                                             src={item.image || "/placeholder.svg"}
                                             alt={item.name}
@@ -269,23 +287,21 @@ function CheckoutContent() {
                         <div className="space-y-3 border-t border-gray-200 pt-4">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600">Subtotal</span>
-                                <span className="font-semibold">${subtotal.toLocaleString()}</span>
+                                <span className="font-semibold">{formatCurrency(numericSubtotal)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600">Shipping</span>
-                                <span className="font-semibold text-green-600">Free</span>
+                                <span className={`font-semibold ${shippingCost <= 0 ? "text-green-600" : "text-gray-800"}`}>
+                                    {shippingDisplay}
+                                </span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Tax (8%)</span>
-                                <span className="font-semibold">
-                                    ${tax.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                </span>
+                                <span className="text-gray-600">{taxLabel}</span>
+                                <span className="font-semibold">{taxDisplay}</span>
                             </div>
                             <div className="flex justify-between text-lg font-bold border-t border-gray-200 pt-3">
                                 <span>Total</span>
-                                <span>
-                                    ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                </span>
+                                <span>{formatCurrency(total)}</span>
                             </div>
                         </div>
                     </div>
@@ -295,11 +311,11 @@ function CheckoutContent() {
     )
 }
 
-export default function Checkout() {
+export default function Checkout({ shippingOptions, taxSettings }) {
     return (
         <GuestLayout>
             <Head title="Checkout" />
-            <CheckoutContent />
+            <CheckoutContent shippingOptions={shippingOptions} taxSettings={taxSettings} />
         </GuestLayout>
     )
 }

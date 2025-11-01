@@ -34,6 +34,7 @@ export default function Overview({ product }) {
     const [showZoom, setShowZoom] = useState(false)
     const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 })
     const [quantity, setQuantity] = useState(1)
+    const [isAdding, setIsAdding] = useState(false)
 
     useEffect(() => {
         setSelectedVariantId(initialVariant?.id ?? null)
@@ -77,21 +78,24 @@ export default function Overview({ product }) {
         setQuantity(quantity + 1)
     }
 
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
         if (!product) return
-        const variantTitle = selectedVariant?.title ?? "Default"
-        const priceLabel = formatCurrency(selectedVariant?.price) ?? ""
-        addItem({
-            name: product.name,
-            price: priceLabel,
-            color: variantTitle,
-            quantity,
-            image: selectedVariant?.image ?? selectedImageUrl,
-            sku: selectedVariant?.sku ?? product.sku,
-        })
+
+        try {
+            setIsAdding(true)
+            await addItem({
+                productId: product.id,
+                productVariantId: selectedVariant?.id ?? null,
+                quantity,
+            })
+        } catch (error) {
+            // Error is handled in the cart context toast
+        } finally {
+            setIsAdding(false)
+        }
     }
 
-    const itemInCart = isInCart(product?.name, selectedVariant?.title ?? "Default")
+    const itemInCart = product?.id ? isInCart(product.id, selectedVariant?.id ?? null) : false
 
     const comparePrice = formatCurrency(selectedVariant?.compare_at_price)
     const currentPrice = formatCurrency(selectedVariant?.price)
@@ -299,9 +303,12 @@ export default function Overview({ product }) {
                         {!itemInCart ? (
                             <button
                                 onClick={handleAddToCart}
-                                className="flex-1 bg-black text-white py-3 px-6 rounded font-semibold hover:bg-gray-800 transition-colors"
+                                disabled={isAdding}
+                                className={`flex-1 bg-black text-white py-3 px-6 rounded font-semibold transition-colors ${
+                                    isAdding ? "opacity-75 cursor-not-allowed" : "hover:bg-gray-800"
+                                }`}
                             >
-                                Add to Cart
+                                {isAdding ? "Adding..." : "Add to Cart"}
                             </button>
                         ) : (
                             <button

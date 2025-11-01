@@ -4,18 +4,32 @@ import { useCart } from "@/contexts/CartContext"
 export default function CartItem({ id, name, price, color, quantity, image }) {
   const { updateQuantity, removeItem } = useCart()
 
-  const handleDecrease = () => {
-    if (quantity > 1) {
-      updateQuantity(id, quantity - 1)
+  const handleDecrease = async () => {
+    if (quantity <= 1) {
+      return
+    }
+
+    try {
+      await updateQuantity(id, quantity - 1)
+    } catch (error) {
+      // handled by context
     }
   }
 
-  const handleIncrease = () => {
-    updateQuantity(id, quantity + 1)
+  const handleIncrease = async () => {
+    try {
+      await updateQuantity(id, quantity + 1)
+    } catch (error) {
+      // handled by context
+    }
   }
 
-  const handleRemove = () => {
-    removeItem(id)
+  const handleRemove = async () => {
+    try {
+      await removeItem(id)
+    } catch (error) {
+      // handled by context
+    }
   }
 
   return (

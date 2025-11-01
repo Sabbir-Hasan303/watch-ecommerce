@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WebProductController;
@@ -26,6 +28,14 @@ Route::get('/watches', [WebProductController::class, 'productList'])->name('watc
 
 Route::get('/watches/{slug}', [WebProductController::class, 'singleProduct'])->name('single-product');
 
+Route::prefix('cart')->group(function () {
+    Route::get('/', [CartController::class, 'show'])->name('cart.show');
+    Route::post('/items', [CartController::class, 'store'])->name('cart.items.store');
+    Route::patch('/items/{cartItem}', [CartController::class, 'update'])->name('cart.items.update');
+    Route::delete('/items/{cartItem}', [CartController::class, 'destroy'])->name('cart.items.destroy');
+    Route::delete('/', [CartController::class, 'clear'])->name('cart.clear');
+});
+
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
@@ -33,9 +43,7 @@ Route::get('/terms', function () {
     return Inertia::render('Web/Terms');
 })->name('terms');
 
-Route::get('/checkout', function () {
-    return Inertia::render('Web/Checkout');
-})->name('checkout');
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 
 
 // Customer Routes

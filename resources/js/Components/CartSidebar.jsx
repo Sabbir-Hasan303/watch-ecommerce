@@ -72,7 +72,13 @@ export default function CartSidebar() {
             {/* Subtotal */}
             <div className="flex items-center justify-between text-lg">
               <span className="font-semibold">Subtotal:</span>
-              <span className="font-bold">${subtotal.toLocaleString()}</span>
+              <span className="font-bold">
+                $
+                {subtotal.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
             </div>
 
             {/* Checkout Button */}
