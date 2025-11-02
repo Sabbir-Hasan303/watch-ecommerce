@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { Minus, Plus } from "lucide-react"
+import { router } from "@inertiajs/react"
 import TechnicalSpecs from "@/Pages/Web/SingleProductSections/TechnicalSpecs"
 import { useCart } from "@/contexts/CartContext"
 
@@ -35,6 +36,7 @@ export default function Overview({ product }) {
     const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 })
     const [quantity, setQuantity] = useState(1)
     const [isAdding, setIsAdding] = useState(false)
+    const [isBuying, setIsBuying] = useState(false)
 
     useEffect(() => {
         setSelectedVariantId(initialVariant?.id ?? null)
@@ -96,6 +98,26 @@ export default function Overview({ product }) {
     }
 
     const itemInCart = product?.id ? isInCart(product.id, selectedVariant?.id ?? null) : false
+
+    const handleBuyNow = async () => {
+        if (!product) return
+
+        try {
+            setIsBuying(true)
+
+            if (!itemInCart) {
+                await addItem({
+                    productId: product.id,
+                    productVariantId: selectedVariant?.id ?? null,
+                    quantity,
+                })
+            }
+
+            router.visit(route("checkout"))
+        } catch (error) {
+            setIsBuying(false)
+        }
+    }
 
     const comparePrice = formatCurrency(selectedVariant?.compare_at_price)
     const currentPrice = formatCurrency(selectedVariant?.price)
@@ -318,8 +340,14 @@ export default function Overview({ product }) {
                                 In Cart
                             </button>
                         )}
-                        <button className="flex-1 bg-red-600 text-white py-3 px-6 rounded font-semibold hover:bg-red-700 transition-colors">
-                            Buy Now
+                        <button
+                            onClick={handleBuyNow}
+                            disabled={isBuying}
+                            className={`flex-1 bg-red-600 text-white py-3 px-6 rounded font-semibold transition-colors ${
+                                isBuying ? "opacity-75 cursor-not-allowed" : "hover:bg-red-700"
+                            }`}
+                        >
+                            {isBuying ? "Redirecting..." : "Buy Now"}
                         </button>
                     </div>
                 </div>

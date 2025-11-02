@@ -59,6 +59,23 @@ export default function OrderConfirmation({ order }) {
                         <Package className="w-5 h-5 text-gray-700" />
                         <span className="font-semibold text-gray-900">Order Number: {orderData.id}</span>
                     </div>
+                    {/* Action Buttons */}
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-4">
+                        <Link
+                            href="/"
+                            className=" bg-black text-white py-3 px-4 rounded font-semibold hover:bg-gray-800 transition-colors text-sm flex items-center justify-center gap-2"
+                        >
+                            <Home className="w-5 h-5" />
+                            Continue Shopping
+                        </Link>
+                        {/* <Link
+                            href="/orders"
+                            className=" bg-white text-black py-3 px-4 rounded font-semibold border-2 border-black hover:bg-gray-50 transition-colors text-sm flex items-center justify-center gap-2"
+                        >
+                            View Order Status
+                            <ArrowRight className="w-5 h-5" />
+                        </Link> */}
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
@@ -150,9 +167,8 @@ export default function OrderConfirmation({ order }) {
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Shipping</span>
                                     <span
-                                        className={`font-semibold ${
-                                            (orderData.totals?.shipping || 0) <= 0 ? "text-green-600" : "text-gray-800"
-                                        }`}
+                                        className={`font-semibold ${(orderData.totals?.shipping || 0) <= 0 ? "text-green-600" : "text-gray-800"
+                                            }`}
                                     >
                                         {(orderData.totals?.shipping || 0) <= 0
                                             ? "Free"
@@ -202,24 +218,6 @@ export default function OrderConfirmation({ order }) {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="space-y-3">
-                            <Link
-                                href="/"
-                                className="w-full bg-black text-white py-4 px-6 rounded font-semibold hover:bg-gray-800 transition-colors text-base flex items-center justify-center gap-2"
-                            >
-                                <Home className="w-5 h-5" />
-                                Continue Shopping
-                            </Link>
-                            <Link
-                                href="/orders"
-                                className="w-full bg-white text-black py-4 px-6 rounded font-semibold border-2 border-black hover:bg-gray-50 transition-colors text-base flex items-center justify-center gap-2"
-                            >
-                                View Order Status
-                                <ArrowRight className="w-5 h-5" />
-                            </Link>
                         </div>
                     </div>
                 </div>

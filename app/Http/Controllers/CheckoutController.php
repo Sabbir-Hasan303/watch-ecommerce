@@ -8,6 +8,7 @@ use App\Services\CartService;
 use App\Services\OptionService;
 use App\Services\OrderService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -15,8 +16,14 @@ use Inertia\Response;
 
 class CheckoutController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response|RedirectResponse
     {
+        $cart = CartService::resolveCart($request, false);
+
+        if (!$cart || !$cart->items()->exists()) {
+            return redirect()->route('watches-list')->with('error', 'Your cart is empty. Please add items before proceeding to checkout.');
+        }
+
         $shippingOptions = $this->buildShippingOptions();
         $taxSettings = $this->buildTaxSettings();
 
