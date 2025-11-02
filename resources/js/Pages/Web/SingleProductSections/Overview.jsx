@@ -199,7 +199,7 @@ export default function Overview({ product }) {
                 </div>
 
                 {/* Right Column - Product Details */}
-                <div className="space-y-6">
+                <div className="space-y-6 lg:sticky lg:top-16 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
                     {/* Price */}
                     <div className="space-y-2">
                         <div className="flex items-center gap-3 text-3xl font-bold text-gray-900">
