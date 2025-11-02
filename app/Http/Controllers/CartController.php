@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
-use App\Models\ProductVariant;
+use App\Services\CartService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class CartController extends Controller
 {
@@ -18,14 +15,14 @@ class CartController extends Controller
      */
     public function show(Request $request): JsonResponse
     {
-        $cart = $this->resolveCart($request, false);
+        $cart = CartService::resolveCart($request, false);
 
         if (!$cart) {
             return response()->json(['cart' => null]);
         }
 
         return response()->json([
-            'cart' => $this->transformCart($cart),
+            'cart' => CartService::transformCart($cart),
         ]);
     }
 
@@ -40,7 +37,7 @@ class CartController extends Controller
             'quantity' => ['required', 'integer', 'min:1'],
         ]);
 
-        $cart = $this->resolveCart($request, true);
+        $cart = CartService::resolveCart($request, true);
 
         $product = Product::with(['images', 'variants'])->findOrFail($data['product_id']);
 
@@ -83,7 +80,7 @@ class CartController extends Controller
         $cart->refresh();
 
         return response()->json([
-            'cart' => $this->transformCart($cart),
+            'cart' => CartService::transformCart($cart),
         ]);
     }
 
@@ -96,7 +93,7 @@ class CartController extends Controller
             'quantity' => ['required', 'integer', 'min:1'],
         ]);
 
-        $cart = $this->resolveCart($request, false);
+        $cart = CartService::resolveCart($request, false);
 
         if (!$cart || $cartItem->cart_id !== $cart->id) {
             abort(404);
@@ -108,7 +105,7 @@ class CartController extends Controller
         $cart->refresh();
 
         return response()->json([
-            'cart' => $this->transformCart($cart),
+            'cart' => CartService::transformCart($cart),
         ]);
     }
 
@@ -117,7 +114,7 @@ class CartController extends Controller
      */
     public function destroy(Request $request, CartItem $cartItem): JsonResponse
     {
-        $cart = $this->resolveCart($request, false);
+        $cart = CartService::resolveCart($request, false);
 
         if (!$cart || $cartItem->cart_id !== $cart->id) {
             abort(404);
@@ -128,7 +125,7 @@ class CartController extends Controller
         $cart->refresh();
 
         return response()->json([
-            'cart' => $this->transformCart($cart),
+            'cart' => CartService::transformCart($cart),
         ]);
     }
 
@@ -137,130 +134,17 @@ class CartController extends Controller
      */
     public function clear(Request $request): JsonResponse
     {
-        $cart = $this->resolveCart($request, false);
+        $cart = CartService::resolveCart($request, false);
 
         if (!$cart) {
             return response()->json(['cart' => null]);
         }
 
-        $cart->items()->delete();
-        $cart->refresh();
+        CartService::clearCart($cart);
 
         return response()->json([
-            'cart' => $this->transformCart($cart),
+            'cart' => CartService::transformCart($cart),
         ]);
-    }
-
-    /**
-     * Resolve the cart for the current user or guest session
-     */
-    protected function resolveCart(Request $request, bool $createIfMissing): ?Cart
-    {
-        $user = $request->user();
-
-        if ($user) {
-            $query = Cart::where('user_id', $user->id);
-            $cart = $query->first();
-
-            if ($cart) {
-                return $cart;
-            }
-
-            return $createIfMissing ? Cart::create(['user_id' => $user->id]) : null;
-        }
-
-        $guestSessionId = $request->session()->get('guest_cart_id');
-
-        if (!$guestSessionId) {
-            if (!$createIfMissing) {
-                return null;
-            }
-
-            $guestSessionId = (string) Str::uuid();
-            $request->session()->put('guest_cart_id', $guestSessionId);
-        }
-
-        $cart = Cart::where('guest_session_id', $guestSessionId)->first();
-
-        if ($cart) {
-            return $cart;
-        }
-
-        return $createIfMissing ? Cart::create(['guest_session_id' => $guestSessionId]) : null;
-    }
-
-    /**
-     * Transform the cart model for frontend consumption
-     */
-    protected function transformCart(Cart $cart): array
-    {
-        $cart->loadMissing([
-            'items.product.images',
-            'items.variant',
-        ]);
-
-        $items = $cart->items->map(function (CartItem $item) {
-            $product = $item->product;
-            $variant = $item->variant;
-
-            $imageUrl = $this->resolveItemImage($product, $variant) ?? '/placeholder.svg';
-
-            $unitPrice = (float) $item->unit_price;
-
-            return [
-                'id' => $item->id,
-                'productId' => $product->id,
-                'productVariantId' => $variant?->id,
-                'name' => $product->name,
-                'color' => $variant?->title ?? 'Default',
-                'quantity' => $item->quantity,
-                'unitPrice' => $unitPrice,
-                'price' => $this->formatMoney($unitPrice),
-                'image' => $imageUrl,
-                'sku' => $variant?->sku ?? $product->sku,
-            ];
-        })->values();
-
-        $subtotal = $items->reduce(function ($carry, $item) {
-            return $carry + ($item['unitPrice'] * $item['quantity']);
-        }, 0.0);
-
-        return [
-            'id' => $cart->id,
-            'items' => $items,
-            'itemCount' => $cart->items->sum('quantity'),
-            'subtotal' => round($subtotal, 2),
-            'subtotalFormatted' => $this->formatMoney($subtotal),
-        ];
-    }
-
-    /**
-     * Resolve the best image to display for a cart item
-     */
-    protected function resolveItemImage(Product $product, ?ProductVariant $variant): ?string
-    {
-        $images = $product->images;
-
-        $image = $images->firstWhere('product_variant_id', $variant?->id)
-            ?? $images->firstWhere('is_primary', true)
-            ?? $images->first();
-
-        $imagePath = $image?->image_path ?? $product->primary_image_url;
-
-        if (!$imagePath) {
-            return null;
-        }
-
-        if (Str::startsWith($imagePath, ['http://', 'https://', '//', '/'])) {
-            return $imagePath;
-        }
-
-        return Storage::url($imagePath);
-    }
-
-    protected function formatMoney(float $value): string
-    {
-        return '$' . number_format($value, 2);
     }
 }
 

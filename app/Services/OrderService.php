@@ -9,6 +9,8 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\ProductVariant;
 use App\Services\OptionService;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class OrderService
 {
@@ -188,6 +190,34 @@ class OrderService
         }
     }
 
+    public static function restoreStockForOrder(Order $order): void
+    {
+        $order->loadMissing('items');
+
+        foreach ($order->items as $item) {
+            if (!$item->product_variant_id) {
+                continue;
+            }
+
+            ProductVariant::where('id', $item->product_variant_id)
+                ->increment('quantity', $item->quantity);
+        }
+    }
+
+    public static function deductStockForOrder(Order $order): void
+    {
+        $order->loadMissing('items');
+
+        foreach ($order->items as $item) {
+            if (!$item->product_variant_id) {
+                continue;
+            }
+
+            ProductVariant::where('id', $item->product_variant_id)
+                ->decrement('quantity', $item->quantity);
+        }
+    }
+
     /**
      * Update an existing order with all related data
      */
@@ -317,17 +347,29 @@ class OrderService
      */
     public static function sendOrderNotifications(Order $order, array $validated): void
     {
-        // TODO: Implement email notifications
-        // - Send confirmation email to customer
-        // - Send notification to admin
-        // - Send invoice if requested
+        try {
+            // Get customer email (from user or shipping address)
+            $customerEmail = $order->user
+                ? $order->user->email
+                : ($order->shipping_address['email'] ?? null);
 
-        if ($validated['send_confirmation_email'] ?? false) {
-            // TODO: Send order confirmation email
-        }
+            // Send confirmation email to customer with invoice PDF
+            if ($customerEmail) {
+                Mail::to($customerEmail)
+                    ->send(new \App\Mail\OrderConfirmationMail($order));
+            }
 
-        if ($validated['send_invoice'] ?? false) {
-            // TODO: Send invoice email
+            // Get admin email from config, default to MAIL_FROM_ADDRESS
+            $adminEmail = config('mail.admin_email', config('mail.from.address'));
+
+            // Send notification email to admin
+            if ($adminEmail) {
+                Mail::to($adminEmail)
+                    ->send(new \App\Mail\NewOrderNotificationMail($order));
+            }
+        } catch (\Exception $e) {
+            // Log the error but don't fail the order creation
+            Log::error('Failed to send order notification emails: ' . $e->getMessage());
         }
     }
 }

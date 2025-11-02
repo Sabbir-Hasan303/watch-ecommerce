@@ -12,7 +12,8 @@ import {
   ShoppingBag,
   ImageIcon,
   Settings,
-  UserCheck
+  UserCheck,
+  FileText
 } from 'lucide-react'
 import { Button } from '@mui/material'
 
@@ -20,10 +21,21 @@ export default function Sidebar({ collapsed, onToggle, user }) {
   const { url } = usePage()
   const [expandedItems, setExpandedItems] = useState([])
 
+  // Helper function to extract path from full URL
+  const getPathFromUrl = (fullUrl) => {
+    try {
+      const urlObj = new URL(fullUrl, window.location.origin)
+      return urlObj.pathname
+    } catch {
+      // If it's already just a path, return it
+      return fullUrl
+    }
+  }
+
   // Check if any child item is active for a given parent
   const hasActiveChild = item => {
     if (!item.subItems) return false
-    return item.subItems.some(subItem => url === subItem.href)
+    return item.subItems.some(subItem => url === getPathFromUrl(subItem.href))
   }
 
   // Get the parent item that has an active child
@@ -93,6 +105,11 @@ export default function Sidebar({ collapsed, onToggle, user }) {
       ]
     },
     {
+      icon: FileText,
+      label: 'Log Viewer',
+      href: route('admin.logs')
+    },
+    {
       icon: Settings,
       label: 'Settings',
       subItems: [
@@ -147,7 +164,7 @@ export default function Sidebar({ collapsed, onToggle, user }) {
   const renderMenuItem = (item, index) => {
     const isExpanded = expandedItems.includes(item.label)
     const hasSubItems = item.subItems && item.subItems.length > 0
-    const isActive = item.href ? url === item.href : false
+    const isActive = item.href ? url === getPathFromUrl(item.href) : false
     const isSettings = item.label === 'Settings'
     const hasActiveChildItem = hasActiveChild(item)
 
@@ -206,7 +223,7 @@ export default function Sidebar({ collapsed, onToggle, user }) {
           <div className='mt-1 space-y-0.5 animate-in slide-in-from-top-2 duration-300 relative'>
             {item.subItems?.map((subItem, subIndex) => {
               const isLast = subIndex === item.subItems.length - 1
-              const isSubActive = url === subItem.href
+              const isSubActive = url === getPathFromUrl(subItem.href)
 
               return (
                 <div key={subIndex} className='relative group/sub'>

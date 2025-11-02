@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react"
-import { Link, Head } from "@inertiajs/react"
+import React, { useEffect, useMemo } from "react"
+import { Link, Head, useForm } from "@inertiajs/react"
 import { ChevronLeft } from "lucide-react"
 import GuestLayout from "@/Layouts/GuestLayout"
 import { useCart } from "@/contexts/CartContext"
@@ -23,51 +23,55 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
 
     const defaultArea = areaOptions[0]?.value ?? ""
 
-    const [formData, setFormData] = useState(() => ({
+    const { data, setData, post, processing, errors, reset } = useForm({
         fullName: "",
         phone: "",
         email: "",
         area: defaultArea,
         fullAddress: "",
-    }))
+        orderNotes: "",
+    })
 
     useEffect(() => {
         if (!areaOptions.length) {
             return
         }
 
-        const hasCurrentArea = areaOptions.some((option) => option.value === formData.area)
+        const hasCurrentArea = areaOptions.some((option) => option.value === data.area)
 
         if (!hasCurrentArea) {
-            setFormData((prev) => ({
-                ...prev,
-                area: defaultArea,
-            }))
+            setData('area', defaultArea)
         }
-    }, [areaOptions, defaultArea, formData.area])
+    }, [areaOptions, defaultArea, data.area, setData])
 
     const handleInputChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        })
+        setData(e.target.name, e.target.value)
     }
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        // Handle form submission
-        console.log("Order submitted:", { formData, items, paymentMethod: "COD" })
-        alert("Order placed successfully! You will receive a confirmation email shortly.")
+
+        if (items.length === 0) {
+            alert("Your cart is empty. Please add items to your cart before checkout.")
+            return
+        }
+
+        post(route('checkout.store'), {
+            preserveScroll: false,
+            onSuccess: () => {
+                reset()
+            },
+        })
     }
 
     const numericSubtotal = Number(subtotal) || 0
 
     const shippingCost = useMemo(() => {
-        if (!formData.area) {
+        if (!data.area) {
             return 0
         }
 
-        const areaSetting = shippingOptions?.[formData.area]
+        const areaSetting = shippingOptions?.[data.area]
 
         if (!areaSetting) {
             return 0
@@ -82,7 +86,7 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
         }
 
         return Number(Number(value).toFixed(2))
-    }, [formData.area, shippingOptions])
+    }, [data.area, shippingOptions])
 
     const taxRate = Number.parseFloat(taxSettings?.rate ?? 0)
     const taxEnabled = Boolean(taxSettings?.enabled)
@@ -125,6 +129,12 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                         <p className="text-gray-600 mt-2">Fill in your details to complete your order as a guest.</p>
                     </div>
 
+                    {(errors.cart || errors.checkout) && (
+                        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                            {errors.cart || errors.checkout}
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
                             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
@@ -144,12 +154,13 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                                             type="text"
                                             id="fullName"
                                             name="fullName"
-                                            value={formData.fullName}
+                                            value={data.fullName}
                                             onChange={handleInputChange}
                                             required
                                             className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
                                             placeholder="Full Name"
                                         />
+                                        {errors.fullName && <p className="text-sm text-red-600 mt-1">{errors.fullName}</p>}
                                     </div>
                                     <div>
                                         <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
@@ -159,12 +170,13 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                                             type="tel"
                                             id="phone"
                                             name="phone"
-                                            value={formData.phone}
+                                            value={data.phone}
                                             onChange={handleInputChange}
                                             required
                                             className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
                                             placeholder="Phone Number"
                                         />
+                                        {errors.phone && <p className="text-sm text-red-600 mt-1">{errors.phone}</p>}
                                     </div>
                                 </div>
 
@@ -177,12 +189,13 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                                             type="email"
                                             id="email"
                                             name="email"
-                                            value={formData.email}
+                                            value={data.email}
                                             onChange={handleInputChange}
                                             required
                                             className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
                                             placeholder="example@gmail.com"
                                         />
+                                        {errors.email && <p className="text-sm text-red-600 mt-1">{errors.email}</p>}
                                     </div>
 
                                     <div>
@@ -192,10 +205,11 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                                         <select
                                             id="area"
                                             name="area"
-                                            value={formData.area}
+                                            value={data.area}
                                             onChange={handleInputChange}
                                             className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
                                             disabled={!areaOptions.length}
+                                            required
                                         >
                                             {areaOptions.length ? (
                                                 areaOptions.map((option) => (
@@ -210,6 +224,7 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                                         <span className="text-xs text-gray-500">
                                             Shipping fees may differ by area
                                         </span>
+                                        {errors.area && <p className="text-sm text-red-600 mt-1">{errors.area}</p>}
                                     </div>
                                 </div>
 
@@ -220,13 +235,14 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                                     <textarea
                                         id="fullAddress"
                                         name="fullAddress"
-                                        value={formData.fullAddress}
+                                        value={data.fullAddress}
                                         onChange={handleInputChange}
                                         required
                                         rows={3}
                                         className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black resize-none"
                                         placeholder="123 Main Street, City, Country"
                                     />
+                                    {errors.fullAddress && <p className="text-sm text-red-600 mt-1">{errors.fullAddress}</p>}
                                 </div>
                             </div>
                         </div>
@@ -245,19 +261,35 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                             <p className="text-sm text-gray-500 mt-3">More payment options will be available soon.</p>
                         </div>
 
+                        {/* Order Notes */}
+                        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+                            <h2 className="text-xl font-bold mb-4">Special Instructions</h2>
+                            <textarea
+                                id="orderNotes"
+                                name="orderNotes"
+                                value={data.orderNotes}
+                                onChange={handleInputChange}
+                                rows={3}
+                                className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black resize-none"
+                                placeholder="Any special instructions for the delivery"
+                            />
+                            {errors.orderNotes && <p className="text-sm text-red-600 mt-1">{errors.orderNotes}</p>}
+                        </div>
+
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            className="w-full bg-black text-white py-4 px-6 rounded font-semibold hover:bg-gray-800 transition-colors text-lg"
+                            disabled={processing || items.length === 0}
+                            className="w-full bg-black text-white py-4 px-6 rounded font-semibold hover:bg-gray-800 transition-colors text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Place Order - {formatCurrency(total)}
+                            {processing ? "Processing..." : `Place Order - ${formatCurrency(total)}`}
                         </button>
                     </form>
                 </div>
 
                 {/* Right Column - Order Summary */}
                 <div className="space-y-6">
-                    <div className="bg-white rounded-lg p-6 shadow-sm sticky top-4">
+                    <div className="bg-white rounded-lg p-6 shadow-sm sticky top-16">
                         <h2 className="text-xl font-bold mb-4">Order Summary</h2>
 
                         {/* Cart Items */}
@@ -295,10 +327,13 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                                     {shippingDisplay}
                                 </span>
                             </div>
+                            {/* if tax is enabled, show the tax */}
+                            {taxEnabled && (
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600">{taxLabel}</span>
-                                <span className="font-semibold">{taxDisplay}</span>
-                            </div>
+                                    <span className="font-semibold">{taxDisplay}</span>
+                                </div>
+                            )}
                             <div className="flex justify-between text-lg font-bold border-t border-gray-200 pt-3">
                                 <span>Total</span>
                                 <span>{formatCurrency(total)}</span>

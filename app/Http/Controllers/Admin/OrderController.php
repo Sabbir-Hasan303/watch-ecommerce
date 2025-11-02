@@ -150,8 +150,24 @@ class OrderController extends Controller
         ]);
 
         $order = Order::find($validated['id']);
-        $order->status = $validated['status'];
-        $order->save();
+
+        if (!$order) {
+            return redirect()->back()->with('error', 'Order not found');
+        }
+
+        $previousStatus = $order->status;
+        $newStatus = $validated['status'];
+
+        DB::transaction(function () use ($order, $previousStatus, $newStatus) {
+            $order->status = $newStatus;
+            $order->save();
+
+            if ($previousStatus !== 'cancelled' && $newStatus === 'cancelled') {
+                OrderService::restoreStockForOrder($order);
+            } elseif ($previousStatus === 'cancelled' && $newStatus !== 'cancelled') {
+                OrderService::deductStockForOrder($order);
+            }
+        });
 
         return redirect()->back()->with('success', 'Order status changed successfully');
     }
@@ -163,8 +179,20 @@ class OrderController extends Controller
         ]);
 
         $order = Order::find($validated['id']);
-        $order->status = 'cancelled';
-        $order->save();
+
+        if (!$order) {
+            return redirect()->back()->with('error', 'Order not found');
+        }
+
+        if ($order->status === 'cancelled') {
+            return redirect()->back()->with('success', 'Order already cancelled');
+        }
+
+        DB::transaction(function () use ($order) {
+            OrderService::restoreStockForOrder($order);
+            $order->status = 'cancelled';
+            $order->save();
+        });
 
         return redirect()->back()->with('success', 'Order cancelled successfully');
     }
