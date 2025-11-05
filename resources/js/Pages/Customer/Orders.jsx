@@ -1,143 +1,49 @@
-import { router } from "@inertiajs/react"
-import { useState } from "react"
+import { Head, usePage } from "@inertiajs/react"
+import { useMemo, useState } from "react"
 import CustomerLayout from "@/Layouts/CustomerLayout"
 import OrderCard from "@/Pages/Customer/OrderCard"
 
-// Mock orders data
-const mockOrders = [
-  {
-    id: "1",
-    orderNumber: "ORD-2024-001",
-    date: "Jan 15, 2024",
-    status: "delivered",
-    items: [
-      {
-        id: "1",
-        name: "2024 Tesla Model S",
-        image: "/placeholder.svg?height=80&width=80",
-        color: "Midnight Silver",
-        quantity: 1,
-        price: 45999.99,
-      },
-    ],
-    subtotal: 45999.99,
-    shipping: 0,
-    total: 45999.99,
-    shippingAddress: {
-      fullName: "John Doe",
-      phone: "+1 234 567 8900",
-      address: "123 Main St",
-      city: "San Francisco",
-      state: "CA",
-      zipCode: "94102",
-      country: "USA",
-    },
-    paymentMethod: "Cash on Delivery",
-  },
-  {
-    id: "2",
-    orderNumber: "ORD-2024-002",
-    date: "Jan 20, 2024",
-    status: "shipped",
-    items: [
-      {
-        id: "2",
-        name: "2024 Tesla Model S",
-        image: "/placeholder.svg?height=80&width=80",
-        color: "Pearl White",
-        quantity: 1,
-        price: 52999.99,
-      },
-    ],
-    subtotal: 52999.99,
-    shipping: 0,
-    total: 52999.99,
-    shippingAddress: {
-      fullName: "John Doe",
-      phone: "+1 234 567 8900",
-      address: "123 Main St",
-      city: "San Francisco",
-      state: "CA",
-      zipCode: "94102",
-      country: "USA",
-    },
-    paymentMethod: "Cash on Delivery",
-  },
-  {
-    id: "3",
-    orderNumber: "ORD-2024-003",
-    date: "Jan 25, 2024",
-    status: "processing",
-    items: [
-      {
-        id: "3",
-        name: "2024 Tesla Model S",
-        image: "/placeholder.svg?height=80&width=80",
-        color: "Deep Blue",
-        quantity: 1,
-        price: 48999.99,
-      },
-    ],
-    subtotal: 48999.99,
-    shipping: 0,
-    total: 48999.99,
-    shippingAddress: {
-      fullName: "John Doe",
-      phone: "+1 234 567 8900",
-      address: "123 Main St",
-      city: "San Francisco",
-      state: "CA",
-      zipCode: "94102",
-      country: "USA",
-    },
-    paymentMethod: "Cash on Delivery",
-  },
+const tabs = [
+  { key: "all", label: "All Orders" },
+  { key: "new", label: "New Orders" },
+  { key: "history", label: "Order History" },
+  { key: "cancelled", label: "Cancelled" },
 ]
 
-export default function Orders() {
+export default function Orders({ orders = [], statusGroups = {} }) {
+  const { auth } = usePage().props
   const [filter, setFilter] = useState("all")
 
-  const filteredOrders = mockOrders.filter((order) => {
-    if (filter === "new") {
-      return order.status === "pending" || order.status === "processing" || order.status === "shipped"
-    }
-    if (filter === "history") {
-      return order.status === "delivered" || order.status === "cancelled"
-    }
-    return true
-  })
+  const filteredOrders = useMemo(() => {
+    if (filter === "all") return orders
+
+    const allowedStatuses =
+      filter === "cancelled"
+        ? ["cancelled"]
+        : statusGroups[filter] ?? []
+
+    return orders.filter((order) => allowedStatuses.includes(order.status))
+  }, [orders, filter, statusGroups])
 
   return (
     <CustomerLayout>
+      <Head title="My Orders" />
       <div>
         <h1 className="text-2xl font-bold mb-8">My Orders</h1>
 
         {/* Filter Tabs */}
-        <div className="flex gap-2 mb-6 border-b border-gray-200">
-          <button
-            onClick={() => setFilter("all")}
-            className={`px-4 py-2 font-medium transition-colors ${
-              filter === "all" ? "border-b-2 border-black text-black" : "text-gray-600 hover:text-black"
-            }`}
-          >
-            All Orders
-          </button>
-          <button
-            onClick={() => setFilter("new")}
-            className={`px-4 py-2 font-medium transition-colors ${
-              filter === "new" ? "border-b-2 border-black text-black" : "text-gray-600 hover:text-black"
-            }`}
-          >
-            New Orders
-          </button>
-          <button
-            onClick={() => setFilter("history")}
-            className={`px-4 py-2 font-medium transition-colors ${
-              filter === "history" ? "border-b-2 border-black text-black" : "text-gray-600 hover:text-black"
-            }`}
-          >
-            Order History
-          </button>
+        <div className="flex gap-2 mb-6 border-b border-gray-200 overflow-x-auto">
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setFilter(tab.key)}
+              className={`px-4 py-2 whitespace-nowrap font-medium transition-colors ${
+                filter === tab.key ? "border-b-2 border-black text-black" : "text-gray-600 hover:text-black"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         {/* Orders List */}
@@ -146,7 +52,7 @@ export default function Orders() {
             filteredOrders.map((order) => <OrderCard key={order.id} order={order} />)
           ) : (
             <div className="border border-gray-200 rounded-lg p-12 text-center">
-              <p className="text-gray-600">No orders found</p>
+              <p className="text-gray-600">No orders found in this category.</p>
             </div>
           )}
         </div>
