@@ -19,7 +19,7 @@ export default function OrderCard({ order }) {
 
   return (
     <Link
-      href={route("customer.orders.show", { order })}
+      href={route("customer.orders.show", { orderNumber: order.orderNumber })}
       className="block bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
     >
       <div className="flex items-start justify-between gap-4">

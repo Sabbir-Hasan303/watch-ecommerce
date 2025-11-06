@@ -65,12 +65,7 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
     Route::patch('/customer/addresses/{address}/default', [CustomerAddressController::class, 'setDefault'])->name('customer.addresses.default');
 
     Route::get('/customer/orders', [CustomerOrderController::class, 'index'])->name('customer.orders');
-
-    Route::get('/customer/orders/{order}', function ($order) {
-        return Inertia::render('Customer/ShowOrder', [
-            'order' => $order,
-        ]);
-    })->name('customer.orders.show');
+    Route::get('/customer/orders/{orderNumber}', [CustomerOrderController::class, 'show'])->name('customer.orders.show');
 
     Route::get('/customer/logout', function () {
         Auth::logout();
@@ -79,11 +74,11 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
 
 });
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+// Route::middleware('auth')->group(function () {
+//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// });
 
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';
