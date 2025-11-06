@@ -193,8 +193,10 @@ export default function ShowOrder({ order }) {
                         <CreditCard className="w-6 h-6 text-gray-600 flex-shrink-0 mt-1" />
                         <div>
                             <h2 className="text-lg font-bold mb-3">Payment Method</h2>
-                            <p className="text-gray-600 capitalize">{order.paymentMethod || "Not specified"}</p>
-                            <p className="text-sm text-gray-500 mt-1">
+                            <p className="text-gray-600 capitalize">
+                                {order.paymentMethod === "cod" ? "Cash on Delivery" : order.paymentMethod || "Not specified"}
+                            </p>
+                            {/* <p className="text-sm text-gray-500 mt-1">
                                 Status:{" "}
                                 <span
                                     className={`font-medium ${order.paymentStatus === "paid" ? "text-green-600" : "text-amber-600"
@@ -202,7 +204,7 @@ export default function ShowOrder({ order }) {
                                 >
                                     {order.paymentStatus?.charAt(0).toUpperCase() + order.paymentStatus?.slice(1)}
                                 </span>
-                            </p>
+                            </p> */}
                         </div>
                     </div>
                 </div>
