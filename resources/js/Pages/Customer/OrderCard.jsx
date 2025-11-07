@@ -10,9 +10,16 @@ export default function OrderCard({ order }) {
     cancelled: "bg-red-100 text-red-800",
   }
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "--"
+    return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(
+      new Date(dateString)
+    )
+  }
+
   return (
     <Link
-      href={route("customer.orders.show", { order })}
+      href={route("customer.orders.show", { orderNumber: order.orderNumber })}
       className="block bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
     >
       <div className="flex items-start justify-between gap-4">
@@ -28,7 +35,7 @@ export default function OrderCard({ order }) {
                 {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
               </span>
             </div>
-            <p className="text-sm text-gray-600 mb-2">{order.date}</p>
+            <p className="text-sm text-gray-600 mb-2">{formatDate(order.createdAt)}</p>
             <p className="text-sm text-gray-700">
               {order.items.length} item{order.items.length > 1 ? "s" : ""} • ${order.total.toFixed(2)}
             </p>

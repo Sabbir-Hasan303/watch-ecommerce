@@ -16,7 +16,7 @@ export default function Footer() {
                                     <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                                 </svg>
                             </div>
-                            <span className="text-xl font-semibold">chronos</span>
+                            <span className="text-xl font-semibold">RavenHour</span>
                         </div>
 
                         <address className="not-italic text-sm mb-6 leading-relaxed">

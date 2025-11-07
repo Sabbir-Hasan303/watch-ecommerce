@@ -19,13 +19,21 @@ export default function Sidebar( { sidebarOpen, setSidebarOpen } ) {
             {/* User Profile Section */}
             <div className="mb-6 pb-6 border-b border-gray-200">
                 <div className="flex items-center gap-3 mb-2">
-                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                        <User className="w-6 h-6 text-gray-600" />
+                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {page.props.auth.user?.profile_image ? (
+                            <img
+                                src={`/storage/${page.props.auth.user.profile_image}`}
+                                alt={page.props.auth.user.name}
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <User className="w-6 h-6 text-gray-600" />
+                        )}
                     </div>
                     <div>
                         <p className="text-sm text-gray-600">Hello,</p>
                         <p className="font-semibold text-gray-900">
-                            {page.props.auth.user?.firstName || "Guest"} {page.props.auth.user?.lastName || ""}
+                            {page.props.auth.user?.name || "Guest"}
                         </p>
                     </div>
                 </div>

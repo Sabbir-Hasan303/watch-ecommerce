@@ -3,6 +3,10 @@
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Customer\AddressController as CustomerAddressController;
+use App\Http\Controllers\Customer\DashboardController;
+use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
+use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WebProductController;
 use Illuminate\Foundation\Application;
@@ -50,29 +54,18 @@ Route::get('/orders/{order}/confirmation', [CheckoutController::class, 'show'])-
 
 // Customer Routes
 Route::middleware(['auth', 'verified', 'customer'])->group(function () {
-    Route::get('/customer/dashboard', function () {
-        $user = Auth::user();
-        return Inertia::render('Customer/Dashboard', [
-            'user' => $user,
-        ]);
-    })->name('customer.dashboard');
+    Route::get('/customer/dashboard', DashboardController::class)->name('customer.dashboard');
 
-    Route::get('/customer/profile', function () {
-        $user = Auth::user();
-        return Inertia::render('Customer/Profile', [
-            'user' => $user,
-        ]);
-    })->name('customer.profile');
+    Route::get('/customer/profile', [CustomerProfileController::class, 'show'])->name('customer.profile');
+    Route::put('/customer/profile', [CustomerProfileController::class, 'update'])->name('customer.profile.update');
+    Route::post('/customer/profile/image', [CustomerProfileController::class, 'updateImage'])->name('customer.profile.image');
 
-    Route::get('/customer/orders', function () {
-        return Inertia::render('Customer/Orders');
-    })->name('customer.orders');
+    Route::post('/customer/addresses', [CustomerAddressController::class, 'store'])->name('customer.addresses.store');
+    Route::delete('/customer/addresses/{address}', [CustomerAddressController::class, 'destroy'])->name('customer.addresses.destroy');
+    Route::patch('/customer/addresses/{address}/default', [CustomerAddressController::class, 'setDefault'])->name('customer.addresses.default');
 
-    Route::get('/customer/orders/{order}', function ($order) {
-        return Inertia::render('Customer/ShowOrder', [
-            'order' => $order,
-        ]);
-    })->name('customer.orders.show');
+    Route::get('/customer/orders', [CustomerOrderController::class, 'index'])->name('customer.orders');
+    Route::get('/customer/orders/{orderNumber}', [CustomerOrderController::class, 'show'])->name('customer.orders.show');
 
     Route::get('/customer/logout', function () {
         Auth::logout();
@@ -81,11 +74,11 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
 
 });
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+// Route::middleware('auth')->group(function () {
+//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// });
 
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';

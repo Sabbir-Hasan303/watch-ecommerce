@@ -30,7 +30,7 @@ export default function Navbar() {
                                     <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                                 </svg>
                             </div>
-                            <span className="text-xl font-semibold text-black">chronos</span>
+                            <span className="text-xl font-semibold text-black">RavenHour</span>
                         </Link>
 
                         {/* Desktop Navigation */}
