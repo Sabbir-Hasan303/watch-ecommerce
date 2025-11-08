@@ -5,21 +5,32 @@ import GuestLayout from "@/Layouts/GuestLayout"
 import ProductCardDetailed from "@/Components/ProductCardDetailed"
 import ProductCardCompact from "@/Components/ProductCardCompact"
 
-export default function ProductList({ products = [] }) {
+export default function ProductList({ products = [], availableCategories = [] }) {
     const [activeCategory, setActiveCategory] = useState("All")
     const [isSearchOpen, setIsSearchOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
 
+    // Use passed categories from backend, or extract from products as fallback
     const categoryOptions = useMemo(() => {
+        if (availableCategories.length > 0) {
+            return ["All", ...availableCategories]
+        }
+        // Fallback: extract unique categories from products
         const unique = Array.from(new Set(products.map((product) => product.category ?? "Uncategorized")))
         return ["All", ...unique]
-    }, [products])
+    }, [availableCategories, products])
 
+    // Read query parameter and set active category on mount
     useEffect(() => {
-        if (!categoryOptions.includes(activeCategory)) {
+        const params = new URLSearchParams(window.location.search)
+        const categoryParam = params.get("category")
+
+        if (categoryParam && categoryOptions.includes(categoryParam)) {
+            setActiveCategory(categoryParam)
+        } else if (!categoryOptions.includes(activeCategory)) {
             setActiveCategory(categoryOptions[0] ?? "All")
         }
-    }, [categoryOptions, activeCategory])
+    }, [categoryOptions])
 
     const filteredProducts = useMemo(() => {
         if (activeCategory === "All") {
