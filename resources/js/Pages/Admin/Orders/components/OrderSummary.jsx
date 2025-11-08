@@ -1,6 +1,6 @@
 import { Percent, Eye, Download, Send } from "lucide-react"
 import { Button } from "@mui/material"
-import { Card } from "@/components/ui/card"
+import { Card } from "@/Components/ui/card"
 import {
     Dialog,
     DialogContent,
@@ -8,7 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/Components/ui/dialog"
 import Taka from "@/Components/Taka"
 
 export default function OrderSummary({

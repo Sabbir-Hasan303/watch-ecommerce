@@ -1,8 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from "react"
 import { Package, Plus, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react"
 import { Button, Box, Typography } from "@mui/material"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Card } from "@/Components/ui/card"
+import { Badge } from "@/Components/ui/badge"
 import AsynchronousInput from "@/Components/AsynchronousInput"
 
 export default function ProductSelection({

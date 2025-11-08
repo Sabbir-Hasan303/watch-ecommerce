@@ -1,7 +1,7 @@
 import { User, Package, Truck, Mail } from "lucide-react"
 import { Switch } from "@mui/material"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Card } from "@/Components/ui/card"
+import { Badge } from "@/Components/ui/badge"
 import Taka from "@/Components/Taka"
 
 export default function OrderReview({

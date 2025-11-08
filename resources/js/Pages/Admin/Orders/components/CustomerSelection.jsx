@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react"
 import { User, MapPin, UserPlus, X, Package, Plus } from "lucide-react"
 import { Button, Avatar, Box, Typography } from "@mui/material"
-import { Card } from "@/components/ui/card"
+import { Card } from "@/Components/ui/card"
 import CustomTextField from "@/components/CustomTextField"
 import CustomSelectField from "@/Components/CustomSelectField"
 import AsynchronousInput from "@/Components/AsynchronousInput"

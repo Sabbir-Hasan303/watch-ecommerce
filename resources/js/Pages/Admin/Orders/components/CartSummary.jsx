@@ -1,6 +1,6 @@
 import { ShoppingCart, Plus, Minus, X, AlertTriangle } from "lucide-react"
 import { Button } from "@mui/material"
-import { Card } from "@/components/ui/card"
+import { Card } from "@/Components/ui/card"
 
 export default function CartSummary({
     cart,

@@ -1,6 +1,6 @@
 import { Truck, CreditCard, FileText } from "lucide-react"
 import { Button, RadioGroup, Radio, FormControlLabel, FormControl } from "@mui/material"
-import { Card } from "@/components/ui/card"
+import { Card } from "@/Components/ui/card"
 import CustomTextField from "@/components/CustomTextField"
 
 export default function PaymentShipping({
