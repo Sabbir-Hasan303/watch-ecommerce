@@ -57,9 +57,9 @@ export default function Sidebar({ collapsed, onToggle, user }) {
       subItems: [
         { label: 'Product List', href: route('admin.products.index') },
         { label: 'Add Product', href: route('admin.products.create') },
-        { label: 'Categories', href: route('admin.products.categories') }
+        { label: 'Categories', href: route('admin.products.categories') },
         // { label: 'Tags', href: '/products/tags' }
-        // { label: 'Featured Products', href: '/products/featured' }
+        { label: 'Featured Products', href: route('admin.products.featured-products') }
       ]
     },
     {

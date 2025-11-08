@@ -42,9 +42,10 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
                 return Inertia::render('Admin/Products/Tags');
             })->name('admin.products.tags');
 
-            Route::get('/featured', function () {
-                return Inertia::render('Admin/Products/FeaturedProductPage');
-            })->name('admin.products.featured');
+            // Featured Products
+            Route::get('/featured-products', [ProductController::class, 'featuredIndex'])->name('admin.products.featured-products');
+            Route::put('/featured-products/update', [ProductController::class, 'updateFeatured'])->name('admin.products.featured.update');
+            Route::post('/featured-products/bulk-update', [ProductController::class, 'bulkUpdateFeatured'])->name('admin.products.featured.bulk-update');
         });
 
         // Orders
