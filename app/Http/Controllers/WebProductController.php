@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use Inertia\Inertia;
 use App\Models\Product;
 use Illuminate\Support\Facades\Storage;
@@ -45,8 +46,15 @@ class WebProductController extends Controller
             })
             ->values();
 
+        // Fetch first 14 categories (including those without products)
+        $availableCategories = Category::limit(14)
+            ->orderBy('created_at', 'desc')
+            ->pluck('name')
+            ->all();
+
         return Inertia::render('Web/ProductList', [
             'products' => $products,
+            'availableCategories' => $availableCategories,
         ]);
     }
 

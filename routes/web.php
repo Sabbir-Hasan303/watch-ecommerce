@@ -7,22 +7,23 @@ use App\Http\Controllers\Customer\AddressController as CustomerAddressController
 use App\Http\Controllers\Customer\DashboardController;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
 use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WebProductController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 
-Route::get('/', function () {
-    // return Inertia::render('Welcome', [
-    //     'canLogin' => Route::has('login'),
-    //     'canRegister' => Route::has('register'),
-    //     'laravelVersion' => Application::VERSION,
-    //     'phpVersion' => PHP_VERSION,
-    // ]);
-    return Inertia::render('Web/Home');
-});
+// Route::get('/', function () {
+//     // return Inertia::render('Welcome', [
+//     //     'canLogin' => Route::has('login'),
+//     //     'canRegister' => Route::has('register'),
+//     //     'laravelVersion' => Application::VERSION,
+//     //     'phpVersion' => PHP_VERSION,
+//     // ]);
+//     return Inertia::render('Web/Home');
+// });
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Route::get('/watches', function () {
 //     return Inertia::render('Web/ProductList');
