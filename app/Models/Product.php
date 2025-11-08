@@ -44,6 +44,11 @@ class Product extends Model
         return $this->belongsToMany(Tag::class)->withTimestamps();
     }
 
+    public function featuredProduct()
+    {
+        return $this->hasOne(FeaturedProduct::class);
+    }
+
     // public function reviews()
     // {
     //     return $this->hasMany(Review::class);

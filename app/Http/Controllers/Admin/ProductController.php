@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\FeaturedProduct;
+use App\Http\Requests\FeaturedProductRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -438,6 +440,85 @@ class ProductController extends Controller
             Log::error('Failed to delete product: ' . $e->getMessage());
 
             return redirect()->route('admin.products.index')->with('error', 'Failed to delete product: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Display featured products management page.
+     * Load all products with their featured status (defaults to 'none' if not set).
+     */
+    public function featuredIndex()
+    {
+        // Get all products with their featured status
+        $products = Product::with(['categories', 'variants', 'images', 'featuredProduct'])
+            ->get()
+            ->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'product_id' => $product->id,
+                    'name' => $product->name,
+                    'sku' => $product->sku,
+                    'category' => $product->categories->first()?->name ?? 'Uncategorized',
+                    'price' => $product->variants->count() > 0 ? $product->variants->first()->price : 0,
+                    'stock' => $product->variants->sum('quantity'),
+                    'status' => $product->featuredProduct?->status ?? 'none',
+                    'image' => $product->images->where('is_primary', true)->first()?->image_path ?? $product->images->first()?->image_path,
+                    'created_at' => $product->created_at,
+                    'updated_at' => $product->updated_at,
+                ];
+            });
+
+        $categories = Category::all()->pluck('name')->unique()->values();
+        $statusOptions = ['trending', 'featured', 'new-arrival', 'best-seller', 'hot-deal', 'none'];
+
+        return Inertia::render('Admin/Products/FeaturedProductPage', [
+            'featuredProducts' => $products,
+            'categories' => $categories,
+            'statusOptions' => $statusOptions,
+        ]);
+    }
+
+    /**
+     * Update a product's featured status (upsert).
+     */
+    public function updateFeatured(FeaturedProductRequest $request)
+    {
+        try {
+            FeaturedProduct::updateOrCreate(
+                ['product_id' => $request->product_id],
+                ['status' => $request->status]
+            );
+
+            return back()->with('success', 'Product status updated successfully.');
+        } catch (\Exception $e) {
+            Log::error('Failed to update featured product: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Failed to update product status: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Bulk update featured product statuses (upsert).
+     */
+    public function bulkUpdateFeatured(Request $request)
+    {
+        $request->validate([
+            'product_ids' => 'required|array',
+            'product_ids.*' => 'integer|exists:products,id',
+            'status' => 'required|string|in:trending,featured,new-arrival,best-seller,hot-deal,none',
+        ]);
+
+        try {
+            foreach ($request->product_ids as $productId) {
+                FeaturedProduct::updateOrCreate(
+                    ['product_id' => $productId],
+                    ['status' => $request->status]
+                );
+            }
+
+            return back()->with('success', 'Products status updated successfully.');
+        } catch (\Exception $e) {
+            Log::error('Failed to bulk update featured products: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Failed to update products status: ' . $e->getMessage()]);
         }
     }
 }

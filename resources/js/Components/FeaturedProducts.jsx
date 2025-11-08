@@ -2,10 +2,7 @@
 
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { Search, Filter, Star, TrendingUp, Flame, Sparkles, Upload, ImageIcon, Check, ChevronDown } from 'lucide-react'
-// import { Card } from "@/Components/ui/card"
-// import { Input } from "@/Components/ui/input"
-// import { Button } from "@/Components/ui/button"
+import { Search, Filter, TrendingUp } from 'lucide-react'
 import {
   Card,
   Input,
@@ -19,87 +16,54 @@ import {
   TableRow,
   TableContainer,
   Paper,
-  Checkbox
+  Checkbox,
+  Chip,
+  TablePagination
 } from '@mui/material'
 import CustomTextField from '@/Components/CustomTextField'
+import CustomSelectField from '@/Components/CustomSelectField'
+import { router } from '@inertiajs/react'
 
-const statusOptions = [
-  { value: 'featured', label: 'Featured Product', icon: Star, color: 'from-yellow-500 to-orange-500' },
-  { value: 'new-arrival', label: 'New Arrival', icon: Sparkles, color: 'from-blue-500 to-cyan-500' },
-  { value: 'best-seller', label: 'Best Seller', icon: TrendingUp, color: 'from-emerald-500 to-teal-500' },
-  { value: 'hot-deal', label: 'Hot Deal', icon: Flame, color: 'from-red-500 to-pink-500' },
-  { value: 'none', label: 'None', icon: null, color: '' }
-]
+const formatStatusOptions = (statusOptions) => {
+  const statusLabels = {
+    'trending': 'Trending Product',
+    // 'featured': 'Featured Product',
+    // 'new-arrival': 'New Arrival',
+    // 'best-seller': 'Best Seller',
+    // 'hot-deal': 'Hot Deal',
+    'none': 'None'
+  }
 
-const categories = ['All Categories', 'Electronics', 'Clothing', 'Home & Garden', 'Sports', 'Books']
+  return statusOptions.map(status => ({
+    value: status,
+    label: statusLabels[status] || status
+  }))
+}
 
-export function FeaturedProducts() {
+export function FeaturedProducts({ featuredProducts: initialProducts = [], categories: initialCategories = [], statusOptions: initialStatusOptions = [] }) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('All Categories')
+  const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedProducts, setSelectedProducts] = useState(new Set())
-  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false)
-  const [products, setProducts] = useState([
-    {
-      id: '1',
-      name: 'Wireless Headphones Pro',
-      category: 'Electronics',
-      price: 299.99,
-      stock: 45,
-      status: 'featured',
-      image: '/placeholder.svg?height=40&width=40'
-    },
-    {
-      id: '2',
-      name: 'Smart Watch Ultra',
-      category: 'Electronics',
-      price: 499.99,
-      stock: 23,
-      status: 'best-seller',
-      image: '/placeholder.svg?height=40&width=40'
-    },
-    {
-      id: '3',
-      name: 'Premium Yoga Mat',
-      category: 'Sports',
-      price: 79.99,
-      stock: 67,
-      status: 'new-arrival',
-      image: '/placeholder.svg?height=40&width=40'
-    },
-    {
-      id: '4',
-      name: 'Designer Backpack',
-      category: 'Clothing',
-      price: 149.99,
-      stock: 34,
-      status: 'hot-deal',
-      image: '/placeholder.svg?height=40&width=40'
-    },
-    {
-      id: '5',
-      name: 'LED Desk Lamp',
-      category: 'Home & Garden',
-      price: 59.99,
-      stock: 89,
-      status: 'none',
-      image: '/placeholder.svg?height=40&width=40'
-    },
-    {
-      id: '6',
-      name: 'Bluetooth Speaker',
-      category: 'Electronics',
-      price: 129.99,
-      stock: 56,
-      status: 'featured',
-      image: '/placeholder.svg?height=40&width=40'
-    }
-  ])
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [bulkStatus, setBulkStatus] = useState('trending')
+
+  const products = initialProducts || []
+  const categories = ['all', ...initialCategories]
+  // Only use 'trending' and 'none' status options, ignore others from backend
+  const filteredStatusOptions = initialStatusOptions.filter(status => status === 'trending' || status === 'none')
+  const statusOptionsFormatted = formatStatusOptions(filteredStatusOptions)
 
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesCategory = selectedCategory === 'All Categories' || product.category === selectedCategory
+    const matchesSearch = product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         product.sku?.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory
     return matchesSearch && matchesCategory
   })
+
+  // Pagination
+  const startIndex = page * rowsPerPage
+  const paginatedProducts = filteredProducts.slice(startIndex, startIndex + rowsPerPage)
 
   const toggleProductSelection = id => {
     const newSelected = new Set(selectedProducts)
@@ -119,263 +83,242 @@ export function FeaturedProducts() {
     }
   }
 
-  const updateProductStatus = (id, status) => {
-    setProducts(products.map(p => (p.id === id ? { ...p, status } : p)))
+  const updateProductStatus = (productId, status) => {
+    router.put(route('admin.products.featured.update'),
+      {
+        product_id: productId,
+        status: status
+      },
+      {
+        preserveScroll: true,
+        preserveState: true,
+      }
+    )
   }
 
-  const handleIconUpload = id => {
-    // Simulate icon upload
-    console.log('[v0] Icon upload for product:', id)
+  const handleBulkUpdate = (status) => {
+    if (selectedProducts.size === 0) return
+
+    const productIds = Array.from(selectedProducts)
+
+    router.post(route('admin.products.featured.bulk-update'),
+      {
+        product_ids: productIds,
+        status: status
+      },
+      {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+          setSelectedProducts(new Set())
+        }
+      }
+    )
   }
 
   const getStatusConfig = status => {
-    return statusOptions.find(opt => opt.value === status) || statusOptions[4]
+    return statusOptionsFormatted.find(opt => opt.value === status) || statusOptionsFormatted[0]
   }
 
   return (
-    <Card className='bg-[#1C252E] border-white/5 p-6 animate-in fade-in slide-in-from-bottom-4 hover:border-emerald-500/20 transition-all duration-500'>
+    <div className='space-y-6'>
       {/* Header */}
-      <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6'>
-        <div>
-          <h3 className='text-xl font-bold text-text-primary bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent'>
-            Featured Products Management
-          </h3>
-          <p className='text-sm text-gray-500 mt-1'>Manage product highlights and promotions</p>
-        </div>
-        <div className='flex items-center gap-2'>
-          <span className='text-xs text-gray-500'>
-            {selectedProducts.size} of {filteredProducts.length} selected
-          </span>
-        </div>
+      <div className='flex flex-col md:flex-row justify-between items-center mb-6'>
+        <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Featured Products Management</h2>
       </div>
 
-      {/* Search and Filter Bar */}
-      <div className='flex flex-col sm:flex-row justify-between gap-3 mb-6'>
-        {/* Search Input */}
-        <FormControl size='small' sx={{ minWidth: 300 }}>
-          <CustomTextField
-            placeholder='Search products...'
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position='start'>
-                  <Search className='w-4 h-4 mr-2' />
-                </InputAdornment>
-              )
-            }}
-          />
-        </FormControl>
+      {/* Filters and Actions */}
+      <div className='bg-card shadow-lg rounded-lg'>
+        <div className='p-6 flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between'>
+          <div className='flex flex-col sm:flex-row gap-3 w-full lg:w-auto'>
+            <FormControl size='small' sx={{ minWidth: 300 }}>
+              <CustomTextField
+                placeholder='Search products...'
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position='start'>
+                      <Search className='w-4 h-4 mr-2' />
+                    </InputAdornment>
+                  )
+                }}
+              />
+            </FormControl>
 
-        {/* Category Filter */}
-        <div className='relative'>
-          <Button
-            onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-            className='w-full sm:w-auto bg-white/5 hover:bg-white/10 border border-white/10 text-text-primary transition-all duration-300 group'>
-            <Filter className='w-4 h-4 mr-2 group-hover:rotate-12 transition-transform' />
-            {selectedCategory}
-            <ChevronDown className={cn('w-4 h-4 ml-2 transition-transform duration-300', showCategoryDropdown && 'rotate-180')} />
-          </Button>
-
-          {showCategoryDropdown && (
-            <div className='absolute top-full right-0 w-48 bg-[#1C252E] border border-white/10 rounded-lg shadow-2xl shadow-black/50 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2'>
-              {categories.map(category => (
-                <button
-                  key={category}
-                  onClick={() => {
-                    setSelectedCategory(category)
-                    setShowCategoryDropdown(false)
-                  }}
-                  className={cn(
-                    'w-full px-4 py-2.5 text-left text-sm transition-all duration-200 hover:bg-gradient-to-r hover:from-emerald-500/10 hover:to-teal-500/10',
-                    selectedCategory === category ? 'text-emerald-400 bg-emerald-500/10' : 'text-gray-300 hover:text-text-primary'
-                  )}>
-                  {category}
-                </button>
-              ))}
-            </div>
-          )}
+            <FormControl size='small' sx={{ minWidth: 200 }}>
+              <CustomSelectField
+                placeholder='Select category...'
+                value={selectedCategory}
+                onChange={e => setSelectedCategory(e.target.value)}
+                label='Category'
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position='start'>
+                      <Filter className='w-4 h-4 mr-2' />
+                    </InputAdornment>
+                  )
+                }}
+                options={categories.map(category => ({ value: category, label: category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ') }))}
+              />
+            </FormControl>
+          </div>
         </div>
-      </div>
 
-      {/* Table */}
-      <div className=''>
-        <TableContainer component={Paper} sx={{ maxHeight: '500px' }} className='table-container'>
-          <Table sx={{ minWidth: 650 }} aria-label='featured products table'>
-            <TableHead>
-              <TableRow className='table-header-cell dark:table-header-cell' sx={{ minWidth: 150 }}>
-                <TableCell className='table-header-cell dark:table-header-cell'>
-                  <Checkbox
-                    checked={selectedProducts.size === filteredProducts.length && filteredProducts.length > 0}
-                    indeterminate={selectedProducts.size > 0 && selectedProducts.size < filteredProducts.length}
-                    onChange={toggleAllProducts}
-                    sx={{
-                      color: '#10B981',
-                      '&.Mui-checked': {
-                        color: '#10B981'
-                      },
-                      '&.MuiCheckbox-indeterminate': {
-                        color: '#10B981'
-                      }
-                    }}
-                  />
-                </TableCell>
-                <TableCell className='table-header-cell dark:table-header-cell'>Product</TableCell>
-                <TableCell className='table-header-cell dark:table-header-cell'>Category</TableCell>
-                <TableCell className='table-header-cell dark:table-header-cell'>Price</TableCell>
-                <TableCell className='table-header-cell dark:table-header-cell'>Stock</TableCell>
-                <TableCell className='table-header-cell dark:table-header-cell'>Status</TableCell>
-                <TableCell className='table-header-cell dark:table-header-cell'>Icon</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredProducts.map((product, index) => {
-                const statusConfig = getStatusConfig(product.status)
-                const StatusIcon = statusConfig.icon
-
-                return (
-                  <TableRow
-                    key={product.id}
-                    sx={{
-                      '&:last-child td, &:last-child th': { border: 0 },
-                      '&:hover': { bgcolor: 'rgba(55, 65, 81, 0.3)' },
-                      borderColor: '#374151'
-                    }}>
-                    {/* Checkbox */}
-                    <TableCell className='table-body-cell dark:table-body-cell'>
-                      <Checkbox
-                        checked={selectedProducts.has(product.id)}
-                        onChange={() => toggleProductSelection(product.id)}
-                        sx={{
-                          color: '#10B981',
-                          '&.Mui-checked': {
-                            color: '#10B981'
-                          }
-                        }}
-                      />
-                    </TableCell>
-
-                    {/* Product Info */}
-                    <TableCell className='table-body-cell dark:table-body-cell'>
-                      <div className='flex items-center gap-3'>
-                        <div className='relative group/img'>
-                          <div className='absolute inset-0 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg blur-md opacity-0 group-hover/img:opacity-50 transition-opacity' />
-                          <img
-                            src={product.image || '/placeholder.svg'}
-                            alt={product.name}
-                            className='relative w-10 h-10 rounded-lg object-cover border border-white/10 group-hover/img:scale-110 transition-transform duration-300'
-                          />
-                        </div>
-                        <span className='text-sm font-medium text-text-primary group-hover:text-emerald-400 transition-colors'>{product.name}</span>
-                      </div>
-                    </TableCell>
-
-                    {/* Category */}
-                    <TableCell className='table-body-cell dark:table-body-cell'>
-                      <span className='text-sm text-gray-400'>{product.category}</span>
-                    </TableCell>
-
-                    {/* Price */}
-                    <TableCell className='table-body-cell dark:table-body-cell'>
-                      <span className='text-sm font-semibold text-text-primary'>${product.price.toFixed(2)}</span>
-                    </TableCell>
-
-                    {/* Stock */}
-                    <TableCell className='table-body-cell dark:table-body-cell'>
-                      <span
-                        className={cn(
-                          'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium',
-                          product.stock > 50
-                            ? 'bg-emerald-500/10 text-emerald-400'
-                            : product.stock > 20
-                            ? 'bg-orange-500/10 text-orange-400'
-                            : 'bg-red-500/10 text-red-400'
-                        )}>
-                        {product.stock} units
-                      </span>
-                    </TableCell>
-
-                    {/* Status Dropdown */}
-                    <TableCell className='table-body-cell dark:table-body-cell'>
-                      <div className='relative group/status'>
-                        <select
-                          value={product.status}
-                          onChange={e => updateProductStatus(product.id, e.target.value)}
-                          className={cn(
-                            'appearance-none bg-white/5 border border-white/10 rounded-lg px-3 py-2 pr-8 text-xs font-medium cursor-pointer transition-all duration-300 hover:border-emerald-500/50 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none',
-                            product.status !== 'none' ? 'text-text-primary' : 'text-gray-500'
-                          )}>
-                          {statusOptions.map(option => (
-                            <option key={option.value} value={option.value} className='bg-[#1C252E]'>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
-                        <ChevronDown className='absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none' />
-
-                        {/* Status Badge */}
-                        {product.status !== 'none' && StatusIcon && (
-                          <div className='absolute -top-1 -right-1 pointer-events-none'>
-                            <div
-                              className={cn(
-                                'w-5 h-5 rounded-full flex items-center justify-center bg-gradient-to-br shadow-lg animate-pulse',
-                                statusConfig.color
-                              )}>
-                              <StatusIcon className='w-3 h-3 text-text-primary' />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-
-                    {/* Icon Upload */}
-                    <TableCell className='table-body-cell dark:table-body-cell'>
-                      <button
-                        onClick={() => handleIconUpload(product.id)}
-                        className='relative group/upload flex items-center justify-center w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:border-emerald-500/50 hover:bg-gradient-to-br hover:from-emerald-500/10 hover:to-teal-500/10 transition-all duration-300'>
-                        {product.icon ? (
-                          <ImageIcon className='w-4 h-4 text-emerald-400' />
-                        ) : (
-                          <Upload className='w-4 h-4 text-gray-500 group-hover/upload:text-emerald-400 group-hover/upload:scale-110 transition-all' />
-                        )}
-
-                        {/* Tooltip */}
-                        <div className='absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-[#1C252E] border border-white/10 rounded text-xs text-text-primary whitespace-nowrap opacity-0 group-hover/upload:opacity-100 transition-opacity pointer-events-none shadow-xl'>
-                          Upload Icon
-                        </div>
-                      </button>
+        <Paper sx={{ width: '100%' }}>
+          <TableContainer sx={{ maxHeight: '500px' }} className='table-container'>
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell className='table-header-cell dark:table-header-cell'>
+                    <Checkbox
+                      checked={selectedProducts.size === filteredProducts.length && filteredProducts.length > 0}
+                      indeterminate={selectedProducts.size > 0 && selectedProducts.size < filteredProducts.length}
+                      onChange={toggleAllProducts}
+                      sx={{
+                        color: '#10B981',
+                        '&.Mui-checked': {
+                          color: '#10B981'
+                        },
+                        '&.MuiCheckbox-indeterminate': {
+                          color: '#10B981'
+                        }
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell className='table-header-cell dark:table-header-cell'>
+                    <div className='flex items-center gap-2'>
+                      Product
+                    </div>
+                  </TableCell>
+                  <TableCell className='table-header-cell dark:table-header-cell'>
+                    <div className='flex items-center gap-2'>
+                      Category
+                    </div>
+                  </TableCell>
+                  <TableCell className='table-header-cell dark:table-header-cell'>
+                    <div className='flex items-center gap-2'>
+                      Price
+                    </div>
+                  </TableCell>
+                  <TableCell className='table-header-cell dark:table-header-cell'>
+                    <div className='flex items-center gap-2'>
+                      Stock
+                    </div>
+                  </TableCell>
+                  <TableCell className='table-header-cell dark:table-header-cell'>Status</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {paginatedProducts.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className='table-body-cell dark:table-body-cell text-center py-8'>
+                      <p className='text-gray-400 text-sm'>No products found</p>
                     </TableCell>
                   </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
+                ) : (
+                  paginatedProducts.map(product => {
+                    const statusConfig = getStatusConfig(product.status)
+                    return (
+                      <TableRow key={product.id} hover>
+                        <TableCell className='table-body-cell dark:table-body-cell'>
+                          <Checkbox
+                            checked={selectedProducts.has(product.id)}
+                            onChange={() => toggleProductSelection(product.id)}
+                            sx={{
+                              color: '#10B981',
+                              '&.Mui-checked': {
+                                color: '#10B981'
+                              }
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell className='table-body-cell dark:table-body-cell'>
+                          <div className='flex items-center gap-3'>
+                            <img
+                              src={product.image ? `/storage/${product.image}` : '/placeholder.svg'}
+                              alt={product.name}
+                              className='w-12 h-12 rounded-lg object-cover bg-muted flex-shrink-0'
+                            />
+                            <div className='min-w-0'>
+                              <p className='font-medium text-foreground truncate'>{product.name}</p>
+                              <p className='text-xs text-muted-foreground'>
+                                SKU: {product.sku || 'N/A'}
+                              </p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className='table-body-cell dark:table-body-cell'>
+                          <Chip label={product.category} variant='outlined' size='small' />
+                        </TableCell>
+                        <TableCell className='table-body-cell dark:table-body-cell'>
+                          <p className='font-semibold text-foreground'>${product.price ? parseFloat(product.price).toFixed(2) : '0.00'}</p>
+                        </TableCell>
+                        <TableCell className='table-body-cell dark:table-body-cell'>
+                          <p className={cn(
+                            'font-medium',
+                            product.stock === 0 ? 'text-red-400' : product.stock < 20 ? 'text-amber-400' : 'text-emerald-400'
+                          )}>
+                            {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                          </p>
+                        </TableCell>
+                        <TableCell className='table-body-cell dark:table-body-cell'>
+                          <CustomSelectField
+                            value={product.status}
+                            onChange={e => updateProductStatus(product.id, e.target.value)}
+                            options={statusOptionsFormatted}
+                            size='small'
+                            sx={{ minWidth: 150 }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-      {/* Empty State */}
-      {filteredProducts.length === 0 && (
-        <div className='text-center py-12'>
-          <div className='inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 mb-4'>
-            <Search className='w-8 h-8 text-gray-500' />
-          </div>
-          <p className='text-gray-400 text-sm'>No products found matching your criteria</p>
-        </div>
-      )}
+          <TablePagination
+            className='table-pagination dark:table-pagination'
+            rowsPerPageOptions={[5, 10, 25, 50, 100]}
+            component='div'
+            count={filteredProducts.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={(event, newPage) => setPage(newPage)}
+            onRowsPerPageChange={(event) => {
+              setRowsPerPage(parseInt(event.target.value, 10))
+              setPage(0) // Reset to first page when changing rows per page
+            }}
+            labelDisplayedRows={({ from, to, count }) => `${from}-${to} of ${count !== -1 ? count : `more than ${to}`}`}
+          />
+        </Paper>
+      </div>
 
       {/* Footer Actions */}
       {selectedProducts.size > 0 && (
-        <div className='mt-6 flex flex-wrap items-center gap-3 p-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-lg border border-emerald-500/20 animate-in fade-in slide-in-from-bottom-2'>
+        <div className='flex flex-wrap items-center gap-3 p-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-lg border border-emerald-500/20'>
           <span className='text-sm text-text-primary font-medium'>{selectedProducts.size} products selected</span>
           <div className='flex-1' />
-          <Button className='bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-text-primary shadow-lg hover:shadow-emerald-500/50 transition-all duration-300'>
-            Bulk Update Status
+          <FormControl size='small' sx={{ minWidth: 180 }}>
+            {/* Only trending option is available. To show all options, use: statusOptionsFormatted */}
+            <CustomSelectField
+              value={bulkStatus}
+              onChange={e => setBulkStatus(e.target.value)}
+              options={statusOptionsFormatted.filter(opt => opt.value === 'trending')}
+              size='small'
+              label='Select Status'
+            />
+          </FormControl>
+          <Button onClick={() => handleBulkUpdate(bulkStatus)} className='bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-text-primary shadow-lg hover:shadow-emerald-500/50 transition-all duration-300'>
+            Update Status
           </Button>
           <Button variant='outline' onClick={() => setSelectedProducts(new Set())} className='border-white/20 text-text-primary hover:bg-white/5'>
             Clear Selection
           </Button>
         </div>
       )}
-    </Card>
+    </div>
   )
 }

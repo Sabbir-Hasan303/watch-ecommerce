@@ -4,13 +4,13 @@ import Category from "@/Pages/Web/HomeSections/Category"
 import GuestLayout from "@/Layouts/GuestLayout"
 import { Head } from "@inertiajs/react"
 
-export default function Home({ categories }) {
+export default function Home({ categories, trendingProducts }) {
   return (
     <GuestLayout>
         <Head title="Home" />
         <div className="min-h-screen">
             <HeroSection />
-            <Trending />
+            <Trending trendingProducts={trendingProducts} />
             <Category categories={categories} />
         </div>
     </GuestLayout>
