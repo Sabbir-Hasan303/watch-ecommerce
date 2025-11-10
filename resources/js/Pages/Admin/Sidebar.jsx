@@ -12,8 +12,7 @@ import {
   ShoppingBag,
   ImageIcon,
   Settings,
-  UserCheck,
-  FileText
+  UserCheck
 } from 'lucide-react'
 import { Button } from '@mui/material'
 
@@ -103,11 +102,6 @@ export default function Sidebar({ collapsed, onToggle, user }) {
         // { label: 'Customer Reviews', href: '/customers/reviews' },
         // { label: 'Customer Ratings', href: '/customers/ratings' }
       ]
-    },
-    {
-      icon: FileText,
-      label: 'Log Viewer',
-      href: route('admin.logs')
     },
     {
       icon: Settings,

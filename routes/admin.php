@@ -17,11 +17,6 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
             return Inertia::render('Admin/Dashboard');
         })->name('admin.dashboard');
 
-        // Log Viewer
-        Route::get('/logs', function () {
-            return Inertia::render('Admin/LogViewer');
-        })->name('admin.logs');
-
         // Products
         Route::prefix('products')->group(function () {
 
