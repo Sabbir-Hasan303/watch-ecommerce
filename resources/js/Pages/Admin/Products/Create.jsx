@@ -494,6 +494,8 @@ function ProductCreateFields({ categories }) {
                                         options={categories.map(category => ({ label: category.name, value: category.id }))}
                                         value={data.categories}
                                         onChange={values => setData('categories', values)}
+                                        error={!!errors.categories}
+                                        helperText={errors.categories}
                                     />
 
                                     <CustomTextField
@@ -694,6 +696,12 @@ function ProductCreateFields({ categories }) {
                             {/* Product Images */}
                             <div className='bg-card border border-border rounded-xl p-6 space-y-4'>
                                 <h2 className='text-lg font-semibold text-foreground'>Product Images</h2>
+
+                                {errors.images && (
+                                    <div className='text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3'>
+                                        {errors.images}
+                                    </div>
+                                )}
 
                                 <ImageUploadArea dragActive={dragActive} onDrag={handleDrag} onDrop={handleDrop} onFileSelect={handleFileSelect} />
 

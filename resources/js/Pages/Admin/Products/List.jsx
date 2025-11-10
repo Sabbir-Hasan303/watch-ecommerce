@@ -139,32 +139,32 @@ export default function ProductList({ products = [], categories = [], statuses =
 
                         <Paper sx={{ width: '100%' }}>
                             <TableContainer sx={{ maxHeight: '500px' }} className='table-container'>
-                                <Table>
+                                <Table stickyHeader>
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell className='table-header-cell dark:table-header-cell'>
+                                            <TableCell className='table-header-cell dark:table-header-cell' sx={{ position: 'sticky', top: 0, zIndex: 10 }}>
                                                 <div className='flex items-center gap-2'>
                                                     Product
                                                 </div>
                                             </TableCell>
-                                            <TableCell className='table-header-cell dark:table-header-cell'>
+                                            <TableCell className='table-header-cell dark:table-header-cell' sx={{ position: 'sticky', top: 0, zIndex: 10 }}>
                                                 <div className='flex items-center gap-2'>
                                                     Category
                                                 </div>
                                             </TableCell>
-                                            <TableCell className='table-header-cell dark:table-header-cell'>
+                                            <TableCell className='table-header-cell dark:table-header-cell' sx={{ position: 'sticky', top: 0, zIndex: 10 }}>
                                                 <div className='flex items-center gap-2'>
                                                     Price
                                                 </div>
                                             </TableCell>
-                                            <TableCell className='table-header-cell dark:table-header-cell'>
+                                            <TableCell className='table-header-cell dark:table-header-cell' sx={{ position: 'sticky', top: 0, zIndex: 10 }}>
                                                 <div className='flex items-center gap-2'>
                                                     Stock
                                                 </div>
                                             </TableCell>
-                                            <TableCell className='table-header-cell dark:table-header-cell'>Variants</TableCell>
-                                            <TableCell className='table-header-cell dark:table-header-cell'>Status</TableCell>
-                                            <TableCell className='table-header-cell dark:table-header-cell !text-center'>Actions</TableCell>
+                                            <TableCell className='table-header-cell dark:table-header-cell' sx={{ position: 'sticky', top: 0, zIndex: 10 }}>Variants</TableCell>
+                                            <TableCell className='table-header-cell dark:table-header-cell' sx={{ position: 'sticky', top: 0, zIndex: 10 }}>Status</TableCell>
+                                            <TableCell className='table-header-cell dark:table-header-cell !text-center' sx={{ position: 'sticky', top: 0, zIndex: 10 }}>Actions</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -245,9 +245,9 @@ export default function ProductList({ products = [], categories = [], statuses =
                                                 </TableCell>
                                                 <TableCell className='table-body-cell dark:table-body-cell'>
                                                     <div className='flex items-center'>
-                                                        <Button variant='ghost' size='icon' className='h-8 w-8'>
+                                                        {/* <Button variant='ghost' size='icon' className='h-8 w-8'>
                                                             <Eye className='w-4 h-4' />
-                                                        </Button>
+                                                        </Button> */}
                                                         <Button variant='ghost' size='icon' className='h-8 w-8' onClick={() => handleEdit(product.id)}>
                                                             <Edit className='w-4 h-4' />
                                                         </Button>

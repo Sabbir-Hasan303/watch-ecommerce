@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { Link, router } from '@inertiajs/react'
+import { Link, router, usePage } from '@inertiajs/react'
 import { cn } from '@/lib/utils'
 import { Badge, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
 import { ArrowLeft, Upload, X, Save, ImageIcon, Trash2, Plus, Edit } from 'lucide-react'
@@ -319,6 +319,7 @@ const VariantTable = ({ variants, onEdit, onRemove }) => (
 
 function ProductEditFields({ productId, product, categories }) {
     const { isDark } = useThemeContext()
+    const { errors = {} } = usePage().props
     // Main form state
     const [formData, setFormData, updateFormField] = useFormState(INITIAL_FORM_DATA)
 
@@ -329,8 +330,10 @@ function ProductEditFields({ productId, product, categories }) {
 
     // Variant state
     const [variants, setVariants] = useState([])
+    const [deletedVariantIds, setDeletedVariantIds] = useState([])
     const [showVariantForm, setShowVariantForm] = useState(false)
     const [variantForm, setVariantForm] = useFormState(INITIAL_VARIANT_FORM)
+    const [editingVariantId, setEditingVariantId] = useState(null)
 
     // Image upload
     const { images, setImages, dragActive, handleImageUpload, removeImage, handleDrag, handleDrop } = useImageUpload()
@@ -484,23 +487,41 @@ function ProductEditFields({ productId, product, categories }) {
             return
         }
 
-        const newVariant = { id: generateId(), ...variantForm }
-        setVariants(prev => [...prev, newVariant])
+        if (editingVariantId) {
+            // Update existing variant
+            setVariants(prev => prev.map(v => v.id === editingVariantId ? { ...variantForm, id: editingVariantId } : v))
+            setEditingVariantId(null)
+        } else {
+            // Create new variant
+            const newVariant = { id: generateId(), ...variantForm }
+            setVariants(prev => [...prev, newVariant])
+        }
+
         setVariantForm(INITIAL_VARIANT_FORM)
         setShowVariantForm(false)
-    }, [variantForm, setVariantForm])
+    }, [variantForm, setVariantForm, editingVariantId])
 
     const removeVariant = useCallback(id => {
+        // Track deleted variant IDs (only for existing variants from database)
+        // New variants have generated IDs and don't need to be tracked
+        const variantToRemove = variants.find(v => v.id === id)
+
+        // Check if this is an existing variant from DB (typically numeric IDs for existing, string IDs for new)
+        if (variantToRemove && typeof id === 'number') {
+            setDeletedVariantIds(prev => [...prev, id])
+        }
+
+        // Remove from variants array
         setVariants(prev => prev.filter(variant => variant.id !== id))
-    }, [])
+    }, [variants])
 
     const editVariant = useCallback(
         variant => {
             setVariantForm(variant)
+            setEditingVariantId(variant.id)
             setShowVariantForm(true)
-            removeVariant(variant.id)
         },
-        [setVariantForm, removeVariant]
+        [setVariantForm]
     )
 
     // Event handlers
@@ -519,6 +540,7 @@ function ProductEditFields({ productId, product, categories }) {
     const handleVariantCancel = useCallback(() => {
         setShowVariantForm(false)
         setVariantForm(INITIAL_VARIANT_FORM)
+        setEditingVariantId(null)
     }, [setVariantForm])
 
     const handleVariantImageRemove = useCallback(() => {
@@ -577,6 +599,8 @@ function ProductEditFields({ productId, product, categories }) {
                                             options={categories.map(category => ({ label: category.name, value: category.id }))}
                                             value={formData.categories}
                                             onChange={values => updateFormField('categories', values)}
+                                            error={!!errors.categories}
+                                            helperText={errors.categories}
                                         />
                                     ) : (
                                         <CustomTextField
@@ -585,6 +609,8 @@ function ProductEditFields({ productId, product, categories }) {
                                             placeholder='Enter categories (comma separated)'
                                             value={Array.isArray(formData.categories) ? formData.categories.join(',') : ''}
                                             onChange={e => updateFormField('categories', e.target.value.split(',').map(v => v.trim()).filter(Boolean))}
+                                            error={!!errors.categories}
+                                            helperText={errors.categories}
                                         />
                                     )}
 
@@ -783,6 +809,12 @@ function ProductEditFields({ productId, product, categories }) {
                             <div className='bg-card border border-border rounded-xl p-6 space-y-4'>
                                 <h2 className='text-lg font-semibold text-foreground'>Product Images</h2>
 
+                                {errors.images && (
+                                    <div className='text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3'>
+                                        {errors.images}
+                                    </div>
+                                )}
+
                                 <ImageUploadArea dragActive={dragActive} onDrag={handleDrag} onDrop={handleDrop} onFileSelect={handleFileSelect} />
 
                                 {images.length > 0 && <ImageGrid images={images} onRemoveImage={removeImage} />}
@@ -812,7 +844,7 @@ function ProductEditFields({ productId, product, categories }) {
                                 {/* Variant Creation Form */}
                                 {showVariantForm && (
                                     <div className='border border-border rounded-lg p-4 space-y-4 bg-muted/20'>
-                                        <h3 className='text-md font-medium text-foreground'>Create New Variant</h3>
+                                        <h3 className='text-md font-medium text-foreground'>{editingVariantId ? 'Edit Variant' : 'Create New Variant'}</h3>
 
                                         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                                             <CustomTextField
@@ -917,7 +949,7 @@ function ProductEditFields({ productId, product, categories }) {
 
                                         <div className='flex gap-2'>
                                             <Button variant='outlined' onClick={addVariant}>
-                                                Add
+                                                {editingVariantId ? 'Update' : 'Add'}
                                             </Button>
                                             <Button variant='outline' onClick={handleVariantCancel}
                                                 sx={{
@@ -1009,7 +1041,10 @@ function ProductEditFields({ productId, product, categories }) {
 
                                         // Variants
                                         variants.forEach((variant, index) => {
-                                            if (variant.id) payload.append(`variants[${index}][id]`, String(variant.id))
+                                            // Only send numeric IDs (existing variants from DB), not string IDs (new variants)
+                                            if (variant.id && typeof variant.id === 'number') {
+                                                payload.append(`variants[${index}][id]`, String(variant.id))
+                                            }
                                             payload.append(`variants[${index}][title]`, variant.title)
                                             payload.append(`variants[${index}][sku]`, variant.sku)
                                             payload.append(`variants[${index}][size]`, variant.size || '')
@@ -1022,9 +1057,14 @@ function ProductEditFields({ productId, product, categories }) {
 
                                             if (variant.image && variant.image.file) {
                                                 payload.append(`variants[${index}][image]`, variant.image.file)
-                                            } else if (variant.image && variant.image.id) {
+                                            } else if (variant.image && variant.image.id && typeof variant.image.id === 'number') {
                                                 payload.append(`variants[${index}][existing_image_id]`, String(variant.image.id))
                                             }
+                                        })
+
+                                        // Deleted variant IDs
+                                        deletedVariantIds.forEach(id => {
+                                            payload.append('deleted_variant_ids[]', String(id))
                                         })
 
                                         setSaving(true)
