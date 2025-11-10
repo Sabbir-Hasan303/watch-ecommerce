@@ -471,7 +471,7 @@ class ProductController extends Controller
         $categories = Category::all()->pluck('name')->unique()->values();
         $statusOptions = ['trending', 'featured', 'new-arrival', 'best-seller', 'hot-deal', 'none'];
 
-        return Inertia::render('Admin/Products/FeaturedProductPage', [
+        return Inertia::render('Admin/Products/FeaturedProduct', [
             'featuredProducts' => $products,
             'categories' => $categories,
             'statusOptions' => $statusOptions,

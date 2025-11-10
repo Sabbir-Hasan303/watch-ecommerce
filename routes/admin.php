@@ -42,7 +42,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
             })->name('admin.products.tags');
 
             // Featured Products
-            Route::get('/featured-products', [ProductController::class, 'featuredIndex'])->name('admin.products.featured-products');
+            Route::get('/trending-products', [ProductController::class, 'featuredIndex'])->name('admin.products.featured-products');
             Route::put('/featured-products/update', [ProductController::class, 'updateFeatured'])->name('admin.products.featured.update');
             Route::post('/featured-products/bulk-update', [ProductController::class, 'bulkUpdateFeatured'])->name('admin.products.featured.bulk-update');
         });
@@ -76,9 +76,9 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         });
 
         // Contents
-        Route::get('/newsletters', function () {
-            return Inertia::render('Admin/Contents/Newsletters');
-        })->name('admin.contents.newsletters');
+        // Route::get('/newsletters', function () {
+        //     return Inertia::render('Admin/Contents/Newsletters');
+        // })->name('admin.contents.newsletters');
 
         Route::get('/contact-list', [ContactController::class, 'list'])->name('admin.contents.contact-list');
         Route::post('/contact-list/mark-as-replied', [ContactController::class, 'markAsReplied'])->name('admin.contents.contact-list.mark-as-replied');

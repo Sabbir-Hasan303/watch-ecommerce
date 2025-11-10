@@ -3,7 +3,7 @@ import { FeaturedProducts } from '@/Components/FeaturedProducts'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Head } from '@inertiajs/react'
 
-export default function FeaturedProductPage({ featuredProducts = [], categories = [], statusOptions = [], flash }) {
+export default function FeaturedProduct({ featuredProducts = [], categories = [], statusOptions = [], flash }) {
   return (
     <AuthenticatedLayout flash={flash}>
       <Head title='Featured Products' />
