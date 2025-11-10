@@ -5,6 +5,7 @@ import OutlinedInput from '@mui/material/OutlinedInput'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
+import FormHelperText from '@mui/material/FormHelperText'
 import Select from '@mui/material/Select'
 import Chip from '@mui/material/Chip'
 import { useThemeContext } from '@/contexts/ThemeContext'
@@ -25,6 +26,8 @@ export default function CustomMultiSelect({
   options = [],
   value = [],
   onChange,
+  error = false,
+  helperText = '',
   borderColor = 'gray',
   customSx = {},
   fullWidth = true,
@@ -76,14 +79,14 @@ export default function CustomMultiSelect({
       backgroundColor: isDark ? colors.darkQuaternary : 'transparent',
       color: isDark ? colors.darkTextPrimary : 'inherit',
       '& fieldset': {
-        borderColor: isDark ? colors.darkBorderColor : actualBorderColor
+        borderColor: error ? '#dc2626' : (isDark ? colors.darkBorderColor : actualBorderColor)
       },
       '&:hover fieldset': {
-        borderColor: isDark ? colors.darkTextPrimary : colors.brandPrimary,
+        borderColor: error ? '#dc2626' : (isDark ? colors.darkTextPrimary : colors.brandPrimary),
         borderWidth: '1px'
       },
       '&.Mui-focused fieldset': {
-        borderColor: isDark ? colors.darkTextPrimary : colors.brandPrimary,
+        borderColor: error ? '#dc2626' : (isDark ? colors.darkTextPrimary : colors.brandPrimary),
         borderWidth: '2px'
       }
     },
@@ -185,7 +188,7 @@ export default function CustomMultiSelect({
   }
 
   return (
-    <FormControl fullWidth={fullWidth} variant={variant} sx={finalSx}>
+    <FormControl fullWidth={fullWidth} variant={variant} sx={finalSx} error={error}>
       {label && <InputLabel id={`${id}-label`}>{label}</InputLabel>}
       <Select
         labelId={`${id}-label`}
@@ -212,6 +215,11 @@ export default function CustomMultiSelect({
           </MenuItem>
         ))}
       </Select>
+      {helperText && (
+        <FormHelperText sx={{ color: error ? '#dc2626' : 'inherit' }}>
+          {helperText}
+        </FormHelperText>
+      )}
     </FormControl>
   )
 }
