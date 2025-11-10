@@ -30,7 +30,7 @@ export const ThemeContextProvider = ({ children }) => {
       const newMode = prevMode === 'light' ? 'dark' : 'light'
       localStorage.setItem('themeMode', newMode)
 
-      // Dispatch custom event for log viewer and other components
+      // Dispatch custom event when theme changes
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('theme-changed', {
           detail: { theme: newMode }
@@ -47,7 +47,7 @@ export const ThemeContextProvider = ({ children }) => {
     const root = document.documentElement
     root.classList.toggle('dark', mode === 'dark')
 
-    // Dispatch custom event when mode changes (for log viewer and other components)
+    // Dispatch custom event when mode changes
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('theme-changed', {
         detail: { theme: mode }

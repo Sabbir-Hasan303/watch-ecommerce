@@ -32,10 +32,15 @@ export default function Sidebar({ collapsed, onToggle, user }) {
     }
   }
 
+  // Helper function to extract pathname from current URL (without query params)
+  const getCurrentPathname = (currentUrl) => {
+    return currentUrl.split('?')[0]
+  }
+
   // Check if any child item is active for a given parent
   const hasActiveChild = item => {
     if (!item.subItems) return false
-    return item.subItems.some(subItem => url === getPathFromUrl(subItem.href))
+    return item.subItems.some(subItem => getCurrentPathname(url) === getPathFromUrl(subItem.href))
   }
 
   // Get the parent item that has an active child
@@ -106,7 +111,7 @@ export default function Sidebar({ collapsed, onToggle, user }) {
     },
     {
       icon: FileText,
-      label: 'Log Viewer',
+      label: 'Logs',
       href: route('admin.logs')
     },
     {
@@ -164,7 +169,7 @@ export default function Sidebar({ collapsed, onToggle, user }) {
   const renderMenuItem = (item, index) => {
     const isExpanded = expandedItems.includes(item.label)
     const hasSubItems = item.subItems && item.subItems.length > 0
-    const isActive = item.href ? url === getPathFromUrl(item.href) : false
+    const isActive = item.href ? getCurrentPathname(url) === getPathFromUrl(item.href) : false
     const isSettings = item.label === 'Settings'
     const hasActiveChildItem = hasActiveChild(item)
 
@@ -223,7 +228,7 @@ export default function Sidebar({ collapsed, onToggle, user }) {
           <div className='mt-1 space-y-0.5 animate-in slide-in-from-top-2 duration-300 relative'>
             {item.subItems?.map((subItem, subIndex) => {
               const isLast = subIndex === item.subItems.length - 1
-              const isSubActive = url === getPathFromUrl(subItem.href)
+              const isSubActive = getCurrentPathname(url) === getPathFromUrl(subItem.href)
 
               return (
                 <div key={subIndex} className='relative group/sub'>

@@ -33,9 +33,5 @@ class AppServiceProvider extends ServiceProvider
             ];
         });
 
-        // Gate for Log Viewer access - only admins can access
-        Gate::define('viewLogViewer', function ($user) {
-            return $user && $user->role === 'admin';
-        });
     }
 }

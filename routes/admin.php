@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Admin\LogViewerController;
 
 
 
@@ -18,9 +19,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         })->name('admin.dashboard');
 
         // Log Viewer
-        Route::get('/logs', function () {
-            return Inertia::render('Admin/LogViewer');
-        })->name('admin.logs');
+        Route::get('/logs', [LogViewerController::class, 'index'])->name('admin.logs');
 
         // Products
         Route::prefix('products')->group(function () {
