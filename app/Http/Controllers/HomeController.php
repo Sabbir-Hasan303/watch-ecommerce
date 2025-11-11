@@ -30,11 +30,6 @@ class HomeController extends Controller
                 $prices = $variants->pluck('price')->filter()->sort()->values();
                 $minPrice = $prices->first();
                 $maxPrice = $prices->last();
-                $priceDisplay = $minPrice && $maxPrice
-                    ? ($minPrice == $maxPrice
-                        ? '$' . number_format($minPrice, 2)
-                        : '$' . number_format($minPrice, 2) . ' - $' . number_format($maxPrice, 2))
-                    : 'N/A';
 
                 // Get first variant for display attributes
                 $firstVariant = $variants->first();
@@ -50,7 +45,8 @@ class HomeController extends Controller
                     'caseDiameter' => $firstVariant?->size ?? 'N/A',
                     'caseMaterial' => $firstVariant?->material ?? 'N/A',
                     'color' => $firstVariant?->color ?? '#1f2937',
-                    'price' => $priceDisplay,
+                    'minPrice' => $minPrice,
+                    'maxPrice' => $maxPrice,
                 ];
             });
 

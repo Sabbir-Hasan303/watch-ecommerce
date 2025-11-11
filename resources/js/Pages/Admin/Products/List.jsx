@@ -23,6 +23,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import CustomTextField from '@/Components/CustomTextField'
 import CustomSelectField from '@/Components/CustomSelectField'
 import { Head } from '@inertiajs/react'
+import PriceDisplay from '@/Components/PriceDisplay'
 
 export default function ProductList({ products = [], categories = [], statuses = [], flash }) {
     const [searchQuery, setSearchQuery] = useState('')
@@ -71,10 +72,10 @@ export default function ProductList({ products = [], categories = [], statuses =
         }
 
         if (min === max) {
-            return `$${min.toFixed(2)}`
+            return `${min.toFixed(2)}`
         }
 
-        return `$${min.toFixed(2)} - $${max.toFixed(2)}`
+        return `${min.toFixed(2)} - ${max.toFixed(2)}`
     }
 
     return (
@@ -201,7 +202,7 @@ export default function ProductList({ products = [], categories = [], statuses =
                                                 </TableCell>
                                                 <TableCell className='table-body-cell dark:table-body-cell'>
                                                     <Typography variant='body2' className='font-semibold text-foreground'>
-                                                        {formatPrice(product.min_price, product.max_price)}
+                                                        <PriceDisplay minPrice={product.min_price} maxPrice={product.max_price} />
                                                     </Typography>
                                                 </TableCell>
                                                 <TableCell className='table-body-cell dark:table-body-cell'>

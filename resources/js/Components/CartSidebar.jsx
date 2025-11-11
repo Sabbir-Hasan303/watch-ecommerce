@@ -3,6 +3,7 @@ import { useCart } from "@/contexts/CartContext"
 import CartItem from "@/Components/CartItem"
 import { useEffect } from "react"
 import { Link } from "@inertiajs/react"
+import Taka from "@/Components/Taka"
 
 export default function CartSidebar() {
   const { items, isOpen, closeCart, itemCount, subtotal } = useCart()
@@ -72,13 +73,15 @@ export default function CartSidebar() {
             {/* Subtotal */}
             <div className="flex items-center justify-between text-lg">
               <span className="font-semibold">Subtotal:</span>
-              <span className="font-bold">
-                $
-                {subtotal.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </span>
+              <div className="flex items-baseline gap-1 font-bold">
+                <Taka color="text-black dark:text-white" size="text-lg" />
+                <span>
+                  {subtotal.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </span>
+              </div>
             </div>
 
             {/* Checkout Button */}

@@ -9,6 +9,7 @@ import CustomTextField from '@/Components/CustomTextField'
 import CustomSelectField from '@/Components/CustomSelectField'
 import CustomMultiSelect from '@/Components/CustomMultiSelect'
 import RichTextEditor from '@/Components/RichTextEditor'
+import Taka from '@/Components/Taka'
 // Constants
 const STATUS_OPTIONS = [
     { label: 'Active', value: 'active' },
@@ -198,11 +199,23 @@ const VariantTable = ({ variants, onEdit, onRemove }) => (
                         <TableCell>{variant.size || '-'}</TableCell>
                         <TableCell>{variant.color || '-'}</TableCell>
                         <TableCell>{variant.material || '-'}</TableCell>
-                        <TableCell>${variant.price}</TableCell>
-                        <TableCell>{variant.compare_at_price ? `$${variant.compare_at_price}` : '-'}</TableCell>
+                        <TableCell>
+                            <div className="flex items-center gap-1">
+                                <Taka color='text-black dark:text-white' className='text-base' />
+                                <span className="text-base">{variant.price}</span>
+                            </div>
+                        </TableCell>
+                        <TableCell>
+                            {variant.compare_at_price ?
+                                <div className="flex items-center gap-1">
+                                    <Taka color='text-black dark:text-white' className='text-base' />
+                                    <span className="text-base">{variant.compare_at_price}</span>
+                                </div>
+                                : <span className="text-base">-</span>}
+                        </TableCell>
                         <TableCell>{variant.quantity}</TableCell>
                         <TableCell>
-                            <Badge className={cn('text-xs', variant.status === 'active' ? 'bg-emerald-500' : 'bg-amber-500')}>{variant.status}</Badge>
+                            <Badge className={cn('text-xs py-1 px-2 rounded-md', variant.status === 'active' ? 'bg-emerald-500' : 'bg-amber-500')}>{variant.status}</Badge>
                         </TableCell>
                         <TableCell>
                             <div className='flex gap-1'>
@@ -803,7 +816,7 @@ function ProductCreateFields({ categories }) {
                                                 value={variantForm.price}
                                                 onChange={e => setVariantForm(prev => ({ ...prev, price: e.target.value }))}
                                                 InputProps={{
-                                                    startAdornment: <span className='text-muted-foreground mr-2'>$</span>
+                                                    startAdornment: <Taka color='text-gray-400 dark:text-gray-400' className='text-base mr-2' />
                                                 }}
                                             />
 
@@ -815,7 +828,7 @@ function ProductCreateFields({ categories }) {
                                                 value={variantForm.compare_at_price}
                                                 onChange={e => setVariantForm(prev => ({ ...prev, compare_at_price: e.target.value }))}
                                                 InputProps={{
-                                                    startAdornment: <span className='text-muted-foreground mr-2'>$</span>
+                                                    startAdornment: <Taka color='text-gray-400 dark:text-gray-400' className='text-base mr-2' />
                                                 }}
                                             />
 

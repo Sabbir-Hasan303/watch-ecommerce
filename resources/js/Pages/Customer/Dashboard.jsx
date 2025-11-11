@@ -1,6 +1,7 @@
 import CustomerLayout from "@/Layouts/CustomerLayout"
 import { Package, MapPin, User, ChevronRight } from "lucide-react"
 import { Link } from "@inertiajs/react"
+import Taka from "@/Components/Taka"
 
 const statusStyles = {
     pending: "bg-amber-100 text-amber-800",
@@ -10,10 +11,10 @@ const statusStyles = {
     cancelled: "bg-red-100 text-red-800",
 }
 
-const formatCurrency = (value) => {
-    if (typeof value !== "number") return "$0.00"
-    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value)
-}
+// const formatCurrency = (value) => {
+//     if (typeof value !== "number") return "0.00"
+//     return new Intl.NumberFormat("bn-BD", { style: "currency", currency: "BDT" }).format(value)
+// }
 
 const formatDate = (value) => {
     if (!value) return "--"
@@ -120,7 +121,10 @@ export default function Dashboard({ auth, stats, account, recentOrders }) {
                                     </div>
                                     <div className="text-right flex items-center gap-4">
                                         <div>
-                                            <p className="font-semibold">{formatCurrency(order.total)}</p>
+                                            <div className="flex items-baseline gap-1 font-semibold">
+                                                <Taka color="text-black dark:text-white" size="text-base" />
+                                                <p>{typeof order.total === "number" ? order.total.toFixed(2) : "0.00"}</p>
+                                            </div>
                                             <span
                                                 className={`text-xs px-2 py-1 rounded-full font-medium ${statusStyles[order.status] || "bg-gray-100 text-gray-800"
                                                     }`}

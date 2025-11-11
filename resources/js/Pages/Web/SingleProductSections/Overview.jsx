@@ -4,13 +4,14 @@ import { router } from "@inertiajs/react"
 import TechnicalSpecs from "@/Pages/Web/SingleProductSections/TechnicalSpecs"
 import { useCart } from "@/contexts/CartContext"
 import { LucideIcon } from "@/Components/LucideIcon"
+import Taka from "@/Components/Taka"
 
 const formatCurrency = (value) => {
     if (value === null || value === undefined || Number.isNaN(Number(value))) {
         return null
     }
 
-    return `$${Number(value).toLocaleString(undefined, {
+    return `${Number(value).toLocaleString(undefined, {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     })}`
@@ -204,9 +205,16 @@ export default function Overview({ product }) {
                     {/* Price */}
                     <div className="space-y-2">
                         <div className="flex items-center gap-3 text-3xl font-bold text-gray-900">
-                            {currentPrice ?? "Pricing unavailable"}
+                            {/* {currentPrice ?? "Pricing unavailable"} */}
+                            <div className="text-3xl font-bold text-gray-900 flex items-center gap-1">
+                                <Taka color='text-gray-900' className='font-bold text-3xl' />
+                                <span className="text-3xl">{currentPrice}</span>
+                            </div>
                             {comparePrice && (
-                                <span className="text-lg font-semibold text-gray-400 line-through">{comparePrice}</span>
+                                <div className="text-lg font-semibold text-gray-400 line-through flex items-center gap-1">
+                                    <Taka color='text-gray-400' className='font-bold text-lg' />
+                                    <span className="text-lg">{comparePrice}</span>
+                                </div>
                             )}
                         </div>
                         {/* <div className="text-sm text-gray-500">Retail price</div> */}

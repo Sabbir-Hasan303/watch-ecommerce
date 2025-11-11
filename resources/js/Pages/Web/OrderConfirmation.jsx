@@ -2,6 +2,7 @@ import React from "react"
 import { Link, Head } from "@inertiajs/react"
 import { CheckCircle, Package, MapPin, Phone, Mail, ArrowRight, Home } from "lucide-react"
 import GuestLayout from "@/Layouts/GuestLayout"
+import Taka from "@/Components/Taka"
 
 export default function OrderConfirmation({ order }) {
     // Use order data from backend, fallback to empty structure if not provided
@@ -29,12 +30,12 @@ export default function OrderConfirmation({ order }) {
         specialInstructions: null,
     }
 
-    const formatCurrency = (value) => {
+    const formatPrice = (value) => {
         const numericValue = Number(value) || 0
-        return `$${numericValue.toLocaleString(undefined, {
+        return numericValue.toLocaleString(undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
-        })}`
+        })
     }
 
     const areaLabel = orderData.shipping?.area
@@ -100,7 +101,10 @@ export default function OrderConfirmation({ order }) {
                                             <h3 className="font-semibold text-base mb-1">{item.name}</h3>
                                             <p className="text-sm text-gray-600">Color: {item.color}</p>
                                             <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
-                                            <p className="font-semibold text-base mt-2">{item.price}</p>
+                                            <div className="flex items-baseline gap-1 font-semibold text-base mt-2">
+                                                <Taka color="text-black dark:text-white" size="text-base" />
+                                                <p>{item.price}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -160,30 +164,37 @@ export default function OrderConfirmation({ order }) {
                             <div className="space-y-3 mb-6">
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Subtotal</span>
-                                    <span className="font-semibold">
-                                        {formatCurrency(orderData.totals?.subtotal || 0)}
-                                    </span>
+                                    <div className="flex items-baseline gap-1 font-semibold">
+                                        <Taka color="text-gray-600" size="text-sm" />
+                                        <span>{formatPrice(orderData.totals?.subtotal || 0)}</span>
+                                    </div>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Shipping</span>
-                                    <span
-                                        className={`font-semibold ${(orderData.totals?.shipping || 0) <= 0 ? "text-green-600" : "text-gray-800"
-                                            }`}
-                                    >
-                                        {(orderData.totals?.shipping || 0) <= 0
-                                            ? "Free"
-                                            : formatCurrency(orderData.totals?.shipping)}
-                                    </span>
+                                    {(orderData.totals?.shipping || 0) <= 0 ? (
+                                        <span className="font-semibold text-green-600">Free</span>
+                                    ) : (
+                                        <div className="flex items-baseline gap-1 font-semibold">
+                                            <Taka color="text-gray-800" size="text-sm" />
+                                            <span>{formatPrice(orderData.totals?.shipping)}</span>
+                                        </div>
+                                    )}
                                 </div>
                                 {orderData.totals?.tax > 0 && (
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-600">Tax</span>
-                                        <span className="font-semibold">{formatCurrency(orderData.totals?.tax)}</span>
+                                        <div className="flex items-baseline gap-1 font-semibold">
+                                            <Taka color="text-gray-600" size="text-sm" />
+                                            <span>{formatPrice(orderData.totals?.tax)}</span>
+                                        </div>
                                     </div>
                                 )}
                                 <div className="flex justify-between text-lg font-bold border-t border-gray-200 pt-3 mt-4">
                                     <span>Total</span>
-                                    <span>{formatCurrency(orderData.totals?.total || 0)}</span>
+                                    <div className="flex items-baseline gap-1">
+                                        <Taka color="text-black dark:text-white" size="text-lg" />
+                                        <span>{formatPrice(orderData.totals?.total || 0)}</span>
+                                    </div>
                                 </div>
                             </div>
 

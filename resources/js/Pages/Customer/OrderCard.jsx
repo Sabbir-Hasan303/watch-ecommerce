@@ -1,5 +1,6 @@
 import { Link } from "@inertiajs/react"
 import { Package, ChevronRight } from "lucide-react"
+import Taka from "@/Components/Taka"
 
 export default function OrderCard({ order }) {
   const statusColors = {
@@ -36,8 +37,10 @@ export default function OrderCard({ order }) {
               </span>
             </div>
             <p className="text-sm text-gray-600 mb-2">{formatDate(order.createdAt)}</p>
-            <p className="text-sm text-gray-700">
-              {order.items.length} item{order.items.length > 1 ? "s" : ""} • ${order.total.toFixed(2)}
+            <p className="text-sm text-gray-700 flex items-baseline gap-1">
+              {order.items.length} item{order.items.length > 1 ? "s" : ""} •
+              <Taka color="text-gray-700" size="text-sm" />
+              <span>{order.total.toFixed(2)}</span>
             </p>
           </div>
         </div>

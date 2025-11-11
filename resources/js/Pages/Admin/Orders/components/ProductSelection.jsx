@@ -4,6 +4,7 @@ import { Button, Box, Typography } from "@mui/material"
 import { Card } from "@/Components/ui/card"
 import { Badge } from "@/Components/ui/badge"
 import AsynchronousInput from "@/Components/AsynchronousInput"
+import Taka from "@/Components/Taka"
 
 export default function ProductSelection({
     products = [],
@@ -167,7 +168,11 @@ export default function ProductSelection({
                             </div>
                             <div className="flex items-center gap-1 flex-shrink-0">
                                 <Typography variant="body2" className="font-medium">
-                                    ${Number(option.price || 0).toFixed(2)}
+                                    {/* ${Number(option.price || 0).toFixed(2)} */}
+                                    <div className="flex items-center gap-1">
+                                        <Taka color='text-black dark:text-white' className='text-base' />
+                                        <span className="text-base">{Number(option.price || 0).toFixed(2)}</span>
+                                    </div>
                                 </Typography>
                             </div>
                         </Box>
@@ -223,11 +228,19 @@ export default function ProductSelection({
                                         </p>
                                         <div className="flex flex-wrap items-center gap-3 mt-2">
                                             <span className="text-lg font-bold text-emerald-600">
-                                                ${(selectedVariant.price || 0).toFixed(2)}
+                                                {/* ${(selectedVariant.price || 0).toFixed(2)} */}
+                                                <div className="flex items-center gap-1">
+                                                    <Taka color='text-emerald-600' className='text-base font-bold' />
+                                                    <span className="text-base">{(selectedVariant.price || 0).toFixed(2)}</span>
+                                                </div>
                                             </span>
                                             {selectedVariant.compare_at_price && selectedVariant.compare_at_price > selectedVariant.price && (
                                                 <span className="text-sm text-gray-500 line-through">
-                                                    ${(selectedVariant.compare_at_price || 0).toFixed(2)}
+                                                    {/* ${(selectedVariant.compare_at_price || 0).toFixed(2)} */}
+                                                    <div className="flex items-center gap-1">
+                                                        <Taka color='text-gray-500' className='text-sm font-bold' />
+                                                        <span className="text-sm">{(selectedVariant.compare_at_price || 0).toFixed(2)}</span>
+                                                    </div>
                                                 </span>
                                             )}
                                             <span className="text-sm text-muted-foreground">

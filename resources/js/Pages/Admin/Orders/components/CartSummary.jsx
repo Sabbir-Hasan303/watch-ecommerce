@@ -1,6 +1,7 @@
 import { ShoppingCart, Plus, Minus, X, AlertTriangle } from "lucide-react"
 import { Button } from "@mui/material"
 import { Card } from "@/Components/ui/card"
+import Taka from "@/Components/Taka"
 
 export default function CartSummary({
     cart,
@@ -43,11 +44,17 @@ export default function CartSummary({
                                             Variant: {item.variantTitle}
                                         </p>
                                     )}
-                                    <p className="text-sm text-muted-foreground mt-1">
-                                        ${(item.price || 0).toFixed(2)} × {item.quantity}
-                                    </p>
+                                    <div className="text-sm text-muted-foreground mt-1">
+                                        <div className="flex items-center gap-1">
+                                            <Taka color='text-muted-foreground' className='text-base' />
+                                            <span className="text-base">{(item.price || 0).toFixed(2)} × {item.quantity}</span>
+                                        </div>
+                                    </div>
                                     <p className="text-sm font-semibold text-emerald-500 mt-1">
-                                        ${((item.price || 0) * item.quantity).toFixed(2)}
+                                        <div className="flex items-center gap-1">
+                                            <Taka color='text-emerald-500' className='text-base font-bold' />
+                                            <span className="text-base">{((item.price || 0) * item.quantity).toFixed(2)}</span>
+                                        </div>
                                     </p>
                                 </div>
                             </div>
@@ -56,7 +63,10 @@ export default function CartSummary({
                         <div className="pt-4 border-t border-border space-y-2">
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Subtotal</span>
-                                <span className="font-semibold text-foreground">${subtotal.toFixed(2)}</span>
+                                <div className="flex items-center gap-1">
+                                    <Taka color='text-black dark:text-white' className='text-base' />
+                                    <span className="text-base">{subtotal.toFixed(2)}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -102,7 +112,11 @@ export default function CartSummary({
                                         Variant: {item.variantTitle}
                                     </p>
                                 )}
-                                <p className="text-base font-semibold text-emerald-600 mt-2">${(item.price || 0).toFixed(2)}</p>
+                                {/* <p className="text-base font-semibold text-emerald-600 mt-2">${(item.price || 0).toFixed(2)}</p> */}
+                                <div className="flex items-center gap-1 mt-2">
+                                    <Taka color='text-emerald-600' className='text-base font-semibold' />
+                                    <span className="text-base font-semibold text-emerald-600">{(item.price || 0).toFixed(2)}</span>
+                                </div>
                                 {item.quantity > item.stock && (
                                     <p className="text-xs text-orange-600 flex items-center gap-1 mt-2 font-medium">
                                         <AlertTriangle className="w-3 h-3" />
@@ -145,7 +159,10 @@ export default function CartSummary({
                     <div className="pt-6 border-t-2 border-border space-y-3">
                         <div className="flex justify-between text-base">
                             <span className="text-muted-foreground font-medium">Subtotal</span>
-                            <span className="font-bold text-foreground text-xl">${subtotal.toFixed(2)}</span>
+                            <div className="flex items-center gap-1">
+                                <Taka color='text-black dark:text-white' className='text-base' />
+                                <span className="text-base">{subtotal.toFixed(2)}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
