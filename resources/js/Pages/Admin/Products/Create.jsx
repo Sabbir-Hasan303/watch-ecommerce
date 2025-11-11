@@ -8,6 +8,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import CustomTextField from '@/Components/CustomTextField'
 import CustomSelectField from '@/Components/CustomSelectField'
 import CustomMultiSelect from '@/Components/CustomMultiSelect'
+import RichTextEditor from '@/Components/RichTextEditor'
 // Constants
 const STATUS_OPTIONS = [
     { label: 'Active', value: 'active' },
@@ -509,12 +510,10 @@ function ProductCreateFields({ categories }) {
                                     />
                                 </div>
 
-                                <CustomTextField
+                                <RichTextEditor
                                     id='description'
                                     label='Description'
                                     placeholder='Enter product description'
-                                    multiline
-                                    rows={4}
                                     value={data.description}
                                     onChange={e => setData('description', e.target.value)}
                                     error={!!errors.description}

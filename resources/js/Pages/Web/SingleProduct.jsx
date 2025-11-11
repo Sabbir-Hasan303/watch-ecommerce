@@ -5,12 +5,12 @@ import HeroSection from "@/Pages/Web/HomeSections/Hero"
 import GuestLayout from "@/Layouts/GuestLayout"
 import { Head } from "@inertiajs/react"
 
-export default function SingleProduct({ product, similarProducts = [] }) {
+export default function SingleProduct({ product, similarProducts = [], banner }) {
     return (
         <GuestLayout>
             <Head title="Single Product" />
             <div>
-                <HeroSection product={product} />
+                <HeroSection product={product} banner={banner} />
                 <Overview product={product} />
                 <SimilarProduct products={similarProducts} />
                 <CTA />

@@ -8,6 +8,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import CustomTextField from '@/Components/CustomTextField'
 import CustomSelectField from '@/Components/CustomSelectField'
 import CustomMultiSelect from '@/Components/CustomMultiSelect'
+import RichTextEditor from '@/Components/RichTextEditor'
 
 // Constants
 const STATUS_OPTIONS = [
@@ -623,14 +624,14 @@ function ProductEditFields({ productId, product, categories }) {
                                     />
                                 </div>
 
-                                <CustomTextField
+                                <RichTextEditor
                                     id='description'
                                     label='Description'
                                     placeholder='Enter product description'
-                                    multiline
-                                    rows={4}
                                     value={formData.description}
                                     onChange={e => updateFormField('description', e.target.value)}
+                                    error={false}
+                                    helperText=''
                                 />
                             </div>
 
@@ -1072,6 +1073,14 @@ function ProductEditFields({ productId, product, categories }) {
                                         router.post(route('admin.products.update', { id: productId }), payload, {
                                             forceFormData: true,
                                             preserveScroll: true,
+                                            onSuccess: () => {
+                                                setSaving(false)
+                                                console.log('Product updated successfully')
+                                            },
+                                            onError: (errors) => {
+                                                setSaving(false)
+                                                console.error('Update failed:', errors)
+                                            },
                                             onFinish: () => setSaving(false)
                                         })
                                     }}

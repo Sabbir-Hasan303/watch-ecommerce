@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Inertia\Inertia;
 use App\Models\Product;
+use App\Models\Banner;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -218,9 +219,15 @@ class WebProductController extends Controller
             'variants' => $variants,
         ];
 
+        // Get active Product Hero banner
+        $banner = Banner::where('position', 'Homepage Hero')
+            ->where('status', true)
+            ->first();
+
         return Inertia::render('Web/SingleProduct', [
             'product' => $payload,
             'similarProducts' => $similarProducts,
+            'banner' => $banner,
         ]);
     }
 }
