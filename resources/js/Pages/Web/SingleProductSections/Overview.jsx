@@ -3,6 +3,7 @@ import { Minus, Plus } from "lucide-react"
 import { router } from "@inertiajs/react"
 import TechnicalSpecs from "@/Pages/Web/SingleProductSections/TechnicalSpecs"
 import { useCart } from "@/contexts/CartContext"
+import { LucideIcon } from "@/Components/LucideIcon"
 
 const formatCurrency = (value) => {
     if (value === null || value === undefined || Number.isNaN(Number(value))) {
@@ -271,7 +272,11 @@ export default function Overview({ product }) {
                                 featureList.map((feature, index) => (
                                     <div key={index} className="flex items-start gap-3">
                                         <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded text-sm font-semibold text-gray-600">
-                                            {(feature.icon && feature.icon[0]) || feature.type?.[0] || feature.name?.[0] || "•"}
+                                            {feature.icon ? (
+                                                <LucideIcon name={feature.icon} className="w-5 h-5 text-gray-700" />
+                                            ) : (
+                                                <span>{feature.type?.[0] || feature.name?.[0] || "•"}</span>
+                                            )}
                                         </div>
                                         <div>
                                             <div className="font-bold text-gray-900">{feature.name}</div>

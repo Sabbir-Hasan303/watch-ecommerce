@@ -16,7 +16,7 @@ import {
     useMediaQuery
 } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
-import { Search, Notifications, AccountCircle, Settings, LightMode, DarkMode, KeyboardArrowDown, Menu as MenuIcon } from '@mui/icons-material'
+import { Search, Notifications, AccountCircle, Settings, LightMode, DarkMode, KeyboardArrowDown, Menu as MenuIcon, Home as HomeIcon } from '@mui/icons-material'
 import { useThemeContext } from '@/contexts/ThemeContext'
 import CustomTextField from '@/Components/CustomTextField'
 import { Link, useForm } from '@inertiajs/react'
@@ -56,6 +56,7 @@ export default function Navbar({ title, subtitle, collapsed, onToggleSidebar, us
                             <MenuIcon />
                         </IconButton>
                     )}
+
                     {title && (
                         <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                             <Typography variant='h1' component='h1'>
@@ -100,6 +101,11 @@ export default function Navbar({ title, subtitle, collapsed, onToggleSidebar, us
                     {/* <IconButton sx={{ color: 'text.secondary' }}>
                         <Settings />
                     </IconButton> */}
+                    <Link href={route('home')} className='hover:opacity-70 transition-opacity'>
+                        <IconButton sx={{ color: 'text.secondary' }} title='Back to Homepage'>
+                            <HomeIcon />
+                        </IconButton>
+                    </Link>
 
                     <IconButton onClick={toggleColorMode} sx={{ color: 'text.secondary' }}>
                         {mode === 'light' ? <DarkMode /> : <LightMode />}

@@ -1,3 +1,5 @@
+import { Link } from '@inertiajs/react';
+
 export default function HeroSection({ banner }) {
     return (
         <section className="relative w-full overflow-hidden">
@@ -15,9 +17,9 @@ export default function HeroSection({ banner }) {
 
                 {/* CTA Button */}
                 <div className="flex justify-center mb-8 lg:mb-12">
-                    <button className="bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors text-sm lg:text-base">
+                    <Link href="/watches" className="bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors text-sm lg:text-base">
                         See All Specifications
-                    </button>
+                    </Link>
                 </div>
 
                 <div className="relative w-full h-[300px] sm:h-[400px] lg:h-[550px] mb-8 lg:mb-6">
