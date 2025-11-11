@@ -141,7 +141,7 @@ const CustomSelectField = ({ borderColor = 'gray', customSx = {}, fullWidth = tr
       {label && <InputLabel>{label}</InputLabel>}
       <Select label={label} MenuProps={menuProps} {...rest}>
         {options.map(option => (
-          <MenuItem key={option.value} value={option.value}>
+          <MenuItem key={option.value} value={option.value} disabled={!!option.disabled}>
             {option.label}
           </MenuItem>
         ))}
