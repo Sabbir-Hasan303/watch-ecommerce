@@ -251,15 +251,10 @@
         </div>
 
         <div style="text-align: center;">
-            @php
-                $orderUrl = $order->user
-                    ? (url('/customer/orders/' . $order->order_number) ?? '#')
-                    : (url('/orders/' . $order->order_number . '/confirmation') ?? '#');
-            @endphp
-            @if($orderUrl !== '#')
-                <a href="{{ $orderUrl }}" class="cta-button">View Order Details</a>
+            @if($order->user)
+                <a href="{{ route('customer.orders.show', ['orderNumber' => $order->order_number]) }}" class="cta-button">View Order Details</a>
             @else
-                <p style="font-size: 12px; color: #666;">You can track your order using order number: <strong>{{ $order->order_number }}</strong></p>
+                <a href="{{ route('order.confirmation', ['order' => $order]) }}" class="cta-button">View Order Details</a>
             @endif
         </div>
 

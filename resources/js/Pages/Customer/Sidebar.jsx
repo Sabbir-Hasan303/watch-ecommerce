@@ -2,15 +2,17 @@ import React from 'react'
 import { User, Home, Package, LogOut } from 'lucide-react'
 import { Link, usePage } from '@inertiajs/react'
 
-export default function Sidebar( { sidebarOpen, setSidebarOpen } ) {
+export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
     const navItems = [
-        { href: "/customer/dashboard", label: "Dashboard", icon: Home },
-        { href: "/customer/profile", label: "Personal Details", icon: User },
-        { href: "/customer/orders", label: "My Orders", icon: Package },
-        { href: "/customer/logout", label: "Logout", icon: LogOut },
+        { href: route('customer.dashboard'), label: "Dashboard", icon: Home, routeName: 'customer.dashboard', component: 'Dashboard' },
+        { href: route('customer.profile'), label: "Personal Details", icon: User, routeName: 'customer.profile', component: 'Profile' },
+        { href: route('customer.orders'), label: "My Orders", icon: Package, routeName: 'customer.orders', component: 'Orders' },
+        { href: route('customer.logout'), label: "Logout", icon: LogOut, routeName: 'customer.logout', component: 'Logout' },
     ]
     const page = usePage()
-    const currentPathname = page.url
+    // Extract component name: 'Pages/Customer/Dashboard' => 'Dashboard'
+    const currentComponent = page.component.split('/').pop()
+
     return (
         <aside
             className={`${sidebarOpen ? "block" : "hidden"
@@ -43,7 +45,7 @@ export default function Sidebar( { sidebarOpen, setSidebarOpen } ) {
             <nav className="space-y-1">
                 {navItems.map((item) => {
                     const Icon = item.icon
-                    const isActive = currentPathname === item.href
+                    const isActive = item.component === currentComponent
                     return (
                         <Link
                             key={item.href}

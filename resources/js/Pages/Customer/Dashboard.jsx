@@ -67,7 +67,7 @@ export default function Dashboard({ auth, stats, account, recentOrders }) {
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-bold">Account Information</h2>
                         <Link
-                            href="/customer/profile"
+                            href={route('customer.profile')}
                             className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
                         >
                             Edit Profile
@@ -99,7 +99,7 @@ export default function Dashboard({ auth, stats, account, recentOrders }) {
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-bold">Recent Orders</h2>
                         <Link
-                            href="/customer/orders"
+                            href={route('customer.orders')}
                             className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
                         >
                             View All
@@ -111,7 +111,7 @@ export default function Dashboard({ auth, stats, account, recentOrders }) {
                             {recentOrders.map((order) => (
                                 <Link
                                     key={order.id}
-                                    href={`/customer/orders/${order.id}`}
+                                    href={route('customer.orders.show', { orderNumber: order.orderNumber })}
                                     className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                                 >
                                     <div>
