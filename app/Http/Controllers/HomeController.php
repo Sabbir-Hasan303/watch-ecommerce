@@ -4,12 +4,18 @@ namespace App\Http\Controllers;
 use Inertia\Inertia;
 use App\Models\Category;
 use App\Models\FeaturedProduct;
+use App\Models\Banner;
 
 class HomeController extends Controller
 {
     public function index()
     {
         $categories = Category::limit(5)->get();
+
+        // Get active Homepage Hero banner
+        $banner = Banner::where('position', 'Homepage Hero')
+            ->where('status', true)
+            ->first();
 
         // Fetch trending products with their variants and image data
         $trendingProducts = FeaturedProduct::where('status', 'trending')
@@ -51,6 +57,7 @@ class HomeController extends Controller
         return Inertia::render('Web/Home', [
             'categories' => $categories,
             'trendingProducts' => $trendingProducts,
+            'banner' => $banner,
         ]);
     }
 }

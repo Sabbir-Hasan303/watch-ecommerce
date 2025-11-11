@@ -91,8 +91,8 @@ export default function Sidebar({ collapsed, onToggle, user }) {
             label: 'Content',
             subItems: [
                 // { label: 'Newsletter', href: route('admin.contents.newsletters') },
-                { label: 'Contact List', href: route('admin.contents.contact-list') }
-                // { label: 'Banners', href: '/dynamic-banner' },
+                { label: 'Contact List', href: route('admin.contents.contact-list') },
+                { label: 'Banners', href: route('admin.contents.banners.index') }
                 // { label: 'FAQs', href: '/faqs' }
             ]
         },

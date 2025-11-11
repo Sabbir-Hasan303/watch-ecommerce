@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Admin\LogViewerController;
+use App\Http\Controllers\Admin\BannerController;
 
 
 
@@ -87,9 +88,14 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
             return Inertia::render('Admin/Contents/FaqList');
         })->name('admin.contents.faqs');
 
-        Route::get('/dynamic-banner', function () {
-            return Inertia::render('Admin/Contents/DynamicBanner');
-        })->name('admin.contents.dynamic-banner');
+        // Banners
+        Route::prefix('banners')->group(function () {
+            Route::get('/', [BannerController::class, 'index'])->name('admin.contents.banners.index');
+            Route::post('/', [BannerController::class, 'store'])->name('admin.contents.banners.store');
+            Route::put('/{id}', [BannerController::class, 'update'])->name('admin.contents.banners.update');
+            Route::delete('/{id}', [BannerController::class, 'destroy'])->name('admin.contents.banners.destroy');
+            Route::post('/{id}/toggle-status', [BannerController::class, 'toggleStatus'])->name('admin.contents.banners.toggle-status');
+        });
 
         Route::prefix('settings')->group(function () {
             Route::get('/profile', [AdminProfileController::class, 'index'])->name('admin.settings.profile');
