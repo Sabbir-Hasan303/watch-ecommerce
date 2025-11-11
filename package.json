@@ -3,7 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "NODE_OPTIONS='--max-old-space-size=768' vite build",
+        "build": "cross-env NODE_OPTIONS=--max-old-space-size=768 vite build",
         "dev": "vite"
     },
     "dependencies": {
@@ -37,6 +37,7 @@
         "autoprefixer": "^10.4.12",
         "axios": "^1.11.0",
         "concurrently": "^9.0.1",
+        "cross-env": "^10.1.0",
         "laravel-vite-plugin": "^2.0.0",
         "postcss": "^8.4.31",
         "react": "^18.2.0",
