@@ -110,34 +110,29 @@ function OrderContent({ order }) {
                         <div className='flex flex-col md:flex-row justify-between items-center mb-6'>
                             <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Order Details</h2>
                             <div className='flex items-center gap-3'>
-                                <Link href={route('admin.orders.edit', { id: order.id })}>
-                                    <Button
-                                        variant='outlined'
-                                        size='sm'
-                                        sx={{
-                                            color: isDarkMode ? '#9CA3AF' : '#374151',
-                                            borderColor: isDarkMode ? '#374151' : '#9CA3AF',
-                                            '&:hover': {
-                                                bgcolor: isDarkMode ? 'rgba(55, 65, 81, 0.3)' : '#9CA3AF',
-                                                borderColor: isDarkMode ? '#6B7280' : '#9CA3AF'
-                                            }
-                                        }}>
-                                        <Edit className='w-4 h-4 mr-2' />
-                                        <span className='hidden sm:inline'>Edit Order</span>
-                                    </Button>
-                                </Link>
+                                {orderStatus !== 'delivered' && (
+                                    <Link href={route('admin.orders.edit', { id: order.id })}>
+                                        <Button
+                                            variant='outlined'
+                                            size='sm'
+                                            sx={{
+                                                color: isDarkMode ? '#9CA3AF' : '#374151',
+                                                borderColor: isDarkMode ? '#374151' : '#9CA3AF',
+                                                '&:hover': {
+                                                    bgcolor: isDarkMode ? 'rgba(55, 65, 81, 0.3)' : '#9CA3AF',
+                                                    borderColor: isDarkMode ? '#6B7280' : '#9CA3AF'
+                                                }
+                                            }}>
+                                            <Edit className='w-4 h-4 mr-2' />
+                                            <span className='hidden sm:inline'>Edit Order</span>
+                                        </Button>
+                                    </Link>
+                                )}
                                 <Button
                                     variant='outlined'
                                     size='sm'
                                     onClick={() => window.open(route('admin.orders.invoice', { id: order.id }), '_blank')}
-                                    sx={{
-                                        color: isDarkMode ? '#9CA3AF' : '#374151',
-                                    borderColor: isDarkMode ? '#374151' : '#9CA3AF',
-                                    '&:hover': {
-                                        bgcolor: isDarkMode ? 'rgba(55, 65, 81, 0.3)' : '#9CA3AF',
-                                        borderColor: isDarkMode ? '#6B7280' : '#9CA3AF'
-                                    }
-                                    }}>
+                                >
                                     <Download className='w-4 h-4 mr-2' />
                                     <span className='hidden sm:inline'>Invoice</span>
                                 </Button>
@@ -161,6 +156,11 @@ function OrderContent({ order }) {
                                         <div className='flex items-center gap-2 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-lg'>
                                             <XCircleIcon className='w-5 h-5 text-red-500' />
                                             <span className='text-red-500 font-medium'>Order Cancelled</span>
+                                        </div>
+                                    ) : orderStatus === 'delivered' ? (
+                                        <div className='flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg'>
+                                            <CheckCircle className='w-5 h-5 text-emerald-500' />
+                                            <span className='text-emerald-500 font-medium'>Order Delivered</span>
                                         </div>
                                     ) : (
                                         <>
@@ -334,7 +334,7 @@ function OrderContent({ order }) {
 
                         {/* Cancel Order Button */}
                         <div className='flex justify-end'>
-                            {orderStatus !== 'cancelled' && (
+                            {orderStatus !== 'cancelled' && orderStatus !== 'delivered' && (
                                 <Button variant='outlined' onClick={() => setCancelDialogOpen(true)} className='!bg-red-500/10 !border-red-500/20 !text-red-500 hover:bg-red-500/20 hover:text-white'>
                                     Cancel Order
                                 </Button>

@@ -196,7 +196,7 @@ export default function ShowOrder({ order }) {
                             <p className="text-gray-600 capitalize">
                                 {order.paymentMethod === "cod" ? "Cash on Delivery" : order.paymentMethod || "Not specified"}
                             </p>
-                            {/* <p className="text-sm text-gray-500 mt-1">
+                            <p className="text-sm text-gray-500 mt-1">
                                 Status:{" "}
                                 <span
                                     className={`font-medium ${order.paymentStatus === "paid" ? "text-green-600" : "text-amber-600"
@@ -204,7 +204,7 @@ export default function ShowOrder({ order }) {
                                 >
                                     {order.paymentStatus?.charAt(0).toUpperCase() + order.paymentStatus?.slice(1)}
                                 </span>
-                            </p> */}
+                            </p>
                         </div>
                     </div>
                 </div>

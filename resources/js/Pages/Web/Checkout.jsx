@@ -4,7 +4,7 @@ import { ChevronLeft } from "lucide-react"
 import GuestLayout from "@/Layouts/GuestLayout"
 import { useCart } from "@/contexts/CartContext"
 
-function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false, rate: 0 } }) {
+function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false, rate: 0 }, authenticatedUser = null }) {
     const { items, subtotal } = useCart()
 
     const areaOptions = useMemo(() => {
@@ -24,11 +24,11 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
     const defaultArea = areaOptions[0]?.value ?? ""
 
     const { data, setData, post, processing, errors, reset } = useForm({
-        fullName: "",
-        phone: "",
-        email: "",
-        area: defaultArea,
-        fullAddress: "",
+        fullName: authenticatedUser?.fullName ?? "",
+        phone: authenticatedUser?.phone ?? "",
+        email: authenticatedUser?.email ?? "",
+        area: authenticatedUser?.area ?? defaultArea,
+        fullAddress: authenticatedUser?.fullAddress ?? "",
         orderNotes: "",
     })
 
@@ -57,9 +57,13 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
         }
 
         post(route('checkout.store'), {
-            preserveScroll: false,
+            preserveScroll: true,
+            preserveState: true,
             onSuccess: () => {
                 reset()
+            },
+            onError: (errors) => {
+                console.error('Validation errors:', errors)
             },
         })
     }
@@ -129,9 +133,16 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                         <p className="text-gray-600 mt-2">Fill in your details to complete your order as a guest.</p>
                     </div>
 
-                    {(errors.cart || errors.checkout) && (
+                    {(errors.cart || errors.checkout || Object.keys(errors).length > 0) && (
                         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                            {errors.cart || errors.checkout}
+                            <p className="font-semibold mb-2">Please fix the following errors:</p>
+                            {errors.cart && <p>• {errors.cart}</p>}
+                            {errors.checkout && <p>• {errors.checkout}</p>}
+                            {errors.fullName && <p>• {errors.fullName}</p>}
+                            {errors.phone && <p>• {errors.phone}</p>}
+                            {errors.email && <p>• {errors.email}</p>}
+                            {errors.area && <p>• {errors.area}</p>}
+                            {errors.fullAddress && <p>• {errors.fullAddress}</p>}
                         </div>
                     )}
 
@@ -148,7 +159,7 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label htmlFor="fullName" className="block text-sm font-semibold text-gray-700 mb-2">
-                                            Full Name
+                                            Full Name <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             type="text"
@@ -157,14 +168,18 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                                             value={data.fullName}
                                             onChange={handleInputChange}
                                             required
-                                            className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
+                                            className={`w-full px-4 py-3 rounded border focus:outline-none focus:ring-2 ${
+                                                errors.fullName
+                                                    ? "border-red-500 focus:ring-red-500 bg-red-50"
+                                                    : "border-gray-300 focus:ring-black"
+                                            }`}
                                             placeholder="Full Name"
                                         />
                                         {errors.fullName && <p className="text-sm text-red-600 mt-1">{errors.fullName}</p>}
                                     </div>
                                     <div>
                                         <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
-                                            Phone
+                                            Phone <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             type="tel"
@@ -173,7 +188,11 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                                             value={data.phone}
                                             onChange={handleInputChange}
                                             required
-                                            className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
+                                            className={`w-full px-4 py-3 rounded border focus:outline-none focus:ring-2 ${
+                                                errors.phone
+                                                    ? "border-red-500 focus:ring-red-500 bg-red-50"
+                                                    : "border-gray-300 focus:ring-black"
+                                            }`}
                                             placeholder="Phone Number"
                                         />
                                         {errors.phone && <p className="text-sm text-red-600 mt-1">{errors.phone}</p>}
@@ -183,7 +202,7 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                                            Email
+                                            Email <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             type="email"
@@ -192,7 +211,11 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                                             value={data.email}
                                             onChange={handleInputChange}
                                             required
-                                            className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
+                                            className={`w-full px-4 py-3 rounded border focus:outline-none focus:ring-2 ${
+                                                errors.email
+                                                    ? "border-red-500 focus:ring-red-500 bg-red-50"
+                                                    : "border-gray-300 focus:ring-black"
+                                            }`}
                                             placeholder="example@gmail.com"
                                         />
                                         {errors.email && <p className="text-sm text-red-600 mt-1">{errors.email}</p>}
@@ -200,14 +223,18 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
 
                                     <div>
                                         <label htmlFor="area" className="block text-sm font-semibold text-gray-700 mb-2">
-                                            Area
+                                            Area <span className="text-red-500">*</span>
                                         </label>
                                         <select
                                             id="area"
                                             name="area"
                                             value={data.area}
                                             onChange={handleInputChange}
-                                            className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
+                                            className={`w-full px-4 py-3 rounded border focus:outline-none focus:ring-2 ${
+                                                errors.area
+                                                    ? "border-red-500 focus:ring-red-500 bg-red-50"
+                                                    : "border-gray-300 focus:ring-black"
+                                            }`}
                                             disabled={!areaOptions.length}
                                             required
                                         >
@@ -230,7 +257,7 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
 
                                 <div>
                                     <label htmlFor="fullAddress" className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Full Address
+                                        Full Address <span className="text-red-500">*</span>
                                     </label>
                                     <textarea
                                         id="fullAddress"
@@ -239,7 +266,11 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                                         onChange={handleInputChange}
                                         required
                                         rows={3}
-                                        className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black resize-none"
+                                        className={`w-full px-4 py-3 rounded border focus:outline-none focus:ring-2 resize-none ${
+                                            errors.fullAddress
+                                                ? "border-red-500 focus:ring-red-500 bg-red-50"
+                                                : "border-gray-300 focus:ring-black"
+                                        }`}
                                         placeholder="123 Main Street, City, Country"
                                     />
                                     {errors.fullAddress && <p className="text-sm text-red-600 mt-1">{errors.fullAddress}</p>}
@@ -346,11 +377,11 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
     )
 }
 
-export default function Checkout({ shippingOptions, taxSettings }) {
+export default function Checkout({ shippingOptions, taxSettings, authenticatedUser }) {
     return (
         <GuestLayout>
             <Head title="Checkout" />
-            <CheckoutContent shippingOptions={shippingOptions} taxSettings={taxSettings} />
+            <CheckoutContent shippingOptions={shippingOptions} taxSettings={taxSettings} authenticatedUser={authenticatedUser} />
         </GuestLayout>
     )
 }

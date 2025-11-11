@@ -23,14 +23,21 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:categories,slug',
+            'name' => 'required|string|max:255|unique:categories,name',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,ico|max:5120', // 5MB max
+        ], [
+            'name.required' => 'Category name is required.',
+            'name.string' => 'Category name must be a valid text.',
+            'name.max' => 'Category name cannot exceed 255 characters.',
+            'name.unique' => 'A category with this name already exists.',
+            'image.image' => 'The uploaded file must be an image.',
+            'image.mimes' => 'The image must be a JPEG, PNG, or ICO file.',
+            'image.max' => 'The image size cannot exceed 5MB.',
         ]);
 
         $data = [
             'name' => $request->name,
-            'slug' => $request->slug,
+            'slug' => Str::slug($request->name),
         ];
 
         // Handle image upload
@@ -52,14 +59,21 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
 
         $request->validate([
-            'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:categories,slug,' . $id,
+            'name' => 'required|string|max:255|unique:categories,name,' . $id,
             'image' => 'nullable|image|mimes:jpeg,png,jpg,ico|max:5120', // 5MB max
+        ], [
+            'name.required' => 'Category name is required.',
+            'name.string' => 'Category name must be a valid text.',
+            'name.max' => 'Category name cannot exceed 255 characters.',
+            'name.unique' => 'A category with this name already exists.',
+            'image.image' => 'The uploaded file must be an image.',
+            'image.mimes' => 'The image must be a JPEG, PNG, or ICO file.',
+            'image.max' => 'The image size cannot exceed 5MB.',
         ]);
 
         $data = [
             'name' => $request->name,
-            'slug' => $request->slug,
+            'slug' => Str::slug($request->name),
         ];
 
         // Handle image upload

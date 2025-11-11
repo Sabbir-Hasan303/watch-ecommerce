@@ -27,9 +27,25 @@ class CheckoutController extends Controller
         $shippingOptions = $this->buildShippingOptions();
         $taxSettings = $this->buildTaxSettings();
 
+        // Get authenticated user's default address if logged in
+        $authenticatedUser = null;
+        if ($request->user()) {
+            $user = $request->user()->load(['addresses']);
+            $defaultAddress = $user->addresses()->where('is_default', true)->first();
+
+            $authenticatedUser = [
+                'fullName' => $user->name,
+                'phone' => $user->phone,
+                'email' => $user->email,
+                'area' => $defaultAddress?->area ?? '',
+                'fullAddress' => $defaultAddress?->address_line ?? '',
+            ];
+        }
+
         return Inertia::render('Web/Checkout', [
             'shippingOptions' => $shippingOptions,
             'taxSettings' => $taxSettings,
+            'authenticatedUser' => $authenticatedUser,
         ]);
     }
 

@@ -343,9 +343,29 @@ class OrderService
     }
 
     /**
-     * Send order notifications
+     * Send order notifications to admin when order is created
      */
     public static function sendOrderNotifications(Order $order, array $validated): void
+    {
+        try {
+            // Get admin email from config, default to MAIL_FROM_ADDRESS
+            $adminEmail = config('mail.admin_email', config('mail.from.address'));
+
+            // Send notification email to admin
+            if ($adminEmail) {
+                Mail::to($adminEmail)
+                    ->send(new \App\Mail\NewOrderNotificationMail($order));
+            }
+        } catch (\Exception $e) {
+            // Log the error but don't fail the order creation
+            Log::error('Failed to send order notification emails: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Send confirmation email to customer when order is confirmed
+     */
+    public static function sendConfirmationEmailToCustomer(Order $order): void
     {
         try {
             // Get customer email (from user or shipping address)
@@ -358,18 +378,47 @@ class OrderService
                 Mail::to($customerEmail)
                     ->send(new \App\Mail\OrderConfirmationMail($order));
             }
+        } catch (\Exception $e) {
+            // Log the error but don't fail the status change
+            Log::error('Failed to send order confirmation email: ' . $e->getMessage());
+        }
+    }
 
-            // Get admin email from config, default to MAIL_FROM_ADDRESS
-            $adminEmail = config('mail.admin_email', config('mail.from.address'));
+    /**
+     * Send shipped email to customer
+     */
+    public static function sendShippedEmailToCustomer(Order $order): void
+    {
+        try {
+            $order->load(['user', 'items.product', 'items.variant']);
 
-            // Send notification email to admin
-            if ($adminEmail) {
-                Mail::to($adminEmail)
-                    ->send(new \App\Mail\NewOrderNotificationMail($order));
+            $email = $order->user ? $order->user->email : $order->shipping_address['email'];
+
+            if ($email) {
+                Mail::to($email)->send(new \App\Mail\OrderShippedMail($order));
             }
         } catch (\Exception $e) {
-            // Log the error but don't fail the order creation
-            Log::error('Failed to send order notification emails: ' . $e->getMessage());
+            // Log the error but don't fail the status change
+            Log::error('Failed to send order shipped email: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Send delivered email to customer
+     */
+    public static function sendDeliveredEmailToCustomer(Order $order): void
+    {
+        try {
+            $order->load(['user', 'items.product', 'items.variant']);
+
+            $email = $order->user ? $order->user->email : $order->shipping_address['email'];
+
+            if ($email) {
+                Mail::to($email)->send(new \App\Mail\OrderDeliveredMail($order));
+            }
+        } catch (\Exception $e) {
+            // Log the error but don't fail the status change
+            Log::error('Failed to send order delivered email: ' . $e->getMessage());
         }
     }
 }

@@ -250,16 +250,11 @@
             </div>
         </div>
 
-        <div class="message" style="margin-top: 30px;">
-            <p><strong>What's Next?</strong></p>
-            <p>We'll send you another email once your order has been shipped. If you have any questions or concerns, please don't hesitate to contact our customer service team.</p>
-        </div>
-
         <div style="text-align: center;">
             @php
                 $orderUrl = $order->user
-                    ? (url('/customer/orders/' . $order->id) ?? '#')
-                    : (url('/orders/' . $order->id . '/confirmation') ?? '#');
+                    ? (url('/customer/orders/' . $order->order_number) ?? '#')
+                    : (url('/orders/' . $order->order_number . '/confirmation') ?? '#');
             @endphp
             @if($orderUrl !== '#')
                 <a href="{{ $orderUrl }}" class="cta-button">View Order Details</a>
