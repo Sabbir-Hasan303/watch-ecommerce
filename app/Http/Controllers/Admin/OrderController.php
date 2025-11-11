@@ -15,6 +15,7 @@ use App\Services\OptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
@@ -115,17 +116,28 @@ class OrderController extends Controller
             abort(404, 'Order not found');
         }
 
+        // Prevent editing of delivered orders
+        if ($order->status === 'delivered') {
+            return redirect()->route('admin.orders.show', $id)->with('error', 'Cannot edit delivered orders');
+        }
+
         $data = OrderService::getCreatePageData();
         $data['order'] = $order;
-        // dd($data);
 
         return Inertia::render('Admin/Orders/Edit', $data);
     }
 
     public function update(OrderRequest $request)
     {
+        // dd($request->all());
         try {
             $validated = $request->validated();
+
+            // Check if order is delivered
+            $order = Order::find($validated['order_id']);
+            if ($order && $order->status === 'delivered') {
+                return redirect()->route('admin.orders.show', $order->id)->with('error', 'Cannot update delivered orders');
+            }
 
             // Use database transaction for data consistency
             return DB::transaction(function () use ($validated) {
@@ -155,17 +167,43 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Order not found');
         }
 
+        // Prevent status changes for delivered orders
+        if ($order->status === 'delivered') {
+            return redirect()->back()->with('error', 'Cannot change status of delivered orders');
+        }
+
         $previousStatus = $order->status;
         $newStatus = $validated['status'];
 
         DB::transaction(function () use ($order, $previousStatus, $newStatus) {
             $order->status = $newStatus;
+
+            // Mark payment as paid when order is delivered
+            if ($newStatus === 'delivered') {
+                $order->payment_status = 'paid';
+            }
+
             $order->save();
 
             if ($previousStatus !== 'cancelled' && $newStatus === 'cancelled') {
                 OrderService::restoreStockForOrder($order);
             } elseif ($previousStatus === 'cancelled' && $newStatus !== 'cancelled') {
                 OrderService::deductStockForOrder($order);
+            }
+
+            // Send confirmation email to customer when order is confirmed
+            if ($previousStatus !== 'confirmed' && $newStatus === 'confirmed') {
+                OrderService::sendConfirmationEmailToCustomer($order);
+            }
+
+            // Send shipped email to customer when order is shipped
+            if ($previousStatus !== 'shipped' && $newStatus === 'shipped') {
+                OrderService::sendShippedEmailToCustomer($order);
+            }
+
+            // Send delivered email to customer when order is delivered
+            if ($previousStatus !== 'delivered' && $newStatus === 'delivered') {
+                OrderService::sendDeliveredEmailToCustomer($order);
             }
         });
 
@@ -186,6 +224,11 @@ class OrderController extends Controller
 
         if ($order->status === 'cancelled') {
             return redirect()->back()->with('success', 'Order already cancelled');
+        }
+
+        // Prevent cancellation of delivered orders
+        if ($order->status === 'delivered') {
+            return redirect()->back()->with('error', 'Cannot cancel delivered orders');
         }
 
         DB::transaction(function () use ($order) {

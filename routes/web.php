@@ -55,20 +55,20 @@ Route::get('/orders/{order}/confirmation', [CheckoutController::class, 'show'])-
 
 // Customer Routes
 Route::middleware(['auth', 'verified', 'customer'])->group(function () {
-    Route::get('/customer/dashboard', DashboardController::class)->name('customer.dashboard');
+    Route::get('/user/dashboard', DashboardController::class)->name('customer.dashboard');
 
-    Route::get('/customer/profile', [CustomerProfileController::class, 'show'])->name('customer.profile');
-    Route::put('/customer/profile', [CustomerProfileController::class, 'update'])->name('customer.profile.update');
-    Route::post('/customer/profile/image', [CustomerProfileController::class, 'updateImage'])->name('customer.profile.image');
+    Route::get('/user/profile', [CustomerProfileController::class, 'show'])->name('customer.profile');
+    Route::put('/user/profile', [CustomerProfileController::class, 'update'])->name('customer.profile.update');
+    Route::post('/user/profile/image', [CustomerProfileController::class, 'updateImage'])->name('customer.profile.image');
 
-    Route::post('/customer/addresses', [CustomerAddressController::class, 'store'])->name('customer.addresses.store');
-    Route::delete('/customer/addresses/{address}', [CustomerAddressController::class, 'destroy'])->name('customer.addresses.destroy');
-    Route::patch('/customer/addresses/{address}/default', [CustomerAddressController::class, 'setDefault'])->name('customer.addresses.default');
+    Route::post('/user/addresses', [CustomerAddressController::class, 'store'])->name('customer.addresses.store');
+    Route::delete('/user/addresses/{address}', [CustomerAddressController::class, 'destroy'])->name('customer.addresses.destroy');
+    Route::patch('/user/addresses/{address}/default', [CustomerAddressController::class, 'setDefault'])->name('customer.addresses.default');
 
-    Route::get('/customer/orders', [CustomerOrderController::class, 'index'])->name('customer.orders');
-    Route::get('/customer/orders/{orderNumber}', [CustomerOrderController::class, 'show'])->name('customer.orders.show');
+    Route::get('/user/orders', [CustomerOrderController::class, 'index'])->name('customer.orders');
+    Route::get('/user/orders/{orderNumber}', [CustomerOrderController::class, 'show'])->name('customer.orders.show');
 
-    Route::get('/customer/logout', function () {
+    Route::get('/user/logout', function () {
         Auth::logout();
         return redirect()->route('login');
     })->name('customer.logout');

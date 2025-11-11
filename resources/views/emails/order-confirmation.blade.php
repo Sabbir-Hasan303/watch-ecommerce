@@ -250,21 +250,11 @@
             </div>
         </div>
 
-        <div class="message" style="margin-top: 30px;">
-            <p><strong>What's Next?</strong></p>
-            <p>We'll send you another email once your order has been shipped. If you have any questions or concerns, please don't hesitate to contact our customer service team.</p>
-        </div>
-
         <div style="text-align: center;">
-            @php
-                $orderUrl = $order->user
-                    ? (url('/customer/orders/' . $order->id) ?? '#')
-                    : (url('/orders/' . $order->id . '/confirmation') ?? '#');
-            @endphp
-            @if($orderUrl !== '#')
-                <a href="{{ $orderUrl }}" class="cta-button">View Order Details</a>
+            @if($order->user)
+                <a href="{{ route('customer.orders.show', ['orderNumber' => $order->order_number]) }}" class="cta-button">View Order Details</a>
             @else
-                <p style="font-size: 12px; color: #666;">You can track your order using order number: <strong>{{ $order->order_number }}</strong></p>
+                <a href="{{ route('order.confirmation', ['order' => $order]) }}" class="cta-button">View Order Details</a>
             @endif
         </div>
 

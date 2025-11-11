@@ -1,18 +1,23 @@
-import { Search, Menu, ShoppingCart, User } from "lucide-react"
+import { Search, Menu, ShoppingCart, User, LogIn } from "lucide-react"
 import { useState } from "react"
 import { useCart } from "@/contexts/CartContext"
-import { Link } from "@inertiajs/react"
+import { Link, usePage } from "@inertiajs/react"
 
 
 export default function Navbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const { itemCount, openCart } = useCart()
+    const { auth } = usePage().props
+    const user = auth?.user
+    const isAuthenticated = !!user
+    const isAdmin = user?.role === 'admin'
+    const isCustomer = user?.role === 'customer'
 
     const mainNavItems = [
         { label: "All Watches", href: route('watches-list') },
         { label: "Contact Us", href: route('contact') },
         { label: "Terms", href: route('terms') },
-      ];
+    ];
 
     const subNavItems = ["Overview", "Tech Specs", "Features", "Similar Watches"]
 
@@ -52,9 +57,28 @@ export default function Navbar() {
                             {/*<button className="text-black hover:text-gray-600" aria-label="Search">
                 <Search className="h-5 w-5" />
               </button>*/}
-                            <Link href={route('customer.dashboard')} className="text-black hover:text-gray-600" aria-label="User dashboard">
-                                <User className="h-5 w-5" />
-                            </Link>
+
+                            {/* Authentication Button/Icon */}
+                            {isAuthenticated ? (
+                                <Link
+                                    href={isAdmin ? route('admin.dashboard') : route('customer.dashboard')}
+                                    className="text-black hover:text-gray-600 transition-colors"
+                                    title={isAdmin ? 'Admin Dashboard' : 'Customer Dashboard'}
+                                    aria-label={isAdmin ? 'Admin Dashboard' : 'Customer Dashboard'}
+                                >
+                                    <User className="h-5 w-5" />
+                                </Link>
+                            ) : (
+                                <Link
+                                    href={route('login')}
+                                    className="flex items-center gap-2 px-4 py-2 text-black bg-gray-100 hover:bg-gray-200 rounded-full font-semibold transition-colors text-sm"
+                                    aria-label="Login"
+                                >
+                                    <LogIn className="h-4 w-4" />
+                                    Login
+                                </Link>
+                            )}
+
                             <button onClick={openCart} className="relative text-black hover:text-gray-600" aria-label="Shopping cart">
                                 <ShoppingCart className="h-5 w-5" />
                                 {itemCount > 0 && (
