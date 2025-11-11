@@ -1,5 +1,6 @@
 import { Minus, Plus, X } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
+import Taka from "@/Components/Taka"
 
 export default function CartItem({ id, name, price, color, quantity, image }) {
   const { updateQuantity, removeItem } = useCart()
@@ -83,7 +84,10 @@ export default function CartItem({ id, name, price, color, quantity, image }) {
           </div>
 
           {/* Price */}
-          <div className="font-bold text-sm">{price}</div>
+          <div className="flex items-baseline gap-1 font-bold text-sm">
+            <Taka color="text-black dark:text-white" size="text-sm" />
+            <span>{price}</span>
+          </div>
         </div>
       </div>
     </div>

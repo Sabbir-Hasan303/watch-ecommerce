@@ -1,3 +1,4 @@
+import Taka from '@/Components/Taka';
 import { Link } from '@inertiajs/react';
 
 export default function HeroSection({ banner }) {
@@ -29,7 +30,10 @@ export default function HeroSection({ banner }) {
                             <div className="absolute right-[5%] sm:right-[8%] lg:right-[12%] top-1/3 -translate-y-1/2 w-[140px] h-[140px] sm:w-[280px] sm:h-[280px] lg:w-[380px] lg:h-[380px] bg-[linear-gradient(180deg,_#9BA8AE_0%,_#FFFFFF_100%)] rounded-full z-0 pt-6 pr-3 sm:pt-16 sm:pr-16 lg:pt-20 lg:pr-20">
                                 {/* Price Badge */}
                                 <div className="text-right">
-                                    <p className="text-base sm:text-3xl lg:text-5xl font-bold text-white">$12,500</p>
+                                    <div className="text-base sm:text-3xl lg:text-5xl font-bold text-white flex justify-end items-center gap-1">
+                                        <Taka color='text-white' className='font-bold text-base lg:text-4xl' />
+                                        12,500
+                                    </div>
                                     <p className="text-[9px] sm:text-sm lg:text-base text-white/90 mt-1">Starting from</p>
                                 </div>
                             </div>

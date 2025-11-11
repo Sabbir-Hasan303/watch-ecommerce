@@ -264,6 +264,7 @@ export default function OrdersList({ orders = [], flash }) {
                                                                         bgcolor: statusConfig[order.status].color.includes('yellow') ? 'rgba(245, 158, 11, 0.2)' : statusConfig[order.status].color.includes('blue') ? 'rgba(59, 130, 246, 0.2)' : statusConfig[order.status].color.includes('purple') ? 'rgba(147, 51, 234, 0.2)' : statusConfig[order.status].color.includes('emerald') ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'
                                                                     }
                                                                 }}
+                                                                className='!py-1 !px-2'
                                                             />
                                                         </TableCell>
                                                         <TableCell className='table-body-cell dark:table-body-cell'>

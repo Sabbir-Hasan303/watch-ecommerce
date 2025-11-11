@@ -1,6 +1,8 @@
 import { Link } from "@inertiajs/react"
 import { ArrowRight } from "lucide-react"
 import { formatMoney, formatRange } from "@/utils/productFormatters"
+import PriceDisplay from "./PriceDisplay"
+import Taka from "./Taka"
 
 const placeholderImage = "/placeholder.svg?height=400&width=600"
 
@@ -53,9 +55,16 @@ export default function ProductCardCompact({ product, showCategory = true, showC
                 <div>
                     <div className="flex flex-col flex-wrap items-baseline gap-2">
                         {compareDisplay && (
-                            <span className="text-base text-gray-400 line-through">{compareDisplay}</span>
+                            <div className="text-base text-gray-400 line-through flex items-center gap-1">
+                                <Taka color='text-gray-400' className='text-base' />
+                                <span className="text-base">{compareDisplay}</span>
+                            </div>
                         )}
-                        {priceDisplay && <span className="text-xl font-bold text-black">{priceDisplay}</span>}
+                        {priceDisplay &&
+                        <div className="text-xl font-bold text-black flex items-center gap-1">
+                            <Taka color='text-black' className='font-bold text-xl' />
+                            <span className="text-xl">{priceDisplay}</span>
+                        </div>}
                     </div>
                 </div>
             </div>

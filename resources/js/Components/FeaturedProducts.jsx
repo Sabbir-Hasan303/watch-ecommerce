@@ -23,6 +23,7 @@ import {
 import CustomTextField from '@/Components/CustomTextField'
 import CustomSelectField from '@/Components/CustomSelectField'
 import { router } from '@inertiajs/react'
+import Taka from './Taka'
 
 const formatStatusOptions = (statusOptions) => {
     const statusLabels = {
@@ -252,7 +253,11 @@ export function FeaturedProducts({ featuredProducts: initialProducts = [], categ
                                                     <Chip label={product.category} variant='outlined' size='small' />
                                                 </TableCell>
                                                 <TableCell className='table-body-cell dark:table-body-cell'>
-                                                    <p className='font-semibold text-foreground'>${product.price ? parseFloat(product.price).toFixed(2) : '0.00'}</p>
+                                                    {/* <p className='font-semibold text-foreground'>${product.price ? parseFloat(product.price).toFixed(2) : '0.00'}</p> */}
+                                                    <div className="flex items-center gap-1">
+                                                        <Taka color='text-black dark:text-white' className='text-base' />
+                                                        <span className="text-base">{product.price ? parseFloat(product.price).toFixed(2) : '0.00'}</span>
+                                                    </div>
                                                 </TableCell>
                                                 <TableCell className='table-body-cell dark:table-body-cell'>
                                                     <p className={cn(

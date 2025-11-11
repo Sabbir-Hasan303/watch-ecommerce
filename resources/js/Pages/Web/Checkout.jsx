@@ -3,6 +3,7 @@ import { Link, Head, useForm } from "@inertiajs/react"
 import { ChevronLeft } from "lucide-react"
 import GuestLayout from "@/Layouts/GuestLayout"
 import { useCart } from "@/contexts/CartContext"
+import Taka from "@/Components/Taka"
 
 function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false, rate: 0 }, authenticatedUser = null }) {
     const { items, subtotal } = useCart()
@@ -103,19 +104,19 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
         return Number(((numericSubtotal * taxRate) / 100).toFixed(2))
     }, [numericSubtotal, taxEnabled, taxRate])
 
-    const formatCurrency = (value) => {
+    const formatPrice = (value) => {
         const numericValue = Number(value) || 0
-        return `$${numericValue.toLocaleString(undefined, {
+        return numericValue.toLocaleString(undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
-        })}`
+        })
     }
 
     const total = useMemo(() => Number((numericSubtotal + shippingCost + tax).toFixed(2)), [numericSubtotal, shippingCost, tax])
 
-    const shippingDisplay = shippingCost <= 0 ? "Free" : formatCurrency(shippingCost)
+    const shippingDisplay = shippingCost <= 0 ? "Free" : formatPrice(shippingCost)
     const taxLabel = taxEnabled ? `Tax (${taxRate}% )` : "Tax"
-    const taxDisplay = formatCurrency(tax)
+    const taxDisplay = formatPrice(tax)
 
     return (
         <div className="max-w-[1440px] mx-auto px-4 py-8">
@@ -311,9 +312,15 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                         <button
                             type="submit"
                             disabled={processing || items.length === 0}
-                            className="w-full bg-black text-white py-4 px-6 rounded font-semibold hover:bg-gray-800 transition-colors text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full bg-black text-white py-4 px-6 rounded font-semibold hover:bg-gray-800 transition-colors text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
-                            {processing ? "Processing..." : `Place Order - ${formatCurrency(total)}`}
+                            {processing ? (
+                                "Processing..."
+                            ) : (
+                                <>
+                                    Place Order - <Taka color="text-white" size="text-lg" /> <span>{formatPrice(total)}</span>
+                                </>
+                            )}
                         </button>
                     </form>
                 </div>
@@ -340,7 +347,10 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                                         <h3 className="font-semibold text-sm truncate">{item.name}</h3>
                                         <p className="text-sm text-gray-600">Color: {item.color}</p>
                                         <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
-                                        <p className="font-semibold text-sm mt-1">{item.price}</p>
+                                        <div className="flex items-baseline gap-1 font-semibold text-sm mt-1">
+                                            <Taka color="text-black dark:text-white" size="text-sm" />
+                                            <p>{item.price}</p>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -350,24 +360,38 @@ function CheckoutContent({ shippingOptions = {}, taxSettings = { enabled: false,
                         <div className="space-y-3 border-t border-gray-200 pt-4">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600">Subtotal</span>
-                                <span className="font-semibold">{formatCurrency(numericSubtotal)}</span>
+                                <div className="flex items-baseline gap-1 font-semibold">
+                                    <Taka color="text-gray-600" size="text-sm" />
+                                    <span>{formatPrice(numericSubtotal)}</span>
+                                </div>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600">Shipping</span>
-                                <span className={`font-semibold ${shippingCost <= 0 ? "text-green-600" : "text-gray-800"}`}>
-                                    {shippingDisplay}
-                                </span>
+                                {shippingCost <= 0 ? (
+                                    <span className={`font-semibold text-green-600`}>Free</span>
+                                ) : (
+                                    <div className="flex items-baseline gap-1 font-semibold">
+                                        <Taka color="text-gray-800" size="text-sm" />
+                                        <span>{formatPrice(shippingCost)}</span>
+                                    </div>
+                                )}
                             </div>
                             {/* if tax is enabled, show the tax */}
                             {taxEnabled && (
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600">{taxLabel}</span>
-                                    <span className="font-semibold">{taxDisplay}</span>
+                                    <div className="flex items-baseline gap-1 font-semibold">
+                                        <Taka color="text-gray-600" size="text-sm" />
+                                        <span>{taxDisplay}</span>
+                                    </div>
                                 </div>
                             )}
                             <div className="flex justify-between text-lg font-bold border-t border-gray-200 pt-3">
                                 <span>Total</span>
-                                <span>{formatCurrency(total)}</span>
+                                <div className="flex items-baseline gap-1">
+                                    <Taka color="text-black dark:text-white" size="text-lg" />
+                                    <span>{formatPrice(total)}</span>
+                                </div>
                             </div>
                         </div>
                     </div>

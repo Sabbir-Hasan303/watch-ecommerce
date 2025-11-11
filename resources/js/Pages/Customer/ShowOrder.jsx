@@ -1,6 +1,7 @@
 import { Head } from "@inertiajs/react"
 import CustomerLayout from "@/Layouts/CustomerLayout"
 import { Download, Package, MapPin, CreditCard } from "lucide-react"
+import Taka from "@/Components/Taka"
 
 const formatDate = (dateString) => {
     if (!dateString) return "--"
@@ -9,9 +10,12 @@ const formatDate = (dateString) => {
     )
 }
 
-const formatCurrency = (value) => {
-    if (typeof value !== "number") return "$0.00"
-    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value)
+const formatPrice = (value) => {
+    if (typeof value !== "number") return "0.00"
+    return value.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    })
 }
 
 export default function ShowOrder({ order }) {
@@ -97,9 +101,15 @@ export default function ShowOrder({ order }) {
                                         <p className="text-sm text-gray-600 mt-1">Quantity: {item.quantity}</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-semibold">{formatCurrency(item.totalPrice)}</p>
+                                        <div className="flex items-baseline gap-1 font-semibold justify-end">
+                                            <Taka color="text-black dark:text-white" size="text-base" />
+                                            <p>{formatPrice(item.totalPrice)}</p>
+                                        </div>
                                         {item.quantity > 1 && (
-                                            <p className="text-xs text-gray-500">{formatCurrency(item.unitPrice)} each</p>
+                                            <div className="flex items-baseline gap-1 text-xs text-gray-500 justify-end">
+                                                <Taka color="text-gray-500" size="text-xs" />
+                                                <p>{formatPrice(item.unitPrice)} each</p>
+                                            </div>
                                         )}
                                     </div>
                                 </div>
@@ -114,27 +124,47 @@ export default function ShowOrder({ order }) {
                         <div className="space-y-2 max-w-xs ml-auto">
                             <div className="flex justify-between text-gray-600">
                                 <span>Subtotal</span>
-                                <span>{formatCurrency(order.subtotal)}</span>
+                                <div className="flex items-baseline gap-1">
+                                    <Taka color="text-gray-600" size="text-sm" />
+                                    <span>{formatPrice(order.subtotal)}</span>
+                                </div>
                             </div>
                             <div className="flex justify-between text-gray-600">
                                 <span>Shipping</span>
-                                <span>{order.shippingCost === 0 ? "Free" : formatCurrency(order.shippingCost)}</span>
+                                {order.shippingCost === 0 ? (
+                                    <span>Free</span>
+                                ) : (
+                                    <div className="flex items-baseline gap-1">
+                                        <Taka color="text-gray-600" size="text-sm" />
+                                        <span>{formatPrice(order.shippingCost)}</span>
+                                    </div>
+                                )}
                             </div>
                             {order.discountTotal > 0 && (
                                 <div className="flex justify-between text-green-600">
                                     <span>Discount</span>
-                                    <span>-{formatCurrency(order.discountTotal)}</span>
+                                    <div className="flex items-baseline gap-1">
+                                        <span>-</span>
+                                        <Taka color="text-green-600" size="text-sm" />
+                                        <span>{formatPrice(order.discountTotal)}</span>
+                                    </div>
                                 </div>
                             )}
                             {order.taxTotal > 0 && (
                                 <div className="flex justify-between text-gray-600">
                                     <span>Tax</span>
-                                    <span>{formatCurrency(order.taxTotal)}</span>
+                                    <div className="flex items-baseline gap-1">
+                                        <Taka color="text-gray-600" size="text-sm" />
+                                        <span>{formatPrice(order.taxTotal)}</span>
+                                    </div>
                                 </div>
                             )}
                             <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
                                 <span>Total</span>
-                                <span>{formatCurrency(order.total)}</span>
+                                <div className="flex items-baseline gap-1">
+                                    <Taka color="text-black dark:text-white" size="text-lg" />
+                                    <span>{formatPrice(order.total)}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
