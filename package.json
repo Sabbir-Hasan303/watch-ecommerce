@@ -3,7 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "cross-env NODE_OPTIONS=--max-old-space-size=768 vite build",
+        "build": "cross-env NODE_OPTIONS=--max-old-space-size=1536 vite build",
         "dev": "vite"
     },
     "dependencies": {
