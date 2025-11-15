@@ -37,6 +37,10 @@ const RichTextEditor = ({ value, onChange, error, helperText, label, placeholder
         setImageUrl,
         imageAlt,
         setImageAlt,
+        imageWidth,
+        setImageWidth,
+        imageHeight,
+        setImageHeight,
         fullscreen,
         setFullscreen,
         handleLinkOpen,
@@ -145,6 +149,10 @@ const RichTextEditor = ({ value, onChange, error, helperText, label, placeholder
                 setImageUrl={setImageUrl}
                 imageAlt={imageAlt}
                 setImageAlt={setImageAlt}
+                imageWidth={imageWidth}
+                setImageWidth={setImageWidth}
+                imageHeight={imageHeight}
+                setImageHeight={setImageHeight}
                 onApply={handleImageApply}
                 isDark={isDark}
             />

@@ -6,6 +6,8 @@ export const useEditorHandlers = (editor) => {
     const [linkUrl, setLinkUrl] = useState('')
     const [imageUrl, setImageUrl] = useState('')
     const [imageAlt, setImageAlt] = useState('')
+    const [imageWidth, setImageWidth] = useState('')
+    const [imageHeight, setImageHeight] = useState('')
     const [fullscreen, setFullscreen] = useState(false)
 
     // Link handlers
@@ -26,19 +28,45 @@ export const useEditorHandlers = (editor) => {
 
     // Image handlers
     const handleImageOpen = useCallback(() => {
-        setImageUrl('')
-        setImageAlt('')
+        // Check if an image is selected to get its current attributes
+        const attrs = editor.getAttributes('image')
+        if (attrs.src) {
+            setImageUrl(attrs.src || '')
+            setImageAlt(attrs.alt || '')
+            setImageWidth(attrs.width || '')
+            setImageHeight(attrs.height || '')
+        } else {
+            setImageUrl('')
+            setImageAlt('')
+            setImageWidth('')
+            setImageHeight('')
+        }
         setImageDialogOpen(true)
-    }, [])
+    }, [editor])
 
     const handleImageApply = useCallback(() => {
         if (imageUrl) {
-            editor.chain().focus().setImage({ src: imageUrl, alt: imageAlt }).run()
+            const imageAttrs = {
+                src: imageUrl,
+                alt: imageAlt || ''
+            }
+
+            // Add width and height if provided
+            if (imageWidth) {
+                imageAttrs.width = imageWidth
+            }
+            if (imageHeight) {
+                imageAttrs.height = imageHeight
+            }
+
+            editor.chain().focus().setImage(imageAttrs).run()
         }
         setImageDialogOpen(false)
         setImageUrl('')
         setImageAlt('')
-    }, [editor, imageUrl, imageAlt])
+        setImageWidth('')
+        setImageHeight('')
+    }, [editor, imageUrl, imageAlt, imageWidth, imageHeight])
 
     // Clear formatting
     const handleClearFormatting = useCallback(() => {
@@ -73,6 +101,10 @@ export const useEditorHandlers = (editor) => {
         setImageUrl,
         imageAlt,
         setImageAlt,
+        imageWidth,
+        setImageWidth,
+        imageHeight,
+        setImageHeight,
         fullscreen,
         setFullscreen,
         handleLinkOpen,
