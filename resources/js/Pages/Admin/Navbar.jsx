@@ -275,7 +275,7 @@ export default function Navbar({ title, subtitle, collapsed, onToggleSidebar, us
                             }}>
                             <MenuItem onClick={handleLogout}>
                                 <ListItemText
-                                    primary='Sign Out'
+                                    primary='Log Out'
                                     primaryTypographyProps={{
                                         color: 'error.main'
                                     }}

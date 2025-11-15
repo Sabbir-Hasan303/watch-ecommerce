@@ -25,7 +25,7 @@ export default function Navbar() {
         <nav className="sticky top-0 z-50 bg-white shadow-sm">
             {/* Main Navigation */}
             <div className="">
-                <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-0">
+                <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-4">
                     <div className="flex h-16 items-center justify-between">
                         {/* Logo */}
                         <Link href="/" className="flex items-center gap-2">

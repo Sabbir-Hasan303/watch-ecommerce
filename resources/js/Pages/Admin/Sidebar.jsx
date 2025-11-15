@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { Link, usePage } from '@inertiajs/react'
 import {
@@ -21,6 +21,19 @@ import Ripple from '@/Components/RippleButton'
 export default function Sidebar({ collapsed, onToggle, user }) {
     const { url } = usePage()
     const [expandedItems, setExpandedItems] = useState([])
+    const prevUrlRef = useRef(url)
+
+    // Helper function to check if we're on mobile (below lg breakpoint)
+    const isMobile = () => {
+        return typeof window !== 'undefined' && window.innerWidth < 1024
+    }
+
+    // Helper function to handle menu item click on mobile
+    const handleMobileClick = () => {
+        if (isMobile() && !collapsed) {
+            onToggle()
+        }
+    }
 
     // Helper function to extract path from full URL
     const getPathFromUrl = (fullUrl) => {
@@ -142,6 +155,17 @@ export default function Sidebar({ collapsed, onToggle, user }) {
         }
     }, [url])
 
+    // Close sidebar on mobile when URL changes (after navigation)
+    useEffect(() => {
+        // Only close if URL actually changed (not on initial mount)
+        if (prevUrlRef.current !== url && isMobile() && !collapsed) {
+            // Close sidebar after navigation completes on mobile
+            onToggle()
+        }
+        prevUrlRef.current = url
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [url])
+
     const toggleExpanded = label => {
         const activeParent = getActiveParent()
         const isActiveParent = activeParent && activeParent.label === label
@@ -211,7 +235,7 @@ export default function Sidebar({ collapsed, onToggle, user }) {
 
                 {/* Single menu item with href - direct navigation */}
                 {item.href && !hasSubItems ? (
-                    <Link href={item.href} className={buttonClasses}>
+                    <Link href={item.href} onClick={handleMobileClick} className={buttonClasses}>
                         <div className={cn('relative z-10 flex items-center', !collapsed && 'gap-3 w-full')}>{buttonContent}</div>
                     </Link>
                 ) : hasSubItems ? (
@@ -237,7 +261,7 @@ export default function Sidebar({ collapsed, onToggle, user }) {
                                     <div className={`absolute left-5 w-px bg-sidebar-border ${isLast ? 'top-0 h-[43%]' : 'top-0 bottom-0'}`}></div>
                                     <div className='absolute left-5 top-[24%] w-3 h-3 border-l border-b border-gray-200 dark:border-gray-600 rounded-bl-md'></div>
 
-                                    <Link href={subItem.href} className='block pl-8 pr-3'>
+                                    <Link href={subItem.href} onClick={handleMobileClick} className='block pl-8 pr-3'>
                                         <Button
                                             variant='text'
                                             className={cn(
