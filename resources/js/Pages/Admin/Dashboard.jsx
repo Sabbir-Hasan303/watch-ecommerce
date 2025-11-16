@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
-import { Head } from '@inertiajs/react'
+import { Head, Link } from '@inertiajs/react'
 import { cn } from '@/lib/utils'
 import { DollarSign, Users, Package2 as PackageIcon, ShoppingCart } from 'lucide-react'
 import { AreaChart } from '@/Components/AreaChart'
@@ -110,9 +110,11 @@ export default function Dashboard({ stats, recentOrders, productSales, salesDist
                                         <h3 className='text-lg font-semibold text-text-primary'>Recent Orders</h3>
                                         <p className='text-sm text-muted-foreground mt-1'>Latest customer transactions</p>
                                     </div>
-                                    <button className='px-4 py-2 text-sm text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 rounded-lg transition-all duration-300'>
+                                    <Link
+                                        href={route('admin.orders.index')}
+                                        className='px-4 py-2 text-sm text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 rounded-lg transition-all duration-300'>
                                         View All
-                                    </button>
+                                    </Link>
                                 </div>
                                 <div className='space-y-3'>
                                     {recentOrders?.map((order, index) => (
