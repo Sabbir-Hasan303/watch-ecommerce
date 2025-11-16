@@ -233,7 +233,7 @@
         <!-- Header -->
         <div class="header clearfix">
             <div class="header-left">
-                <h1 class="company-name">WatchStore</h1>
+                <h1 class="company-name">RavenHour</h1>
             </div>
             <div class="header-right">
                 <h2 class="invoice-title">INVOICE</h2>

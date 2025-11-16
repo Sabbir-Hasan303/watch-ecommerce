@@ -8,7 +8,13 @@ import { usePage } from '@inertiajs/react'
 import { ThemeContextProvider } from '@/contexts/ThemeContext'
 
 export default function AuthenticatedLayout({ header, children, flash }) {
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+    // Initialize sidebar as closed on mobile, open on desktop
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return window.innerWidth < 1024 // lg breakpoint
+        }
+        return false
+    })
     const { auth } = usePage().props
 
     // Handle flash messages from Laravel
@@ -20,6 +26,17 @@ export default function AuthenticatedLayout({ header, children, flash }) {
             toast.error(flash.error)
         }
     }, [flash])
+
+    // Keep sidebar closed on mobile when window resizes
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth < 1024 && !sidebarCollapsed) {
+                setSidebarCollapsed(true)
+            }
+        }
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [sidebarCollapsed])
 
     return (
         <ThemeContextProvider>
@@ -39,7 +56,7 @@ export default function AuthenticatedLayout({ header, children, flash }) {
                         user={auth?.user}
                     />
                     <main>
-                        <Container maxWidth='xl' sx={{ px: { xs: '20px', sm: '40px', md: '40px', lg: '40px', xl: '40px' }}}>
+                        <Container maxWidth='xl' sx={{ px: { xs: '20px', sm: '40px', md: '40px', lg: '40px', xl: '40px' } }}>
                             {children}
                         </Container>
                     </main>

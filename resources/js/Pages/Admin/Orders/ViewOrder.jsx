@@ -110,7 +110,7 @@ function OrderContent({ order }) {
                         <div className='flex flex-col md:flex-row justify-between items-center mb-6'>
                             <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Order Details</h2>
                             <div className='flex items-center gap-3'>
-                                {orderStatus !== 'delivered' && (
+                                {orderStatus !== 'delivered' && orderStatus !== 'shipped' && (
                                     <Link href={route('admin.orders.edit', { id: order.id })}>
                                         <Button
                                             variant='outlined'
@@ -334,7 +334,7 @@ function OrderContent({ order }) {
 
                         {/* Cancel Order Button */}
                         <div className='flex justify-end'>
-                            {orderStatus !== 'cancelled' && orderStatus !== 'delivered' && (
+                            {orderStatus !== 'cancelled' && orderStatus !== 'delivered' && orderStatus !== 'shipped' && (
                                 <Button variant='outlined' onClick={() => setCancelDialogOpen(true)} className='!bg-red-500/10 !border-red-500/20 !text-red-500 hover:bg-red-500/20 hover:text-white'>
                                     Cancel Order
                                 </Button>

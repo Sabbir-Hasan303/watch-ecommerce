@@ -570,7 +570,7 @@ function ProductEditFields({ productId, product, categories }) {
             <div className='flex flex-col md:flex-row justify-between items-center mb-6'>
                 <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Edit Product</h2>
                 <div>
-                    <Link href='/products'>
+                    <Link href='/admin/products'>
                         <Button variant='ghost' size='sm' className='gap-2 text-gray-400 hover:text-white'>
                             <ArrowLeft className='w-4 h-4' />
                             Back to Products

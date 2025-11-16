@@ -16,6 +16,10 @@ const ImageDialog = ({
     setImageUrl,
     imageAlt,
     setImageAlt,
+    imageWidth,
+    setImageWidth,
+    imageHeight,
+    setImageHeight,
     onApply,
     isDark
 }) => {
@@ -29,7 +33,9 @@ const ImageDialog = ({
                     color: isDark ? '#ffffff' : '#000000'
                 }
             }}>
-            <DialogTitle sx={{ color: isDark ? '#ffffff' : '#000000' }}>Add Image</DialogTitle>
+            <DialogTitle sx={{ color: isDark ? '#ffffff' : '#000000' }}>
+                {imageUrl ? 'Edit Image' : 'Add Image'}
+            </DialogTitle>
             <DialogContent sx={{ minWidth: '400px', display: 'flex', flexDirection: 'column', gap: 2 }} className='!p-4'>
                 <CustomTextField
                     fullWidth
@@ -45,6 +51,24 @@ const ImageDialog = ({
                     value={imageAlt}
                     onChange={(e) => setImageAlt(e.target.value)}
                 />
+                <div style={{ display: 'flex', gap: '16px' }}>
+                    <CustomTextField
+                        fullWidth
+                        label="Width"
+                        placeholder="e.g., 500 or 50%"
+                        value={imageWidth}
+                        onChange={(e) => setImageWidth(e.target.value)}
+                        type="text"
+                    />
+                    <CustomTextField
+                        fullWidth
+                        label="Height"
+                        placeholder="e.g., 300 or auto"
+                        value={imageHeight}
+                        onChange={(e) => setImageHeight(e.target.value)}
+                        type="text"
+                    />
+                </div>
             </DialogContent>
             <DialogActions>
                 <Button

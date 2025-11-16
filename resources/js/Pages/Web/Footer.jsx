@@ -5,7 +5,7 @@ import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react"
 export default function Footer() {
     return (
         <footer className="bg-black text-white">
-            <div className="mx-auto max-w-[1440px] px-4 py-12 sm:px-6 lg:px-0">
+            <div className="mx-auto max-w-[1440px] px-4 py-12 sm:px-6 lg:px-4">
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
                     {/* Left Section - Logo, Address, Social, Button */}
                     <div className="lg:col-span-1">
