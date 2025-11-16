@@ -241,7 +241,7 @@ export default function Sidebar({ collapsed, onToggle, user }) {
                                         <Button
                                             variant='text'
                                             className={cn(
-                                                'w-full flex !font-medium !pl-8 !justify-start py-2.5 rounded-lg text-sm transition-all duration-300 group relative overflow-hidden',
+                                                'w-full flex !font-medium !pl-3 !justify-start py-2.5 rounded-lg text-sm transition-all duration-300 group relative overflow-hidden',
                                                 isSubActive
                                                     ? '!text-[#00a76f] dark:!text-[#5be49b] !bg-[rgba(0,167,111,0.08)] dark:!bg-[rgba(0,167,111,0.15)]'
                                                     : '!text-text-secondary hover:text-text-primary hover:!bg-[#F3F4F6] dark:hover:!bg-[#1D242B]'

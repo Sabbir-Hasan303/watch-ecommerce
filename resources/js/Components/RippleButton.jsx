@@ -44,26 +44,8 @@ const Ripple = ({ children, className = '', onClick, bgColor = '', ...props }) =
                     }}
                 />
             ))}
-
-            <style jsx>{`
-                .ripple-animation {
-                    animation: ripple-spread 0.6s ease-out;
-                }
-
-                @keyframes ripple-spread {
-                    from {
-                        transform: scale(0);
-                        opacity: 1;
-                    }
-                    to {
-                        transform: scale(20);
-                        opacity: 0;
-                    }
-                }
-            `}</style>
         </button>
     )
 }
 
 export default Ripple
-
