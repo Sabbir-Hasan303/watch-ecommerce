@@ -190,7 +190,7 @@ export const ThemeContextProvider = ({ children }) => {
               borderRadius: '12px',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               '&:hover': {
-                transform: 'translateY(-2px)',
+                // transform: 'translateY(-2px)',
                 boxShadow:
                   mode === 'dark'
                     ? '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-export function LineChart () {
+export function LineChart ({ data }) {
     const canvasRef = useRef(null)
 
     useEffect(() => {
@@ -20,22 +20,20 @@ export function LineChart () {
         const height = rect.height
         const padding = 40
 
+        // Convert revenue data to chart values
+        const defaultData = [0, 0, 0, 0, 0, 0]
+        const chartValues = data && data.length > 0
+            ? data.map(item => item.revenue)
+            : defaultData
+
         const datasets = [
             {
-                data: [20, 35, 30, 45, 40, 55, 50, 65, 60, 75, 70, 85],
+                data: chartValues,
                 color: 'rgb(59, 130, 246)'
-            },
-            {
-                data: [30, 25, 35, 30, 40, 35, 45, 40, 50, 45, 55, 50],
-                color: 'rgb(168, 85, 247)'
-            },
-            {
-                data: [15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70],
-                color: 'rgb(34, 197, 94)'
             }
         ]
 
-        const max = Math.max(...datasets.flatMap(d => d.data))
+        const max = Math.max(...datasets.flatMap(d => d.data)) || 1
 
         let progress = 0
         const animate = () => {

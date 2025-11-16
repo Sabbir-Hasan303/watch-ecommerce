@@ -49,7 +49,7 @@ class CustomerController extends Controller
 
         // Calculate totals explicitly
         $totalOrders = $customer->orders->count();
-        $totalSpent = $customer->orders->sum('total');
+        $totalSpent = $customer->orders->where('status', 'delivered')->sum('total');
 
         return Inertia::render('Admin/Customers/CustomerOrders', [
             'customer' => $customer,

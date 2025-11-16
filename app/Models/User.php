@@ -88,6 +88,6 @@ class User extends Authenticatable
      */
     public function getTotalSpentAttribute()
     {
-        return $this->orders()->sum('total') ?? 0;
+        return $this->orders()->where('status', 'delivered')->sum('total') ?? 0;
     }
 }

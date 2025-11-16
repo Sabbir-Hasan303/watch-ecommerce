@@ -10,14 +10,13 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Admin\LogViewerController;
 use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\DashboardController;
 
 
 
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::prefix('admin')->group(function () {
-        Route::get('/dashboard', function () {
-            return Inertia::render('Admin/Dashboard');
-        })->name('admin.dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
         // Log Viewer
         Route::get('/logs', [LogViewerController::class, 'index'])->name('admin.logs');

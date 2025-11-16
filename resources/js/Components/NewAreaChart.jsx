@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-export function NewAreaChart () {
+export function NewAreaChart ({ data, dataKey = 'revenue' }) {
     const canvasRef = useRef(null)
 
     useEffect(() => {
@@ -20,8 +20,13 @@ export function NewAreaChart () {
         const height = rect.height
         const padding = 40
 
-        const data = [30, 45, 35, 55, 45, 60, 50, 70, 65, 80, 75, 90]
-        const max = Math.max(...data)
+        // Convert data to chart values (supports both revenue and orders)
+        const defaultData = [0, 0, 0, 0, 0, 0]
+        const chartValues = data && data.length > 0
+            ? data.map(item => item[dataKey] || 0)
+            : defaultData
+
+        const max = Math.max(...chartValues) || 1
 
         let progress = 0
         const animate = () => {
@@ -55,10 +60,10 @@ export function NewAreaChart () {
             ctx.beginPath()
             ctx.moveTo(padding, height - padding)
 
-            data.forEach((value, index) => {
+            chartValues.forEach((value, index) => {
                 const x =
                     padding +
-                    (width - padding * 2) * (index / (data.length - 1))
+                    (width - padding * 2) * (index / (chartValues.length - 1))
                 const y =
                     height -
                     padding -
@@ -79,10 +84,10 @@ export function NewAreaChart () {
             ctx.lineWidth = 3
             ctx.beginPath()
 
-            data.forEach((value, index) => {
+            chartValues.forEach((value, index) => {
                 const x =
                     padding +
-                    (width - padding * 2) * (index / (data.length - 1))
+                    (width - padding * 2) * (index / (chartValues.length - 1))
                 const y =
                     height -
                     padding -
@@ -97,10 +102,10 @@ export function NewAreaChart () {
             ctx.stroke()
 
             // Draw points
-            data.forEach((value, index) => {
+            chartValues.forEach((value, index) => {
                 const x =
                     padding +
-                    (width - padding * 2) * (index / (data.length - 1))
+                    (width - padding * 2) * (index / (chartValues.length - 1))
                 const y =
                     height -
                     padding -
