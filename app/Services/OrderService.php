@@ -368,10 +368,10 @@ class OrderService
     public static function sendConfirmationEmailToCustomer(Order $order): void
     {
         try {
-            // Get customer email (from user or shipping address)
-            $customerEmail = $order->user
-                ? $order->user->email
-                : ($order->shipping_address['email'] ?? null);
+            // Get customer email from order address (email used when creating order)
+            $customerEmail = $order->shipping_address['email']
+                ?? $order->billing_address['email']
+                ?? ($order->user ? $order->user->email : null);
 
             // Send confirmation email to customer with invoice PDF
             if ($customerEmail) {
@@ -392,7 +392,10 @@ class OrderService
         try {
             $order->load(['user', 'items.product', 'items.variant']);
 
-            $email = $order->user ? $order->user->email : $order->shipping_address['email'];
+            // Get customer email from order address (email used when creating order)
+            $email = $order->shipping_address['email']
+                ?? $order->billing_address['email']
+                ?? ($order->user ? $order->user->email : null);
 
             if ($email) {
                 Mail::to($email)->send(new \App\Mail\OrderShippedMail($order));
@@ -411,7 +414,10 @@ class OrderService
         try {
             $order->load(['user', 'items.product', 'items.variant']);
 
-            $email = $order->user ? $order->user->email : $order->shipping_address['email'];
+            // Get customer email from order address (email used when creating order)
+            $email = $order->shipping_address['email']
+                ?? $order->billing_address['email']
+                ?? ($order->user ? $order->user->email : null);
 
             if ($email) {
                 Mail::to($email)->send(new \App\Mail\OrderDeliveredMail($order));
