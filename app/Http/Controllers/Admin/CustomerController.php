@@ -54,7 +54,26 @@ class CustomerController extends Controller
         return Inertia::render('Admin/Customers/CustomerOrders', [
             'customer' => $customer,
             'totalOrders' => $totalOrders,
-            'totalSpent' => $totalSpent
+            'totalSpent' => $totalSpent,
+            'admin' => false
+        ]);
+    }
+
+    public function adminOrders($id)
+    {
+        $customer = User::where('role', 'admin')
+            ->with(['orders.items.product', 'orders', 'addresses'])
+            ->findOrFail($id);
+
+        // Calculate totals explicitly
+        $totalOrders = $customer->orders->count();
+        $totalSpent = $customer->orders->where('status', 'delivered')->sum('total');
+
+        return Inertia::render('Admin/Customers/CustomerOrders', [
+            'customer' => $customer,
+            'totalOrders' => $totalOrders,
+            'totalSpent' => $totalSpent,
+            'admin' => true
         ]);
     }
 }

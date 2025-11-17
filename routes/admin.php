@@ -65,6 +65,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
             Route::get('/', [CustomerController::class, 'index'])->name('admin.customers.index');
 
             Route::get('/{id}/orders', [CustomerController::class, 'allOrders'])->name('admin.customers.orders');
+            Route::get('/{id}/admin-orders', [CustomerController::class, 'adminOrders'])->name('admin.customers.admin-orders');
 
             Route::get('/ratings', function () {
                 return Inertia::render('Admin/Customers/Ratings');
