@@ -86,7 +86,8 @@ export default function Sidebar({ collapsed, onToggle, user }) {
             label: 'Order',
             subItems: [
                 { label: 'All Orders', href: route('admin.orders.index') },
-                { label: 'Create Order', href: route('admin.orders.create') }
+                { label: 'Create Order', href: route('admin.orders.create') },
+                { label: 'Admin Orders', href: route('admin.customers.admin-orders', { id: user.id }) }
             ]
         },
         // {
