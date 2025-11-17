@@ -348,8 +348,8 @@ class OrderService
     public static function sendOrderNotifications(Order $order, array $validated): void
     {
         try {
-            // Get admin email from config, default to MAIL_FROM_ADDRESS
-            $adminEmail = config('mail.admin_email', config('mail.from.address'));
+            // Get admin email from env, default to MAIL_FROM_ADDRESS
+            $adminEmail = env('ADMIN_EMAIL', env('MAIL_FROM_ADDRESS'));
 
             // Send notification email to admin
             if ($adminEmail) {
