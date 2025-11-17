@@ -124,11 +124,11 @@ export default function Sidebar({ collapsed, onToggle, user }) {
                 // { label: 'Customer Ratings', href: '/customers/ratings' }
             ]
         },
-        {
-            icon: FileText,
-            label: 'Logs',
-            href: route('admin.logs')
-        },
+        // {
+        //     icon: FileText,
+        //     label: 'Logs',
+        //     href: route('admin.logs')
+        // },
         {
             icon: Settings,
             label: 'Settings',
