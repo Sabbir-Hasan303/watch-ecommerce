@@ -149,7 +149,7 @@ class CheckoutController extends Controller
 
             OrderService::sendOrderNotifications($order, $orderPayload);
 
-            return redirect()->route('order.confirmation', ['order' => $order->id])
+            return redirect()->route('order.confirmation', ['order_number' => $order->order_number])
                 ->with('success', 'Order placed successfully!');
         } catch (\Throwable $throwable) {
             report($throwable);
@@ -160,8 +160,9 @@ class CheckoutController extends Controller
         }
     }
 
-    public function show(Order $order): Response
+    public function show($order_number): Response
     {
+        $order = Order::where('order_number', $order_number)->firstOrFail();
         $order->load(['items.product.images', 'items.variant.images', 'user']);
 
         return Inertia::render('Web/OrderConfirmation', [
@@ -263,5 +264,3 @@ class CheckoutController extends Controller
         };
     }
 }
-
-

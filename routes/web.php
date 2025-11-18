@@ -50,7 +50,7 @@ Route::get('/terms', function () {
 
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-Route::get('/orders/{order}/confirmation', [CheckoutController::class, 'show'])->name('order.confirmation');
+Route::get('/orders/{order_number}/confirmation', [CheckoutController::class, 'show'])->name('order.confirmation');
 
 
 // Customer Routes
