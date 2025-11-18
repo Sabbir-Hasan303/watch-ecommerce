@@ -349,7 +349,7 @@ class OrderService
     {
         try {
             // Get admin email from env, default to MAIL_FROM_ADDRESS
-            $adminEmail = env('ADMIN_EMAIL', env('MAIL_FROM_ADDRESS'));
+            $adminEmail = env('ADMIN_EMAIL');
 
             // Send notification email to admin
             if ($adminEmail) {
