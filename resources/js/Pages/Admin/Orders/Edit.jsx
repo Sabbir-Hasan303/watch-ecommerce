@@ -301,7 +301,7 @@ export default function OrderEdit({ order, products = [], customers = [], shippi
         <AuthenticatedLayout>
             <Head title='Edit Order' />
             <div className="py-4">
-                <div className="space-y-6 custom-container mx-auto md:px-[40px] md:py-[18px]">
+                <div className="space-y-6 md:px-[40px] md:py-[18px]">
                     {/* Header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                         <div>
@@ -402,7 +402,7 @@ export default function OrderEdit({ order, products = [], customers = [], shippi
                                 <div className="space-y-4">
                                     {orderItems.map(item => (
                                         <div key={item.id || item.variant_id} className="bg-muted/30 rounded-lg p-4">
-                                            <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                                            <div className="flex flex-col 2xl:flex-row 2xl:items-center gap-4">
                                                 {/* Product Image and Info */}
                                                 <div className="flex items-center gap-4 flex-1">
                                                     <img
