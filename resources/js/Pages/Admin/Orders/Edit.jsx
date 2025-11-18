@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
-import { Link, router } from '@inertiajs/react'
+import { Head, Link, router } from '@inertiajs/react'
 import { Plus, Minus, Trash2, Save, X, Search, Package, User, MapPin } from 'lucide-react'
 import { Button, TextField, Chip, Box, Typography } from '@mui/material'
 import { Card } from '@/Components/ui/card'
@@ -299,6 +299,7 @@ export default function OrderEdit({ order, products = [], customers = [], shippi
 
     return (
         <AuthenticatedLayout>
+            <Head title='Edit Order' />
             <div className="py-4">
                 <div className="space-y-6 custom-container mx-auto md:px-[40px] md:py-[18px]">
                     {/* Header */}

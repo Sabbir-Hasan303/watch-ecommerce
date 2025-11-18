@@ -1,6 +1,6 @@
 import CustomerLayout from "@/Layouts/CustomerLayout"
 import { Package, MapPin, User, ChevronRight } from "lucide-react"
-import { Link } from "@inertiajs/react"
+import { Head, Link } from "@inertiajs/react"
 import Taka from "@/Components/Taka"
 
 const statusStyles = {
@@ -26,6 +26,7 @@ export default function Dashboard({ auth, stats, account, recentOrders }) {
 
     return (
         <CustomerLayout>
+            <Head title='Dashboard' />
             <div>
                 <h1 className="text-2xl font-bold mb-1">Dashboard</h1>
                 <p className="text-gray-600 mb-8">Overview of your account and recent activity</p>

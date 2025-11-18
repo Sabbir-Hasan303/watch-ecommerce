@@ -1,7 +1,7 @@
 import { React, useState } from 'react'
 import { ArrowLeft, Package, MapPin, CreditCard, Truck, CheckCircle, XCircle, Clock, Download, Printer, User, XCircleIcon, Edit } from 'lucide-react'
 import { Button, FormControl } from '@mui/material'
-import { router, Link } from '@inertiajs/react'
+import { Head, router, Link } from '@inertiajs/react'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import CustomSelectField from '@/Components/CustomSelectField'
 import Taka from '@/Components/Taka'
@@ -358,6 +358,7 @@ function OrderContent({ order }) {
 export default function ViewOrder({ order }) {
     return (
         <AuthenticatedLayout>
+            <Head title='View Order' />
             <OrderContent order={order} />
         </AuthenticatedLayout>
     )

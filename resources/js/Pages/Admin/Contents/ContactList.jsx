@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from 'react'
-import { router } from '@inertiajs/react'
+import { Head, router } from '@inertiajs/react'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import {
     Button,
@@ -73,6 +73,7 @@ export default function ContactList({ contacts }) {
 
     return (
         <AuthenticatedLayout>
+            <Head title='Contact List' />
             <div className='py-4 custom-container mx-auto md:px-[40px] md:py-[18px]'>
                 <div className='flex flex-col md:flex-row justify-between items-center mb-6'>
                     <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Contact List</h2>

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link, router } from "@inertiajs/react"
+import { Head, Link, router } from "@inertiajs/react"
 import { ArrowRight, ArrowLeft, X } from "lucide-react"
 import { Button } from "@mui/material"
 import toast from "react-hot-toast"
@@ -354,6 +354,7 @@ export default function CreateOrder({ products = [], customers = [], shippingCos
 
     return (
         <AuthenticatedLayout>
+            <Head title='Create Order' />
             <div className="py-4">
                 <div className="space-y-6">
                     {/* Header */}
