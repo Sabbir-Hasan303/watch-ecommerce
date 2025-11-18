@@ -141,9 +141,9 @@ export default function Categories({ categories = [] }) {
         const file = event.target.files[0]
         if (file) {
             // Validate file type
-            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/ico']
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/ico']
             if (!allowedTypes.includes(file.type)) {
-                alert('Please select a valid image file (JPG, PNG, or ICO)')
+                alert('Please select a valid image file (JPG, PNG, WEBP, or ICO)')
                 return
             }
 
@@ -239,29 +239,29 @@ export default function Categories({ categories = [] }) {
                                         ) : (
                                             paginatedCategories.map(category => (
                                                 <TableRow key={category.id} hover>
-                          <TableCell className='table-body-cell dark:table-body-cell'>
-                            <div className='flex items-center gap-3'>
-                              {category.image_url ? (
-                                <img
-                                  src={category.image_url}
-                                  alt={category.name}
-                                  className='w-10 h-10 rounded-lg object-cover flex-shrink-0'
-                                />
-                              ) : (
-                                <div className='w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg flex items-center justify-center flex-shrink-0'>
-                                  <FolderOpen className='w-5 h-5 text-white' />
-                                </div>
-                              )}
-                              <div className='min-w-0'>
-                                <Typography variant='body2' className='font-medium text-foreground'>
-                                  {category.name}
-                                </Typography>
-                                <Typography variant='caption' className='text-muted-foreground'>
-                                  ID: {category.id}
-                                </Typography>
-                              </div>
-                            </div>
-                          </TableCell>
+                                                    <TableCell className='table-body-cell dark:table-body-cell'>
+                                                        <div className='flex items-center gap-3'>
+                                                            {category.image_url ? (
+                                                                <img
+                                                                    src={category.image_url}
+                                                                    alt={category.name}
+                                                                    className='w-10 h-10 rounded-lg object-cover flex-shrink-0'
+                                                                />
+                                                            ) : (
+                                                                <div className='w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg flex items-center justify-center flex-shrink-0'>
+                                                                    <FolderOpen className='w-5 h-5 text-white' />
+                                                                </div>
+                                                            )}
+                                                            <div className='min-w-0'>
+                                                                <Typography variant='body2' className='font-medium text-foreground'>
+                                                                    {category.name}
+                                                                </Typography>
+                                                                <Typography variant='caption' className='text-muted-foreground'>
+                                                                    ID: {category.id}
+                                                                </Typography>
+                                                            </div>
+                                                        </div>
+                                                    </TableCell>
                                                     <TableCell className='table-body-cell dark:table-body-cell'>
                                                         <Typography variant='body2' className='text-muted-foreground font-mono'>
                                                             {category.slug}
@@ -366,7 +366,7 @@ export default function Categories({ categories = [] }) {
                                                     </div>
                                                     <div>
                                                         <p className='text-sm font-medium text-foreground'>Upload category image</p>
-                                                        <p className='text-xs text-muted-foreground'>PNG, JPG, ICO up to 5MB</p>
+                                                        <p className='text-xs text-muted-foreground'>PNG, JPG, WEBP, ICO up to 5MB</p>
                                                     </div>
                                                     <Button variant='outline' size='sm' className='gap-2 bg-transparent' onClick={handleFileSelect}>
                                                         <ImageIcon className='w-4 h-4' />
@@ -379,7 +379,7 @@ export default function Categories({ categories = [] }) {
                                         <input
                                             id='category-image-upload'
                                             type='file'
-                                            accept='image/jpeg,image/jpg,image/png,image/ico'
+                                            accept='image/jpeg,image/jpg,image/png,image/webp,image/ico'
                                             className='hidden'
                                             onChange={handleImageUpload}
                                         />
