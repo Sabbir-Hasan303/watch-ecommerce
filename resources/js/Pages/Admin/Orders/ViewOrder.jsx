@@ -8,6 +8,7 @@ import Taka from '@/Components/Taka'
 import CancelOrderDialog from '@/Components/CancelOrderDialog'
 import { toast } from 'react-hot-toast'
 import { useThemeContext } from '@/contexts/ThemeContext'
+import { Note } from '@mui/icons-material'
 
 const statusConfig = {
     pending: {
@@ -328,6 +329,16 @@ function OrderContent({ order }) {
                                     ) : (
                                         <p className='text-sm text-muted-foreground'>{order?.payment_method || 'N/A'}</p>
                                     )}
+                                </div>
+
+                                <div className='bg-card border border-border rounded-xl p-6'>
+                                    <div className='flex items-center gap-3 mb-4'>
+                                        <div className='p-2 bg-blue-500/10 rounded-lg'>
+                                            <Note className='w-5 h-5 text-blue-500' />
+                                        </div>
+                                        <h2 className='text-lg font-semibold text-foreground'>Additional Notes</h2>
+                                    </div>
+                                    <p className='text-sm text-muted-foreground'>{order?.notes || 'N/A'}</p>
                                 </div>
                             </div>
                         </div>
