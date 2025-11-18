@@ -92,9 +92,10 @@ class DashboardController extends Controller
             ->limit(5)
             ->get()
             ->map(function ($order) {
+                $customerName = $order->user->name ?? ($order->shipping_address['full_name'] ?? 'Unknown');
                 return [
                     'id' => $order->order_number,
-                    'customer' => $order->user->name ?? 'Unknown',
+                    'customer' => $customerName,
                     'amount' => (float) $order->total,
                     'status' => $this->mapOrderStatus($order->status),
                     'time' => $order->created_at->diffForHumans(),
