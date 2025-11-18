@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { Link, router, usePage } from '@inertiajs/react'
+import { Head, Link, router, usePage } from '@inertiajs/react'
 import { cn } from '@/lib/utils'
 import { Badge, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
 import { ArrowLeft, Upload, X, Save, ImageIcon, Trash2, Plus, Edit } from 'lucide-react'
@@ -1112,6 +1112,7 @@ function ProductEditFields({ productId, product, categories }) {
 export default function ProductEdit({ productId, product, categories }) {
     return (
         <AuthenticatedLayout>
+            <Head title='Edit Product' />
             <ProductEditFields productId={productId} product={product} categories={categories} />
         </AuthenticatedLayout>
     )

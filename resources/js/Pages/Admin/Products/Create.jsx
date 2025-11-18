@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react'
-import { Link, useForm } from '@inertiajs/react'
+import { Head, Link, useForm } from '@inertiajs/react'
 import { cn } from '@/lib/utils'
 import { Badge, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
 import { ArrowLeft, Upload, X, Save, ImageIcon, Trash2, Plus, Edit } from 'lucide-react'
@@ -1015,6 +1015,7 @@ function ProductCreateFields({ categories }) {
 export default function ProductCreate({ categories }) {
     return (
         <AuthenticatedLayout>
+            <Head title='Create Product' />
             <ProductCreateFields categories={categories} />
         </AuthenticatedLayout>
     )

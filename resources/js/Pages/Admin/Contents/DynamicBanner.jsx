@@ -17,7 +17,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import CustomTextField from '@/Components/CustomTextField'
 import CustomSelectField from '@/Components/CustomSelectField'
 import { useThemeContext } from '@/contexts/ThemeContext'
-import { router } from '@inertiajs/react'
+import { Head, router } from '@inertiajs/react'
 
 export default function BannerList({ banners = [] }) {
 
@@ -156,6 +156,7 @@ export default function BannerList({ banners = [] }) {
 
     return (
         <AuthenticatedLayout>
+            <Head title='Banners' />
             <div className='py-4'>
                 <div className='space-y-6'>
                     <div className='flex flex-col md:flex-row justify-between items-center mb-6'>

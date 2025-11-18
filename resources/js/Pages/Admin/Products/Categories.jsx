@@ -18,7 +18,7 @@ import {
 } from '@mui/material'
 import { Search } from '@mui/icons-material'
 import CustomTextField from '@/Components/CustomTextField'
-import { router } from '@inertiajs/react'
+import { Head, router } from '@inertiajs/react'
 
 export default function Categories({ categories = [] }) {
     const [searchQuery, setSearchQuery] = useState('')
@@ -180,6 +180,7 @@ export default function Categories({ categories = [] }) {
 
     return (
         <AuthenticatedLayout>
+            <Head title='Product Categories' />
             <div className='py-4 custom-container mx-auto md:px-[40px] md:py-[18px]'>
                 <div className='space-y-6'>
                     <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Product Categories</h2>
