@@ -348,17 +348,24 @@ class OrderService
     public static function sendOrderNotifications(Order $order, array $validated): void
     {
         try {
-            // Get admin email from env, default to MAIL_FROM_ADDRESS
-            $adminEmail = env('ADMIN_EMAIL');
+            // Get admin email from config (works with cached config on production)
+            $adminEmail = config('mail.admin_email');
 
             // Send notification email to admin
             if ($adminEmail) {
                 Mail::to($adminEmail)
                     ->send(new \App\Mail\NewOrderNotificationMail($order));
+            } else {
+                // Log warning if admin email is not configured
+                Log::warning('Admin email not configured. Order notification email not sent for order: ' . $order->order_number);
             }
         } catch (\Exception $e) {
             // Log the error but don't fail the order creation
-            Log::error('Failed to send order notification emails: ' . $e->getMessage());
+            Log::error('Failed to send order notification emails: ' . $e->getMessage(), [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'exception' => $e,
+            ]);
         }
     }
 
