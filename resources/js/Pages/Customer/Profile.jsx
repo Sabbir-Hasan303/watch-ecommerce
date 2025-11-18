@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { router, useForm } from "@inertiajs/react"
+import { Head, router, useForm } from "@inertiajs/react"
 import CustomerLayout from "@/Layouts/CustomerLayout"
 import { Plus, MapPin, Trash2, Star } from "lucide-react"
 
@@ -99,6 +99,7 @@ export default function ProfilePage({ user, addresses = [], areaOptions = [] }) 
 
   return (
     <CustomerLayout>
+      <Head title='Profile' />
       <div>
         <h1 className="text-2xl font-bold mb-8">Personal Details</h1>
 
