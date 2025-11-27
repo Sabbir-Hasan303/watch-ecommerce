@@ -21,7 +21,7 @@ export default function ProductCardCompact({ product, showCategory = true, showC
             href={route("single-product", { slug: product.slug })}
             className="group block rounded-2xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-lg"
         >
-            <div className="relative h-[240px] rounded-xl overflow-hidden bg-gray-100">
+            <div className="relative h-[240px] lg:h-[240px] xl:h-[280px] rounded-xl overflow-hidden bg-gray-100">
                 <img
                     src={product.primaryImage || placeholderImage}
                     alt={product.name}
@@ -47,6 +47,20 @@ export default function ProductCardCompact({ product, showCategory = true, showC
             <div className="mt-4 mb-2 min-h-[60px]">
                 <h3 className="text-xl font-bold text-black line-clamp-2">{product.name}</h3>
             </div>
+
+            {/* Specs Badges */}
+            <div className="mb-6 flex items-center justify-between py-4">
+                <div className="flex-1 text-center">
+                    <div className="mb-1 text-lg font-bold">{product.sizes[0] || 'N/A'}</div>
+                    <div className="text-xs text-gray-500">Case Size</div>
+                </div>
+                <div className="h-12 w-px bg-gray-200" />
+                <div className="flex-1 text-center">
+                    <div className="mb-1 text-lg font-bold">{product.materials[0] || 'N/A'}</div>
+                    <div className="text-xs text-gray-500">Material</div>
+                </div>
+            </div>
+
             {showCategory && categoryLabel && (
                 <p className="inline-block text-xs bg-blue-100 px-4 py-1 rounded-full mb-2">{categoryLabel}</p>
             )}
@@ -61,10 +75,10 @@ export default function ProductCardCompact({ product, showCategory = true, showC
                             </div>
                         )}
                         {priceDisplay &&
-                        <div className="text-xl font-bold text-black flex items-center gap-1">
-                            <Taka color='text-black' className='font-bold text-xl' />
-                            <span className="text-xl">{priceDisplay}</span>
-                        </div>}
+                            <div className="text-xl font-bold text-black flex items-center gap-1">
+                                <Taka color='text-black' className='font-bold text-xl' />
+                                <span className="text-xl">{priceDisplay}</span>
+                            </div>}
                     </div>
                 </div>
             </div>

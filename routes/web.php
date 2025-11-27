@@ -44,6 +44,8 @@ Route::prefix('cart')->group(function () {
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
+Route::get('/about', [HomeController::class, 'about'])->name('about');
+
 Route::get('/terms', function () {
     return Inertia::render('Web/Terms');
 })->name('terms');

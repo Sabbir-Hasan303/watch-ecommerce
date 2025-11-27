@@ -56,4 +56,8 @@ class HomeController extends Controller
             'banner' => $banner,
         ]);
     }
+
+    public function about(){
+        return Inertia::render('Web/AboutUs');
+    }
 }

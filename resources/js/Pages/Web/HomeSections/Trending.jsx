@@ -32,11 +32,6 @@ export default function Trending({ trendingProducts = [] }) {
                         href={route('single-product', { slug: watch.slug })}
                         className="group block rounded-2xl border border-gray-200 bg-white p-6 transition-shadow hover:shadow-lg"
                     >
-                        {/* Watch Header */}
-                        <div className="mb-4">
-                            <h3 className="mb-1 text-2xl font-bold">{watch.name}</h3>
-                            <p className="text-sm text-gray-500">{watch.brand}</p>
-                        </div>
 
                         {/* Watch Image with Hover Arrow */}
                         <div className="relative mb-6 h-[288px] rounded-xl overflow-hidden flex items-center justify-center bg-gray-100">
@@ -50,6 +45,12 @@ export default function Trending({ trendingProducts = [] }) {
                             <div className="absolute bottom-4 right-4 flex h-12 w-12 items-center justify-center rounded-full bg-black opacity-0 transition-opacity group-hover:opacity-100">
                                 <ArrowRight className="h-6 w-6 text-white" />
                             </div>
+                        </div>
+
+                        {/* Watch Header */}
+                        <div className="mb-4">
+                            <h3 className="mb-1 text-2xl font-bold">{watch.name}</h3>
+                            <p className="text-sm text-gray-500">{watch.brand}</p>
                         </div>
 
                         {/* Specs Badges */}
@@ -67,10 +68,6 @@ export default function Trending({ trendingProducts = [] }) {
 
                         {/* Detailed Specs */}
                         <div className="mb-6 space-y-3 text-sm">
-                            <div className="flex gap-4">
-                                <span className="text-gray-600">Case material</span>
-                                <span className="font-bold">{watch.caseMaterial || 'N/A'}</span>
-                            </div>
                             {watch.color && (
                                 <div className="flex gap-4 items-center">
                                     <span className="text-gray-600">Color</span>
