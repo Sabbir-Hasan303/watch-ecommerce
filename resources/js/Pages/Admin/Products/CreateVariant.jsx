@@ -80,7 +80,7 @@ export default function CreateVariant({ productId }) {
 
   const handleCreateVariant = () => {
     // In a real app, this would save to a database
-    console.log('Creating variant:', formData)
+    // console.log('Creating variant:', formData)
     alert(`Successfully created variant for product ${productId}`)
     // Navigate back to variants list
     window.location.href = `/products/edit/${productId}/variants`

@@ -11,7 +11,7 @@ import Taka from '@/Components/Taka'
 import { useThemeContext } from '@/contexts/ThemeContext'
 import AsynchronousInput from '@/Components/AsynchronousInput'
 
-export default function OrderEdit({ order, products = [], customers = [], shippingCosts = {} }) {
+function OrderEditContent({ order, products = [], customers = [], shippingCosts = {} }) {
     const { isDarkMode } = useThemeContext()
     const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -284,21 +284,19 @@ export default function OrderEdit({ order, products = [], customers = [], shippi
 
     if (!order) {
         return (
-            <AuthenticatedLayout>
-                <div className="py-4">
-                    <div className="flex items-center justify-center min-h-[400px]">
-                        <div className="text-center">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                            <p className="text-muted-foreground">Loading order details...</p>
-                        </div>
+            <div className="py-4">
+                <div className="flex items-center justify-center min-h-[400px]">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                        <p className="text-muted-foreground">Loading order details...</p>
                     </div>
                 </div>
-            </AuthenticatedLayout>
+            </div>
         )
     }
 
     return (
-        <AuthenticatedLayout>
+        <>
             <Head title='Edit Order' />
             <div className="py-4">
                 <div className="space-y-6 md:px-[40px] md:py-[18px]">
@@ -677,6 +675,14 @@ export default function OrderEdit({ order, products = [], customers = [], shippi
                     </div>
                 </div>
             </div>
+        </>
+    )
+}
+
+export default function OrderEdit(props) {
+    return (
+        <AuthenticatedLayout>
+            <OrderEditContent {...props} />
         </AuthenticatedLayout>
     )
 }

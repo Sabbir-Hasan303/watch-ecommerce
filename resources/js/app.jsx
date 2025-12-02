@@ -1,7 +1,7 @@
 import '../css/app.css';
 import './bootstrap';
 
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { CssBaseline } from '@mui/material';
@@ -33,4 +33,9 @@ createInertiaApp({
     progress: {
         color: '#4B5563',
     },
+});
+
+// * Automatically scroll to top when navigating to a new page
+router.on('navigate', () => {
+    window.scrollTo(0, 0);
 });
