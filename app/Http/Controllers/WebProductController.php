@@ -6,6 +6,8 @@ use App\Models\Category;
 use Inertia\Inertia;
 use App\Models\Product;
 use App\Models\Banner;
+use App\Services\MetaConversionApiService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -13,53 +15,93 @@ class WebProductController extends Controller
 {
     public function productList()
     {
-        $products = Product::with([
-            'categories:id,name',
+        // * Get page and category from request
+        $categorySlug = request()->input('category', null);
+        $page = request()->input('page', 1);
+        $perPage = 9;
+
+        // * Reset page to 1 only when explicitly selecting "All" (when category param is removed)
+        // Don't reset page if user is just navigating pages without category filter
+        if ($categorySlug === 'All') {
+            $page = 1;
+        }
+
+        // * Query products with pagination
+        $productsQuery = Product::with([
+            'categories:id,name,slug',
             'variants:id,product_id,price,compare_at_price,color,material,size,status',
-            'images:id,product_id,image_path,is_primary',
+            'images:id,product_id,product_variant_id,image_path,is_primary',
         ])
+            ->orderBy('created_at', 'desc');
+
+        // * Apply category filter by slug if provided
+        if ($categorySlug && $categorySlug !== 'All') {
+            $productsQuery->whereHas('categories', function ($query) use ($categorySlug) {
+                $query->where('slug', $categorySlug);
+            });
+        }
+
+        // * Paginate the results
+        $paginatedProducts = $productsQuery->paginate($perPage, ['*'], 'page', $page);
+
+        // * Map products data
+        $products = $paginatedProducts->items();
+        $mappedProducts = array_map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'category' => $product->primary_category,
+                'primaryImage' => $product->primary_image_url,
+                'priceRange' => [
+                    'min' => $product->min_price,
+                    'max' => $product->max_price,
+                ],
+                'compareAtRange' => [
+                    'min' => $product->min_compare_at_price,
+                    'max' => $product->max_compare_at_price,
+                ],
+                'discount' => [
+                    'amount' => $product->discount_amount,
+                    'percentage' => $product->discount_percentage,
+                ],
+                'colors' => $product->color_options,
+                'materials' => $product->material_options,
+                'sizes' => $product->size_options,
+                'status' => $product->status,
+                'variants' => $product->variants_with_color_image_mapping,
+            ];
+        }, $products);
+
+        // * Fetch categories with slug that have products
+        $availableCategories = Category::withCount('products')
+            ->having('products_count', '>', 0)
+            ->limit(14)
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(function ($product) {
+            ->map(function ($category) {
                 return [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'slug' => $product->slug,
-                    'category' => $product->primary_category,
-                    'primaryImage' => $product->primary_image_url,
-                    'priceRange' => [
-                        'min' => $product->min_price,
-                        'max' => $product->max_price,
-                    ],
-                    'compareAtRange' => [
-                        'min' => $product->min_compare_at_price,
-                        'max' => $product->max_compare_at_price,
-                    ],
-                    'discount' => [
-                        'amount' => $product->discount_amount,
-                        'percentage' => $product->discount_percentage,
-                    ],
-                    'colors' => $product->color_options,
-                    'materials' => $product->material_options,
-                    'sizes' => $product->size_options,
-                    'status' => $product->status,
+                    'name' => $category->name,
+                    'slug' => $category->slug,
                 ];
             })
-            ->values();
-
-        // Fetch first 14 categories (including those without products)
-        $availableCategories = Category::limit(14)
-            ->orderBy('created_at', 'desc')
-            ->pluck('name')
             ->all();
 
         return Inertia::render('Web/ProductList', [
-            'products' => $products,
+            'products' => $mappedProducts,
             'availableCategories' => $availableCategories,
+            'pagination' => [
+                'current_page' => $paginatedProducts->currentPage(),
+                'per_page' => $paginatedProducts->perPage(),
+                'total' => $paginatedProducts->total(),
+                'last_page' => $paginatedProducts->lastPage(),
+                'from' => $paginatedProducts->firstItem(),
+                'to' => $paginatedProducts->lastItem(),
+            ],
         ]);
     }
 
-    public function singleProduct(string $slug)
+    public function singleProduct(Request $request, string $slug)
     {
         $product = Product::with([
             'categories:id,name',
@@ -223,6 +265,8 @@ class WebProductController extends Controller
         $banner = Banner::where('position', 'Homepage Hero')
             ->where('status', true)
             ->first();
+
+        MetaConversionApiService::trackViewContent($product, $request);
 
         return Inertia::render('Web/SingleProduct', [
             'product' => $payload,

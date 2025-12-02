@@ -15,7 +15,8 @@ import {
     Paper,
     Typography,
     Chip,
-    TablePagination
+    TablePagination,
+    Tooltip
 } from '@mui/material'
 import { Link } from '@inertiajs/react'
 import { router } from '@inertiajs/react'
@@ -180,18 +181,20 @@ export default function ProductList({ products = [], categories = [], statuses =
                                         ) : (
                                             paginatedProducts.map(product => (
                                             <TableRow key={product.id} hover>
-                                                <TableCell className='table-body-cell dark:table-body-cell'>
+                                                <TableCell className='table-body-cell dark:table-body-cell' sx={{ maxWidth: '280px', width: '280px' }}>
                                                     <div className='flex items-center gap-3'>
                                                         <img
                                                             src={product.primary_image ? `/storage/${product.primary_image}` : '/placeholder.svg'}
                                                             alt={product.name}
                                                             className='w-12 h-12 rounded-lg object-cover bg-muted flex-shrink-0'
                                                         />
-                                                        <div className='min-w-0'>
-                                                            <Typography variant='body2' className='font-medium text-foreground truncate'>
-                                                                {product.name}
-                                                            </Typography>
-                                                            <Typography variant='caption' className='text-muted-foreground'>
+                                                        <div className='min-w-0 flex-1'>
+                                                            <Tooltip title={product.name} placement='top' arrow>
+                                                                <Typography variant='body2' className='font-medium text-foreground truncate cursor-help'>
+                                                                    {product.name}
+                                                                </Typography>
+                                                            </Tooltip>
+                                                            <Typography variant='caption' className='text-muted-foreground truncate block'>
                                                                 SKU: {product.sku}
                                                             </Typography>
                                                         </div>

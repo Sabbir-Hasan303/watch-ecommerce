@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Admin\LogViewerController;
 use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\MarketingController;
 use App\Http\Controllers\Admin\DashboardController;
 
 
@@ -101,6 +102,15 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
             Route::get('/profile', [AdminProfileController::class, 'index'])->name('admin.settings.profile');
             Route::put('/profile', [AdminProfileController::class, 'update'])->name('admin.settings.profile.update');
             Route::post('/profile/image', [AdminProfileController::class, 'updateProfileImage'])->name('admin.settings.profile.image');
+        });
+
+        Route::prefix('marketing')->group(function () {
+            Route::get('/meta', [MarketingController::class, 'indexMeta'])->name('admin.marketing.meta');
+            Route::get('/google', [MarketingController::class, 'indexGoogle'])->name('admin.marketing.google');
+            Route::get('/tiktok', [MarketingController::class, 'indexTiktok'])->name('admin.marketing.tiktok');
+            Route::put('/meta', [MarketingController::class, 'updateMeta'])->name('admin.marketing.meta.update');
+            Route::put('/google', [MarketingController::class, 'updateGoogle'])->name('admin.marketing.google.update');
+            Route::put('/tiktok', [MarketingController::class, 'updateTiktok'])->name('admin.marketing.tiktok.update');
         });
     });
 });

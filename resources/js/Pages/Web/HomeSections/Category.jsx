@@ -38,14 +38,16 @@ export default function Category({ categories = [] }) {
 
                     {/* Explore All Card */}
                     <Link
-                        href="/product"
+                        href={route('watches-list')}
                         className="group relative bg-white border border-gray-200 rounded-2xl p-8 overflow-hidden hover:shadow-lg transition-shadow"
                     >
                         <div className="h-[240px] overflow-hidden absolute right-0 top-0 w-[299px]">
                             <div className="absolute inset-0">
                                 <img
-                                    src="https://framerusercontent.com/images/8dOekjy88hL0ciTUGlREadNfI.jpeg?scale-down-to=512&width=598&height=480"
+                                    src="/assets/category_bg.png"
                                     alt="design"
+                                    width={512}
+                                    height={480}
                                     className="w-full h-full object-contain"
                                 />
                             </div>

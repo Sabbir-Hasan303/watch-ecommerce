@@ -243,14 +243,15 @@ const SpecItem = ({ spec, onRemove }) => (
     </div>
 )
 
-const ModelFeatureItem = ({ feature, onRemove }) => (
-    <div className='flex items-center justify-between p-3 bg-muted/20 rounded-lg border border-border'>
-        <span className='text-foreground'>{feature.name}</span>
-        <Button size='small' variant='destructive' onClick={() => onRemove(feature.id)} className='h-8 w-8 p-0'>
-            <X className='w-3 h-3' />
-        </Button>
-    </div>
-)
+// * Model Feature Component (currently disabled)
+// const ModelFeatureItem = ({ feature, onRemove }) => (
+//     <div className='flex items-center justify-between p-3 bg-muted/20 rounded-lg border border-border'>
+//         <span className='text-foreground'>{feature.name}</span>
+//         <Button size='small' variant='destructive' onClick={() => onRemove(feature.id)} className='h-8 w-8 p-0'>
+//             <X className='w-3 h-3' />
+//         </Button>
+//     </div>
+// )
 
 const VariantImagePreview = ({ image, onRemove }) => (
     <div className='relative w-20 h-20'>
@@ -462,29 +463,29 @@ function ProductEditFields({ productId, product, categories }) {
         [setFormData]
     )
 
-    // Model features handlers
-    const addModelFeature = useCallback(() => {
-        if (!modelFeatureForm.name) {
-            alert('Please fill in feature name')
-            return
-        }
+    // * Model features handlers (currently disabled)
+    // const addModelFeature = useCallback(() => {
+    //     if (!modelFeatureForm.name) {
+    //         alert('Please fill in feature name')
+    //         return
+    //     }
+    //
+    //     const newModelFeature = {
+    //         id: generateId(),
+    //         name: modelFeatureForm.name,
+    //         category: modelFeatureForm.category
+    //     }
+    //
+    //     setFormData(prev => ({ ...prev, model_features: [...prev.model_features, newModelFeature] }))
+    //     setModelFeatureForm(prev => ({ ...prev, name: '' }))
+    // }, [modelFeatureForm, setFormData, setModelFeatureForm])
 
-        const newModelFeature = {
-            id: generateId(),
-            name: modelFeatureForm.name,
-            category: modelFeatureForm.category
-        }
-
-        setFormData(prev => ({ ...prev, model_features: [...prev.model_features, newModelFeature] }))
-        setModelFeatureForm(prev => ({ ...prev, name: '' }))
-    }, [modelFeatureForm, setFormData, setModelFeatureForm])
-
-    const removeModelFeature = useCallback(
-        id => {
-            setFormData(prev => ({ ...prev, model_features: prev.model_features.filter(feature => feature.id !== id) }))
-        },
-        [setFormData]
-    )
+    // const removeModelFeature = useCallback(
+    //     id => {
+    //         setFormData(prev => ({ ...prev, model_features: prev.model_features.filter(feature => feature.id !== id) }))
+    //     },
+    //     [setFormData]
+    // )
 
     // Variant handlers
     const handleVariantImageUpload = useCallback(
@@ -580,7 +581,7 @@ function ProductEditFields({ productId, product, categories }) {
             </div>
 
             <div className='flex-1 overflow-auto'>
-                <div className='max-w-6xl mx-auto space-y-6'>
+                <div className='space-y-6'>
                     <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
                         {/* Main Form - Left Column */}
                         <div className='lg:col-span-2 space-y-6'>
@@ -752,8 +753,8 @@ function ProductEditFields({ productId, product, categories }) {
                                 </div>
                             </div>
 
-                            {/* Model Features */}
-                            <div className='bg-card border border-border rounded-xl p-6 space-y-4'>
+                            {/* Model Features - Currently Disabled */}
+                            {/* <div className='bg-card border border-border rounded-xl p-6 space-y-4'>
                                 <h2 className='text-lg font-semibold text-foreground'>Model Features</h2>
 
                                 <div className='space-y-4'>
@@ -817,7 +818,7 @@ function ProductEditFields({ productId, product, categories }) {
                                         </div>
                                     )}
                                 </div>
-                            </div>
+                            </div> */}
 
                             {/* Product Images */}
                             <div className='bg-card border border-border rounded-xl p-6 space-y-4'>
@@ -1088,7 +1089,7 @@ function ProductEditFields({ productId, product, categories }) {
                                             preserveScroll: true,
                                             onSuccess: () => {
                                                 setSaving(false)
-                                                console.log('Product updated successfully')
+                                                // console.log('Product updated successfully')
                                             },
                                             onError: (errors) => {
                                                 setSaving(false)

@@ -147,6 +147,27 @@ class Product extends Model
             ->all();
     }
 
+    /**
+     * Each variant includes id, color, and image path for color preview on hover
+     */
+    public function getVariantsWithColorImageMappingAttribute(): array
+    {
+        $variants = $this->relationLoaded('variants') ? $this->variants : $this->variants()->get();
+        $images = $this->relationLoaded('images') ? $this->images : $this->images()->get();
+
+        return $variants->map(function ($variant) use ($images) {
+            $variantImage = $images->where('product_variant_id', $variant->id)->first()?->image_path
+                         ?? $images->where('is_primary', true)->first()?->image_path
+                         ?? $images->first()?->image_path;
+
+            return [
+                'id' => $variant->id,
+                'color' => $variant->color,
+                'image' => $variantImage,
+            ];
+        })->values()->all();
+    }
+
     protected function variantPricingSummary(): array
     {
         if (isset($this->computedAttributesCache['variant_pricing_summary'])) {

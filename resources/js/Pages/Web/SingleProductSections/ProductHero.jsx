@@ -1,27 +1,17 @@
 import Taka from '@/Components/Taka';
 import { Link } from '@inertiajs/react';
 
-export default function HeroSection({ banner }) {
+export default function ProductHero({ banner, product }) {
     return (
         <section className="relative w-full overflow-hidden">
             <div className="absolute inset-0 bg-[#f0f1f3] h-1/2" />
             <div className="absolute inset-0 top-1/2 " />
 
             <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8 lg:pt-20 lg:pb-16">
-                {/* Label */}
-                {/* <p className="text-center text-gray-500 text-sm mb-4 lg:mb-6">Best Selling Watches</p> */}
-
                 {/* Heading */}
-                <h1 className="text-3xl sm:text-4xl lg:text-6xl font-extrabold text-center mb-6 lg:mb-8 text-balance">
-                    Experience Time in Its Finest Form
+                <h1 className="text-3xl sm:text-4xl lg:text-6xl max-w-[1000px] mx-auto font-extrabold text-center mb-6 lg:mb-8 text-balance">
+                    {product.name}
                 </h1>
-
-                {/* CTA Button */}
-                <div className="flex justify-center mb-8 lg:mb-12">
-                    <Link href="/watches" className="bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors text-sm lg:text-base">
-                        Explore Watches
-                    </Link>
-                </div>
 
                 <div className="relative w-full h-[300px] sm:h-[400px] lg:h-[550px] mb-8 lg:mb-6">
                     {banner && banner.image_url ? (

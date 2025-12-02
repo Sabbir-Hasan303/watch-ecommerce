@@ -3,7 +3,7 @@ export default function TechnicalSpecs({ specs = [], modelFeatures = [] }) {
     const hasModelFeatures = modelFeatures.length > 0
 
     return (
-        <section className="max-w-[1440px] mx-auto px-4 py-12">
+        <section className="max-w-[1440px] mx-auto">
             {/* Technical Specs */}
             <div className="mb-12">
                 <h2 className="text-2xl font-bold mb-6">Technical Specs</h2>
@@ -25,14 +25,12 @@ export default function TechnicalSpecs({ specs = [], modelFeatures = [] }) {
             </div>
 
             {/* Model Features */}
-            <div>
+            {/* <div>
                 <h2 className="text-2xl font-bold mb-6">Model Features</h2>
                 {hasModelFeatures ? (
                     <div className="grid md:grid-cols-2 gap-6">
                         {modelFeatures.map((featureGroup, index) => (
                             <div key={`${featureGroup.category ?? "features"}-${index}`} className="border border-gray-200 rounded-lg p-6">
-                                {/* <h3 className="text-lg font-bold mb-4">{featureGroup.category ?? "Features"}</h3> */}
-                                {/* if featuredgroup category is primary then show Primary and if additional then show Additional */}
                                 {featureGroup.category === "primary" ? (
                                     <h3 className="text-lg font-bold mb-4">Primary</h3>
                                 ) : (
@@ -55,7 +53,7 @@ export default function TechnicalSpecs({ specs = [], modelFeatures = [] }) {
                 ) : (
                     <p className="text-gray-500">Model feature details will be shared soon.</p>
                 )}
-            </div>
+            </div> */}
         </section>
     )
 }
