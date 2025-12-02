@@ -10,7 +10,7 @@ export default function SingleProduct({ product, similarProducts = [], banner })
         <GuestLayout>
             <Head title="Single Product" />
             <div>
-                <ProductHero product={product} banner={banner} />
+                {/* <ProductHero product={product} banner={banner} /> */}
                 <Overview product={product} />
                 <SimilarProduct products={similarProducts} />
                 <CTA />

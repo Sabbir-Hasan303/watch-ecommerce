@@ -9,7 +9,7 @@ export default function HeroSection({ banner }) {
 
             <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8 lg:pt-20 lg:pb-16">
                 {/* Label */}
-                <p className="text-center text-gray-500 text-sm mb-4 lg:mb-6">Best Selling Watches</p>
+                {/* <p className="text-center text-gray-500 text-sm mb-4 lg:mb-6">Best Selling Watches</p> */}
 
                 {/* Heading */}
                 <h1 className="text-3xl sm:text-4xl lg:text-6xl font-extrabold text-center mb-6 lg:mb-8 text-balance">
@@ -19,7 +19,7 @@ export default function HeroSection({ banner }) {
                 {/* CTA Button */}
                 <div className="flex justify-center mb-8 lg:mb-12">
                     <Link href="/watches" className="bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors text-sm lg:text-base">
-                        See All Specifications
+                        Explore Watches
                     </Link>
                 </div>
 

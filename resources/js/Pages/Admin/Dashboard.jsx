@@ -100,109 +100,112 @@ export default function Dashboard({ stats, recentOrders, productSales, salesDist
 
                         {/* <FeaturedProducts /> */}
 
-                        <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6'>
-                            {/* Recent Orders */}
-                            <Card
-                                className='!bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-left-4 hover:border-emerald-500/20 transition-all duration-500'
-                                style={{ animationDelay: '400ms' }}>
-                                <div className='flex items-center justify-between mb-6'>
-                                    <div>
-                                        <h3 className='text-lg font-semibold text-text-primary'>Recent Orders</h3>
-                                        <p className='text-sm text-muted-foreground mt-1'>Latest customer transactions</p>
+                        <div className='grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6'>
+                            <div className='col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6'>
+                                {/* Recent Orders */}
+                                <Card
+                                    className='!bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-left-4 hover:border-emerald-500/20 transition-all duration-500'
+                                    style={{ animationDelay: '400ms' }}>
+                                    <div className='flex items-center justify-between mb-6'>
+                                        <div>
+                                            <h3 className='text-lg font-semibold text-text-primary'>Recent Orders</h3>
+                                            <p className='text-sm text-muted-foreground mt-1'>Latest customer transactions</p>
+                                        </div>
+                                        <Link
+                                            href={route('admin.orders.index')}
+                                            className='px-4 py-2 text-sm text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 rounded-lg transition-all duration-300'>
+                                            View All
+                                        </Link>
                                     </div>
-                                    <Link
-                                        href={route('admin.orders.index')}
-                                        className='px-4 py-2 text-sm text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 rounded-lg transition-all duration-300'>
-                                        View All
-                                    </Link>
-                                </div>
-                                <div className='space-y-3'>
-                                    {recentOrders?.map((order, index) => (
-                                        <div
-                                            key={order.id}
-                                            className='flex items-center justify-between p-4 bg-foreground/5 rounded-xl hover:bg-gradient-to-r hover:from-emerald-500/10 hover:to-teal-500/10 transition-all duration-300 group cursor-pointer border border-transparent hover:border-emerald-500/20'
-                                            style={{
-                                                animationDelay: `${(index + 5) * 100}ms`
-                                            }}>
-                                            <div className='flex items-center gap-4 flex-1'>
-                                                <div className='relative'>
-                                                    <div className='absolute inset-0 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg blur-md opacity-50 group-hover:opacity-75 transition-opacity' />
-                                                    <div className='relative w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg flex items-center justify-center shadow-lg'>
-                                                        <PackageIcon className='w-5 h-5 text-white' />
+                                    <div className='space-y-3'>
+                                        {recentOrders?.map((order, index) => (
+                                            <div
+                                                key={order.id}
+                                                className='flex flex-wrap items-center justify-between p-4 bg-foreground/5 rounded-xl hover:bg-gradient-to-r hover:from-emerald-500/10 hover:to-teal-500/10 transition-all duration-300 group cursor-pointer border border-transparent hover:border-emerald-500/20'
+                                                style={{
+                                                    animationDelay: `${(index + 5) * 100}ms`
+                                                }}>
+                                                <div className='flex items-center gap-4 flex-1'>
+                                                    <div className='relative'>
+                                                        <div className='absolute inset-0 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg blur-md opacity-50 group-hover:opacity-75 transition-opacity' />
+                                                        <div className='relative w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg flex items-center justify-center shadow-lg'>
+                                                            <PackageIcon className='w-5 h-5 text-white' />
+                                                        </div>
+                                                    </div>
+                                                    <div className='flex-1 min-w-0'>
+                                                        <p className='text-sm font-medium text-text-primary group-hover:text-emerald-400 transition-colors truncate'>
+                                                            {order.customer}
+                                                        </p>
+                                                        <p className='text-xs text-muted-foreground'>
+                                                            Order #{order.id} • {order.time}
+                                                        </p>
                                                     </div>
                                                 </div>
-                                                <div className='flex-1 min-w-0'>
-                                                    <p className='text-sm font-medium text-text-primary group-hover:text-emerald-400 transition-colors truncate'>
-                                                        {order.customer}
+                                                <div className='text-right ml-4'>
+                                                    <p className='text-sm font-semibold text-text-primary flex items-center justify-end gap-1'>
+                                                        <Taka color='text-text-primary' size='text-sm' />
+                                                        <span>{(parseFloat(order.amount) || 0).toFixed(2)}</span>
                                                     </p>
-                                                    <p className='text-xs text-muted-foreground'>
-                                                        Order #{order.id} • {order.time}
-                                                    </p>
+                                                    <span
+                                                        className={cn(
+                                                            'inline-block px-2 py-1 text-xs font-medium rounded-full',
+                                                            (order.status === 'Completed' || order.status === 'Delivered') && 'text-emerald-400 bg-emerald-500/10',
+                                                            (order.status === 'Processing' || order.status === 'Confirmed' || order.status === 'Shipped') && 'text-blue-400 bg-blue-500/10',
+                                                            order.status === 'Pending' && 'text-orange-400 bg-orange-500/10',
+                                                            order.status === 'Cancelled' && 'text-red-400 bg-red-500/10'
+                                                        )}>
+                                                        {order.status}
+                                                    </span>
                                                 </div>
                                             </div>
-                                            <div className='text-right ml-4'>
-                                                <p className='text-sm font-semibold text-text-primary flex items-center justify-end gap-1'>
-                                                    <Taka color='text-text-primary' size='text-sm' />
-                                                    <span>{(parseFloat(order.amount) || 0).toFixed(2)}</span>
-                                                </p>
-                                                <span
-                                                    className={cn(
-                                                        'inline-block px-2 py-1 text-xs font-medium rounded-full',
-                                                        (order.status === 'Completed' || order.status === 'Delivered') && 'text-emerald-400 bg-emerald-500/10',
-                                                        (order.status === 'Processing' || order.status === 'Confirmed' || order.status === 'Shipped') && 'text-blue-400 bg-blue-500/10',
-                                                        order.status === 'Pending' && 'text-orange-400 bg-orange-500/10',
-                                                        order.status === 'Cancelled' && 'text-red-400 bg-red-500/10'
-                                                    )}>
-                                                    {order.status}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </Card>
-
-                            <Card className='!bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4' style={{ animationDelay: '500ms' }}>
-                                <div className='flex items-center justify-between mb-6'>
-                                    <div>
-                                        <h3 className='text-lg font-semibold text-text-primary'>Product Sales</h3>
-                                        <p className='text-sm text-muted-foreground mt-1'>Top selling products</p>
+                                        ))}
                                     </div>
-                                </div>
-                                <BarChart data={productSales} />
-                            </Card>
+                                </Card>
 
-                            <Card className='!bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4' style={{ animationDelay: '700ms' }}>
-                                <h3 className='text-lg font-semibold text-text-primary mb-6'>Sales Distribution</h3>
-                                <DonutChart data={salesDistribution} totalRevenue={totalRevenue ? totalRevenue.toFixed(2) : (stats?.[0]?.value?.replace(/[$,]/g, '') || '0')} />
-                                <div className='mt-6 space-y-3'>
-                                    {salesDistribution?.map((item, index) => (
-                                        <div key={index} className='flex items-center justify-between'>
-                                            <div className='flex items-center gap-2'>
-                                                <div className={cn('w-3 h-3 rounded-full', item.color)} />
-                                                <span className='text-sm text-muted-foreground'>{item.label}</span>
-                                            </div>
-                                            <span className='text-sm font-medium text-text-primary'>{item.value}</span>
+                                <Card className='!bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4' style={{ animationDelay: '500ms' }}>
+                                    <div className='flex items-center justify-between mb-6'>
+                                        <div>
+                                            <h3 className='text-lg font-semibold text-text-primary'>Product Sales</h3>
+                                            <p className='text-sm text-muted-foreground mt-1'>Top selling products</p>
                                         </div>
-                                    ))}
-                                </div>
-                            </Card>
-
-                            <Card className='!bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4' style={{ animationDelay: '400ms' }}>
-                                <div className='flex items-center justify-between mb-6'>
-                                    <div>
-                                        <h3 className='text-lg font-semibold text-text-primary'>Revenue Overview</h3>
-                                        <p className='text-sm text-muted-foreground mt-1'>Monthly revenue trends</p>
                                     </div>
-                                    <select
-                                        value={period}
-                                        onChange={handlePeriodChange}
-                                        className='px-3 py-1.5 bg-card border border-border/40 rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-emerald-500/50'>
-                                        <option value='6months'>Last 6 months</option>
-                                        <option value='year'>Last year</option>
-                                    </select>
-                                </div>
-                                <AreaChart data={revenueTrends} />
-                            </Card>
+                                    <BarChart data={productSales} />
+                                </Card>
+                            </div>
+                            <div className='col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6'>
+                                <Card className='!bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4' style={{ animationDelay: '700ms' }}>
+                                    <h3 className='text-lg font-semibold text-text-primary mb-6'>Sales Distribution</h3>
+                                    <DonutChart data={salesDistribution} totalRevenue={totalRevenue ? totalRevenue.toFixed(2) : (stats?.[0]?.value?.replace(/[$,]/g, '') || '0')} />
+                                    <div className='mt-6 space-y-3'>
+                                        {salesDistribution?.map((item, index) => (
+                                            <div key={index} className='flex items-center justify-between'>
+                                                <div className='flex items-center gap-2'>
+                                                    <div className={cn('w-3 h-3 rounded-full', item.color)} />
+                                                    <span className='text-sm text-muted-foreground'>{item.label}</span>
+                                                </div>
+                                                <span className='text-sm font-medium text-text-primary'>{item.value}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </Card>
+
+                                <Card className='!bg-card border border-border/40 p-6 animate-in fade-in slide-in-from-bottom-4' style={{ animationDelay: '400ms' }}>
+                                    <div className='flex items-center justify-between mb-6'>
+                                        <div>
+                                            <h3 className='text-lg font-semibold text-text-primary'>Revenue Overview</h3>
+                                            <p className='text-sm text-muted-foreground mt-1'>Monthly revenue trends</p>
+                                        </div>
+                                        <select
+                                            value={period}
+                                            onChange={handlePeriodChange}
+                                            className='px-3 py-1.5 bg-card border border-border/40 rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-emerald-500/50'>
+                                            <option value='6months'>Last 6 months</option>
+                                            <option value='year'>Last year</option>
+                                        </select>
+                                    </div>
+                                    <AreaChart data={revenueTrends} />
+                                </Card>
+                            </div>
                         </div>
 
                         <div className='space-y-6'>

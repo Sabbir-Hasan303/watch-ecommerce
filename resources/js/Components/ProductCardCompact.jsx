@@ -1,5 +1,6 @@
 import { Link } from "@inertiajs/react"
 import { ArrowRight } from "lucide-react"
+import { useState, useMemo } from "react"
 import { formatMoney, formatRange } from "@/utils/productFormatters"
 import PriceDisplay from "./PriceDisplay"
 import Taka from "./Taka"
@@ -7,6 +8,9 @@ import Taka from "./Taka"
 const placeholderImage = "/placeholder.svg?height=400&width=600"
 
 export default function ProductCardCompact({ product, showCategory = true, showColors = true }) {
+    const [hoveredColor, setHoveredColor] = useState(null)
+    const [isTransitioning, setIsTransitioning] = useState(false)
+
     const priceDisplay = formatRange(product.priceRange)
     const compareDisplay = formatRange(product.compareAtRange)
     const discountPercentage = typeof product.discount?.percentage === "number" ? product.discount.percentage : null
@@ -16,6 +20,45 @@ export default function ProductCardCompact({ product, showCategory = true, showC
     const colors = product.colors ?? []
     const categoryLabel = product.category ?? "Uncategorized"
 
+    // * Map variants by color for quick lookup with image
+    const variantsByColor = useMemo(() => {
+        const map = {}
+        if (Array.isArray(product.variants)) {
+            product.variants.forEach(variant => {
+                if (variant.color) {
+                    map[variant.color] = variant
+                }
+            })
+        }
+        return map
+    }, [product.variants])
+
+    // * Get display image - use hovered variant image if available, otherwise primary image
+    const displayImage = useMemo(() => {
+        if (hoveredColor && variantsByColor[hoveredColor]?.image) {
+            const imagePath = variantsByColor[hoveredColor].image
+            // * Format storage paths
+            if (imagePath && !imagePath.startsWith('/') && !imagePath.startsWith('http://') && !imagePath.startsWith('https://')) {
+                return `/storage/${imagePath}`
+            }
+            return imagePath
+        }
+        return product.primaryImage || placeholderImage
+    }, [hoveredColor, variantsByColor, product.primaryImage])
+
+    // * Handle smooth transition when color changes
+    const handleColorHover = (color) => {
+        setIsTransitioning(true)
+        setHoveredColor(color)
+        setTimeout(() => setIsTransitioning(false), 150)
+    }
+
+    const handleColorLeave = () => {
+        setIsTransitioning(true)
+        setHoveredColor(null)
+        setTimeout(() => setIsTransitioning(false), 150)
+    }
+
     return (
         <Link
             href={route("single-product", { slug: product.slug })}
@@ -23,9 +66,11 @@ export default function ProductCardCompact({ product, showCategory = true, showC
         >
             <div className="relative h-[240px] lg:h-[240px] xl:h-[280px] rounded-xl overflow-hidden bg-gray-100">
                 <img
-                    src={product.primaryImage || placeholderImage}
+                    src={displayImage}
                     alt={product.name}
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                    className={`absolute inset-0 h-full w-full object-cover transition-all duration-300 ease-out group-hover:scale-105 ${
+                        isTransitioning ? 'opacity-0' : 'opacity-100'
+                    } transition-opacity duration-150`}
                 />
 
                 {discountPercentLabel && (
@@ -51,12 +96,12 @@ export default function ProductCardCompact({ product, showCategory = true, showC
             {/* Specs Badges */}
             <div className="mb-6 flex items-center justify-between py-4">
                 <div className="flex-1 text-center">
-                    <div className="mb-1 text-lg font-bold">{product.sizes[0] || 'N/A'}</div>
+                    <div className="mb-1 text-lg font-bold">{product.sizes?.[0] || 'N/A'}</div>
                     <div className="text-xs text-gray-500">Case Size</div>
                 </div>
                 <div className="h-12 w-px bg-gray-200" />
                 <div className="flex-1 text-center">
-                    <div className="mb-1 text-lg font-bold">{product.materials[0] || 'N/A'}</div>
+                    <div className="mb-1 text-lg font-bold">{product.materials?.[0] || 'N/A'}</div>
                     <div className="text-xs text-gray-500">Material</div>
                 </div>
             </div>
@@ -86,17 +131,34 @@ export default function ProductCardCompact({ product, showCategory = true, showC
             {showColors && (
                 <div className="mb-6 space-y-3 text-sm">
                     <div className="flex gap-4">
-                        <span className="min-w-[120px] text-gray-600">Available colors</span>
+                        <span className="min-w-[120px] text-gray-600">Colors</span>
                         {colors.length ? (
-                            <div className="flex flex-wrap items-center gap-3">
-                                {colors.map((color, index) => (
-                                    <div key={`${product.id}-color-${index}`} className="flex items-center gap-2">
-                                        <span
-                                            className="h-5 w-5 rounded-full border border-gray-200"
+                            <div className="flex flex-wrap items-center gap-2.5">
+                                {colors.map((color, index) => {
+                                    const hasVariantImage = variantsByColor[color]?.image
+                                    const isHovered = hoveredColor === color
+
+                                    return (
+                                        <button
+                                            key={`${product.id}-color-${index}`}
+                                            onMouseEnter={() => handleColorHover(color)}
+                                            onMouseLeave={() => handleColorLeave()}
+                                            onClick={(e) => e.preventDefault()}
+                                            className={`relative h-6 w-6 rounded-full transition-all duration-200 ${
+                                                isHovered
+                                                    ? 'ring-2 ring-offset-2 ring-black scale-110 shadow-lg'
+                                                    : 'ring-1 ring-gray-300 hover:ring-gray-500 hover:scale-105'
+                                            } ${hasVariantImage ? 'cursor-pointer' : 'cursor-default'}`}
                                             style={{ backgroundColor: color }}
-                                        />
-                                    </div>
-                                ))}
+                                            title={hasVariantImage ? `View ${color} variant` : color}
+                                        >
+                                            {/* * Indicator dot for variants with images */}
+                                            {hasVariantImage && (
+                                                <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-blue-500 border-2 border-white shadow-md" />
+                                            )}
+                                        </button>
+                                    )
+                                })}
                             </div>
                         ) : (
                             <span className="font-bold">—</span>

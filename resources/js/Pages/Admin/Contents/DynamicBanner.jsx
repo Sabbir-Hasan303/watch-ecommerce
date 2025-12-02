@@ -19,7 +19,7 @@ import CustomSelectField from '@/Components/CustomSelectField'
 import { useThemeContext } from '@/contexts/ThemeContext'
 import { Head, router } from '@inertiajs/react'
 
-export default function BannerList({ banners = [] }) {
+function BannerListContent({ banners = [] }) {
 
     const [searchQuery, setSearchQuery] = useState('')
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -155,112 +155,109 @@ export default function BannerList({ banners = [] }) {
     }
 
     return (
-        <AuthenticatedLayout>
-            <Head title='Banners' />
-            <div className='py-4'>
-                <div className='space-y-6'>
-                    <div className='flex flex-col md:flex-row justify-between items-center mb-6'>
-                        <div>
-                            <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Banners</h2>
-                            <p className='text-sm text-text-secondary mt-1'>Upload and manage simple banner placements</p>
-                        </div>
-                        <div>
-                            <Button variant='outlined' onClick={() => setIsAddDialogOpen(true)}>
-                                <Plus className='w-4 h-4 mr-2' />
-                                Add Banner
-                            </Button>
-                        </div>
-                    </div>
-
-                    <FormControl size='small' sx={{ minWidth: 200 }}>
-                        <CustomTextField
-                            placeholder='Search banners...'
-                            value={searchQuery}
-                            onChange={e => setSearchQuery(e.target.value)}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position='start'>
-                                        <Search className='w-4 h-4 mr-2' />
-                                    </InputAdornment>
-                                )
-                            }}
-                        />
-                    </FormControl>
-
+        <div className='py-4'>
+            <div className='space-y-6'>
+                <div className='flex flex-col md:flex-row justify-between items-center mb-6'>
                     <div>
-                        <div className='grid grid-cols-1 lg:grid-cols-4 gap-6'>
-                            {filteredBanners.map(banner => (
-                                <Card key={banner.id} className='bg-[#1C252E] border-white/10 overflow-hidden'>
-                                    <div className='relative h-32 bg-gradient-to-r from-gray-800 to-gray-700'>
-                                        {banner.image_url ? (
-                                            <img src={banner.image_url} alt={banner.title} className='w-full h-full object-cover opacity-90' />
-                                        ) : null}
-                                        <div className='absolute top-3 right-3 flex gap-2'>
-                                            <Button size='small' variant='contained' className='!bg-white !text-black' onClick={() => toggleStatus(banner.id)}>
-                                                {banner.status ? <Eye className='w-4 h-4' /> : <EyeOff className='w-4 h-4' />}
-                                            </Button>
-                                        </div>
-                                    </div>
-                                    <div className='p-4'>
-                                        <div className='flex items-start justify-between mb-3'>
-                                            <div className='flex-1'>
-                                                <h3 className='text-lg font-semibold text-text-primary mb-1'>{banner.title}</h3>
-                                                <p className='text-sm text-text-secondary'>{banner.position}</p>
-                                            </div>
-                                            <span
-                                                className={`px-2 py-1 text-xs font-medium rounded-full ${banner.status ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gray-500/20 text-gray-400'
-                                                    }`}>
-                                                {banner.status ? 'active' : 'inactive'}
-                                            </span>
-                                        </div>
-                                        <div className='space-y-2 mb-4' />
-                                        <div className='flex gap-2'>
-                                            <Button
-                                                variant='outlined'
-                                                size='small'
-                                                startIcon={<Edit className='w-4 h-4' />}
-                                                onClick={() => handleEditOpen(banner)}
-                                                sx={{
-                                                    flex: 1,
-                                                    borderColor: '#374151',
-                                                    color: isDark ? '#9CA3AF' : '#1c252e',
-                                                    '&:hover': {
-                                                        bgcolor: 'rgba(55, 65, 81, 0.3)',
-                                                        borderColor: '#6B7280'
-                                                    }
-                                                }}>
-                                                Edit
-                                            </Button>
-                                            <Button
-                                                variant='outlined'
-                                                size='small'
-                                                onClick={() => setConfirmDeleteId(banner.id)}
-                                                sx={{
-                                                    borderColor: 'rgba(239, 68, 68, 0.2)',
-                                                    color: '#EF4444',
-                                                    '&:hover': {
-                                                        bgcolor: 'rgba(239, 68, 68, 0.1)',
-                                                        borderColor: '#EF4444'
-                                                    }
-                                                }}>
-                                                <Trash2 className='w-4 h-4' />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </Card>
-                            ))}
-                        </div>
-
-                        {filteredBanners.length === 0 && (
-                            <div className='flex flex-col items-center justify-center py-12'>
-                                <ImageIcon className='w-16 h-16 text-text-secondary mb-4' />
-                                <h3 className='text-lg font-semibold text-text-secondary mb-2'>No banners found</h3>
-                                <p className='text-sm text-text-secondary'>
-                                    {searchQuery ? 'Try adjusting your search' : 'Add your first banner to get started'}
-                                </p>
-                            </div>
-                        )}
+                        <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Banners</h2>
+                        <p className='text-sm text-text-secondary mt-1'>Upload and manage simple banner placements</p>
                     </div>
+                    <div>
+                        <Button variant='outlined' onClick={() => setIsAddDialogOpen(true)}>
+                            <Plus className='w-4 h-4 mr-2' />
+                            Add Banner
+                        </Button>
+                    </div>
+                </div>
+
+                <FormControl size='small' sx={{ minWidth: 200 }}>
+                    <CustomTextField
+                        placeholder='Search banners...'
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position='start'>
+                                    <Search className='w-4 h-4 mr-2' />
+                                </InputAdornment>
+                            )
+                        }}
+                    />
+                </FormControl>
+
+                <div>
+                    <div className='grid grid-cols-1 lg:grid-cols-4 gap-6'>
+                        {filteredBanners.map(banner => (
+                            <Card key={banner.id} className='bg-[#1C252E] border-white/10 overflow-hidden'>
+                                <div className='relative h-32 bg-gradient-to-r from-gray-800 to-gray-700'>
+                                    {banner.image_url ? (
+                                        <img src={banner.image_url} alt={banner.title} className='w-full h-full object-cover opacity-90' />
+                                    ) : null}
+                                    <div className='absolute top-3 right-3 flex gap-2'>
+                                        <Button size='small' variant='contained' className='!bg-white !text-black' onClick={() => toggleStatus(banner.id)}>
+                                            {banner.status ? <Eye className='w-4 h-4' /> : <EyeOff className='w-4 h-4' />}
+                                        </Button>
+                                    </div>
+                                </div>
+                                <div className='p-4'>
+                                    <div className='flex items-start justify-between mb-3'>
+                                        <div className='flex-1'>
+                                            <h3 className='text-lg font-semibold text-text-primary mb-1'>{banner.title}</h3>
+                                            <p className='text-sm text-text-secondary'>{banner.position}</p>
+                                        </div>
+                                        <span
+                                            className={`px-2 py-1 text-xs font-medium rounded-full ${banner.status ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gray-500/20 text-gray-400'
+                                                }`}>
+                                            {banner.status ? 'active' : 'inactive'}
+                                        </span>
+                                    </div>
+                                    <div className='space-y-2 mb-4' />
+                                    <div className='flex gap-2'>
+                                        <Button
+                                            variant='outlined'
+                                            size='small'
+                                            startIcon={<Edit className='w-4 h-4' />}
+                                            onClick={() => handleEditOpen(banner)}
+                                            sx={{
+                                                flex: 1,
+                                                borderColor: '#374151',
+                                                color: isDark ? '#9CA3AF' : '#1c252e',
+                                                '&:hover': {
+                                                    bgcolor: 'rgba(55, 65, 81, 0.3)',
+                                                    borderColor: '#6B7280'
+                                                }
+                                            }}>
+                                            Edit
+                                        </Button>
+                                        <Button
+                                            variant='outlined'
+                                            size='small'
+                                            onClick={() => setConfirmDeleteId(banner.id)}
+                                            sx={{
+                                                borderColor: 'rgba(239, 68, 68, 0.2)',
+                                                color: '#EF4444',
+                                                '&:hover': {
+                                                    bgcolor: 'rgba(239, 68, 68, 0.1)',
+                                                    borderColor: '#EF4444'
+                                                }
+                                            }}>
+                                            <Trash2 className='w-4 h-4' />
+                                        </Button>
+                                    </div>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+
+                    {filteredBanners.length === 0 && (
+                        <div className='flex flex-col items-center justify-center py-12'>
+                            <ImageIcon className='w-16 h-16 text-text-secondary mb-4' />
+                            <h3 className='text-lg font-semibold text-text-secondary mb-2'>No banners found</h3>
+                            <p className='text-sm text-text-secondary'>
+                                {searchQuery ? 'Try adjusting your search' : 'Add your first banner to get started'}
+                            </p>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -420,6 +417,15 @@ export default function BannerList({ banners = [] }) {
                     </div>
                 </div>
             )}
+        </div>
+    )
+}
+
+export default function BannerList(props) {
+    return (
+        <AuthenticatedLayout>
+            <Head title='Banners' />
+            <BannerListContent {...props} />
         </AuthenticatedLayout>
     )
 }

@@ -1,44 +1,67 @@
 import { useEffect, useMemo, useState } from "react"
-import { Head, Link } from "@inertiajs/react"
+import { Head, Link, router } from "@inertiajs/react"
 import { Search, X } from "lucide-react"
 import GuestLayout from "@/Layouts/GuestLayout"
 import ProductCardDetailed from "@/Components/ProductCardDetailed"
 import ProductCardCompact from "@/Components/ProductCardCompact"
+import Pagination from "@/Components/Pagination"
 
-export default function ProductList({ products = [], availableCategories = [] }) {
-    const [activeCategory, setActiveCategory] = useState("All")
+export default function ProductList({ products = [], availableCategories = [], pagination = {} }) {
     const [isSearchOpen, setIsSearchOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
 
-    // Use passed categories from backend, or extract from products as fallback
+    const currentPage = pagination.current_page || 1
+    const totalPages = pagination.last_page || 1
+
+    // * Get active category from URL or default to "All"
+    const activeCategory = useMemo(() => {
+        const params = new URLSearchParams(window.location.search)
+        return params.get("category") || "All"
+    }, [currentPage, pagination])
+
+    // * Build category options from backend data
     const categoryOptions = useMemo(() => {
         if (availableCategories.length > 0) {
-            return ["All", ...availableCategories]
+            // * Map category objects to include both name and slug
+            return [
+                { name: "All", slug: null },
+                ...availableCategories.map(cat => ({
+                    name: typeof cat === 'string' ? cat : cat.name,
+                    slug: cat.slug || null
+                }))
+            ]
         }
         // Fallback: extract unique categories from products
         const unique = Array.from(new Set(products.map((product) => product.category ?? "Uncategorized")))
-        return ["All", ...unique]
+        return [{ name: "All", slug: null }, ...unique.map(name => ({ name, slug: null }))]
     }, [availableCategories, products])
 
-    // Read query parameter and set active category on mount
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search)
-        const categoryParam = params.get("category")
+    // * Handle category filter with slug-based filtering
+    const handleCategoryChange = (categoryOption) => {
+        const params = {}
 
-        if (categoryParam && categoryOptions.includes(categoryParam)) {
-            setActiveCategory(categoryParam)
-        } else if (!categoryOptions.includes(activeCategory)) {
-            setActiveCategory(categoryOptions[0] ?? "All")
-        }
-    }, [categoryOptions])
-
-    const filteredProducts = useMemo(() => {
-        if (activeCategory === "All") {
-            return products
+        // * If "All" selected, reset to page 1
+        if (categoryOption.name === "All" || !categoryOption.slug) {
+            params.page = 1
+        } else {
+            // * Use slug for category filtering
+            params.category = categoryOption.slug
+            // ? Keep current page when switching to a different specific category
+            params.page = currentPage
         }
 
-        return products.filter((product) => (product.category ?? "Uncategorized") === activeCategory)
-    }, [products, activeCategory])
+        router.get(route('watches-list'), params)
+    }
+
+    // * Handle page change while maintaining category
+    const handlePageChange = (page) => {
+        const params = { page }
+        if (activeCategory !== "All") {
+            // * Pass slug if category is selected
+            params.category = activeCategory
+        }
+        router.get(route('watches-list'), params)
+    }
 
     const filteredResults = useMemo(() => {
         if (!searchQuery) {
@@ -149,16 +172,16 @@ export default function ProductList({ products = [], availableCategories = [] })
 
                 <div className="container mx-auto px-4 py-8">
                     <div className="flex flex-wrap justify-center gap-3 mb-12">
-                        {categoryOptions.map((category) => (
+                        {categoryOptions.map((categoryOption) => (
                             <button
-                                key={category}
-                                onClick={() => setActiveCategory(category)}
-                                className={`px-6 py-3 text-xs rounded-full font-medium transition-colors ${activeCategory === category
+                                key={categoryOption.slug || "all"}
+                                onClick={() => handleCategoryChange(categoryOption)}
+                                className={`px-6 py-3 text-xs rounded-full font-medium transition-colors ${activeCategory === (categoryOption.slug || "All")
                                     ? "bg-black text-white"
                                     : "bg-white shadow-sm text-black hover:text-gray-500"
                                     }`}
                             >
-                                {category}
+                                {categoryOption.name}
                             </button>
                         ))}
                     </div>
@@ -174,15 +197,29 @@ export default function ProductList({ products = [], availableCategories = [] })
                         </div>
                     )} */}
 
-                    {/* Currently using ProductCardCompact */}
-                    {filteredProducts.length === 0 ? (
+                    {/* Currently using ProductCardCompact with server-side pagination */}
+                    {products.length === 0 ? (
                         <div className="mt-4 py-16 text-center text-gray-500">No products available in this category right now.</div>
                     ) : (
-                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-                            {filteredProducts.map((product) => (
-                                <ProductCardCompact key={product.id} product={product} />
-                            ))}
-                        </div>
+                        <>
+                            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                                {products.map((product) => (
+                                    <ProductCardCompact key={product.id} product={product} />
+                                ))}
+                            </div>
+
+                            {/* Pagination Component */}
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                                paginationInfo={{
+                                    from: pagination.from,
+                                    to: pagination.to,
+                                    total: pagination.total
+                                }}
+                            />
+                        </>
                     )}
                 </div>
             </div>

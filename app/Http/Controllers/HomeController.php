@@ -17,38 +17,39 @@ class HomeController extends Controller
             ->where('status', true)
             ->first();
 
-        // Fetch trending products with their variants and image data
+        // Fetch trending products with variants and images for color preview
         $trendingProducts = FeaturedProduct::where('status', 'trending')
-            ->with(['product.categories', 'product.images', 'product.variants'])
+            ->with(['product.categories:id,name', 'product.variants:id,product_id,color,material,size,status', 'product.images:id,product_id,product_variant_id,image_path,is_primary'])
             ->limit(8)
             ->get()
             ->map(function ($featured) {
                 $product = $featured->product;
-                $variants = $product->variants;
-
-                // Calculate price range
-                $prices = $variants->pluck('price')->filter()->sort()->values();
-                $minPrice = $prices->first();
-                $maxPrice = $prices->last();
-
-                // Get first variant for display attributes
-                $firstVariant = $variants->first();
-
                 return [
                     'id' => $product->id,
-                    'product_id' => $product->id,
-                    'slug' => $product->slug,
                     'name' => $product->name,
-                    'brand' => $product->categories->first()?->name ?? 'Watch',
-                    'image' => $product->images->where('is_primary', true)->first()?->image_path
-                           ?? $product->images->first()?->image_path,
-                    'caseDiameter' => $firstVariant?->size ?? 'N/A',
-                    'caseMaterial' => $firstVariant?->material ?? 'N/A',
-                    'color' => $firstVariant?->color ?? '#1f2937',
-                    'minPrice' => $minPrice,
-                    'maxPrice' => $maxPrice,
+                    'slug' => $product->slug,
+                    'category' => $product->primary_category,
+                    'primaryImage' => $product->primary_image_url,
+                    'priceRange' => [
+                        'min' => $product->min_price,
+                        'max' => $product->max_price,
+                    ],
+                    'compareAtRange' => [
+                        'min' => $product->min_compare_at_price,
+                        'max' => $product->max_compare_at_price,
+                    ],
+                    'discount' => [
+                        'amount' => $product->discount_amount,
+                        'percentage' => $product->discount_percentage,
+                    ],
+                    'colors' => $product->color_options,
+                    'materials' => $product->material_options,
+                    'sizes' => $product->size_options,
+                    'status' => $product->status,
+                    'variants' => $product->variants_with_color_image_mapping,
                 ];
-            });
+            })
+            ->values();
 
         return Inertia::render('Web/Home', [
             'categories' => $categories,
