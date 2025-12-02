@@ -1,10 +1,6 @@
-import { clsx } from 'clsx'
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge"
 
-/**
- * Utility function for combining class names
- * @param {...any} inputs - Class names or conditional objects
- * @returns {string} Combined class names
- */
 export function cn(...inputs) {
-    return clsx(inputs)
+  return twMerge(clsx(inputs));
 }

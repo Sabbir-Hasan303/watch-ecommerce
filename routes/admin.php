@@ -1,0 +1,118 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Admin\LogViewerController;
+use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\MarketingController;
+use App\Http\Controllers\Admin\DashboardController;
+
+
+
+Route::middleware(['auth', 'verified', 'admin'])->group(function () {
+    Route::prefix('admin')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
+        // Log Viewer
+        Route::get('/logs', [LogViewerController::class, 'index'])->name('admin.logs');
+
+        // Products
+        Route::prefix('products')->group(function () {
+
+            Route::get('/', [ProductController::class, 'index'])->name('admin.products.index');
+            Route::get('/create', [ProductController::class, 'create'])->name('admin.products.create');
+            Route::get('/edit/{id}', [ProductController::class, 'edit'])->name('admin.products.edit');
+
+            Route::post('/', [ProductController::class, 'store'])->name('admin.products.store');
+            Route::put('/{id}', [ProductController::class, 'update'])->name('admin.products.update');
+            Route::delete('/{id}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
+
+            Route::get('/categories', [CategoryController::class, 'index'])->name('admin.products.categories');
+            Route::post('/categories', [CategoryController::class, 'store'])->name('admin.products.categories.store');
+            Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('admin.products.categories.update');
+            Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('admin.products.categories.destroy');
+
+            Route::get('/tags', function () {
+                return Inertia::render('Admin/Products/Tags');
+            })->name('admin.products.tags');
+
+            // Featured Products
+            Route::get('/trending-products', [ProductController::class, 'featuredIndex'])->name('admin.products.featured-products');
+            Route::put('/featured-products/update', [ProductController::class, 'updateFeatured'])->name('admin.products.featured.update');
+            Route::post('/featured-products/bulk-update', [ProductController::class, 'bulkUpdateFeatured'])->name('admin.products.featured.bulk-update');
+        });
+
+        // Orders
+        Route::prefix('orders')->group(function () {
+            Route::get('/', [OrderController::class, 'index'])->name('admin.orders.index');
+            Route::get('/create', [OrderController::class, 'create'])->name('admin.orders.create');
+            Route::post('/store', [OrderController::class, 'store'])->name('admin.orders.store');
+            Route::get('/{id}/details', [OrderController::class, 'show'])->name('admin.orders.show');
+            Route::get('/{id}/edit', [OrderController::class, 'edit'])->name('admin.orders.edit');
+            Route::post('/update', [OrderController::class, 'update'])->name('admin.orders.update');
+            Route::get('/{id}/invoice', [OrderController::class, 'downloadInvoice'])->name('admin.orders.invoice');
+            Route::post('/change-status', [OrderController::class, 'changeOrderStatus'])->name('admin.orders.change-status');
+            Route::post('/cancel', [OrderController::class, 'cancelOrder'])->name('admin.orders.cancel');
+        });
+
+        // Customers
+        Route::prefix('customers')->group(function () {
+            Route::get('/', [CustomerController::class, 'index'])->name('admin.customers.index');
+
+            Route::get('/{id}/orders', [CustomerController::class, 'allOrders'])->name('admin.customers.orders');
+            Route::get('/{id}/admin-orders', [CustomerController::class, 'adminOrders'])->name('admin.customers.admin-orders');
+
+            Route::get('/ratings', function () {
+                return Inertia::render('Admin/Customers/Ratings');
+            })->name('admin.customers.ratings');
+
+            Route::get('/reviews', function () {
+                return Inertia::render('Admin/Customers/Reviews');
+            })->name('admin.customers.reviews');
+        });
+
+        // Contents
+        // Route::get('/newsletters', function () {
+        //     return Inertia::render('Admin/Contents/Newsletters');
+        // })->name('admin.contents.newsletters');
+
+        Route::get('/contact-list', [ContactController::class, 'list'])->name('admin.contents.contact-list');
+        Route::post('/contact-list/mark-as-replied', [ContactController::class, 'markAsReplied'])->name('admin.contents.contact-list.mark-as-replied');
+
+        Route::get('/faqs', function () {
+            return Inertia::render('Admin/Contents/FaqList');
+        })->name('admin.contents.faqs');
+
+        // Banners
+        Route::prefix('banners')->group(function () {
+            Route::get('/', [BannerController::class, 'index'])->name('admin.contents.banners.index');
+            Route::post('/', [BannerController::class, 'store'])->name('admin.contents.banners.store');
+            Route::put('/{id}', [BannerController::class, 'update'])->name('admin.contents.banners.update');
+            Route::delete('/{id}', [BannerController::class, 'destroy'])->name('admin.contents.banners.destroy');
+            Route::post('/{id}/toggle-status', [BannerController::class, 'toggleStatus'])->name('admin.contents.banners.toggle-status');
+        });
+
+        Route::prefix('settings')->group(function () {
+            Route::get('/profile', [AdminProfileController::class, 'index'])->name('admin.settings.profile');
+            Route::put('/profile', [AdminProfileController::class, 'update'])->name('admin.settings.profile.update');
+            Route::post('/profile/image', [AdminProfileController::class, 'updateProfileImage'])->name('admin.settings.profile.image');
+        });
+
+        Route::prefix('marketing')->group(function () {
+            Route::get('/meta', [MarketingController::class, 'indexMeta'])->name('admin.marketing.meta');
+            Route::get('/google', [MarketingController::class, 'indexGoogle'])->name('admin.marketing.google');
+            Route::get('/tiktok', [MarketingController::class, 'indexTiktok'])->name('admin.marketing.tiktok');
+            Route::put('/meta', [MarketingController::class, 'updateMeta'])->name('admin.marketing.meta.update');
+            Route::put('/google', [MarketingController::class, 'updateGoogle'])->name('admin.marketing.google.update');
+            Route::put('/tiktok', [MarketingController::class, 'updateTiktok'])->name('admin.marketing.tiktok.update');
+        });
+    });
+});
+
+require __DIR__ . '/auth.php';

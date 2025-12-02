@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Models\Option;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -29,10 +30,19 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $metaSettings = Option::getValue('marketing_meta_settings', []);
+        $googleSettings = Option::getValue('marketing_google_settings', []);
+        $tiktokSettings = Option::getValue('marketing_tiktok_settings', []);
+
         return [
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
+            ],
+            'marketing' => [
+                'meta' => $metaSettings,
+                'google' => $googleSettings,
+                'tiktok' => $tiktokSettings,
             ],
         ];
     }

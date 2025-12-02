@@ -16,4 +16,26 @@ export default defineConfig({
             '@': path.resolve(__dirname, 'resources/js'),
         },
     },
+    build: {
+        target: 'esnext',
+        minify: 'terser',
+        terserOptions: {
+            compress: {
+                drop_console: true,
+            },
+        },
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'mui': ['@mui/material', '@mui/icons-material'],
+                    'vendor': ['@inertiajs/react', 'axios', 'react', 'react-dom'],
+                    'radix': ['@radix-ui/react-dialog', '@radix-ui/react-progress', '@radix-ui/react-slot'],
+                }
+            }
+        },
+        chunkSizeWarningLimit: 1000,
+        cssCodeSplit: true,
+        sourcemap: false,
+        reportCompressedSize: false,
+    },
 });

@@ -1,0 +1,1119 @@
+import React, { useState, useCallback, useEffect } from 'react'
+import { Head, Link, router, usePage } from '@inertiajs/react'
+import { cn } from '@/lib/utils'
+import { Badge, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
+import { ArrowLeft, Upload, X, Save, ImageIcon, Trash2, Plus, Edit } from 'lucide-react'
+import { useThemeContext } from '@/contexts/ThemeContext'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
+import CustomTextField from '@/Components/CustomTextField'
+import CustomSelectField from '@/Components/CustomSelectField'
+import CustomMultiSelect from '@/Components/CustomMultiSelect'
+import RichTextEditor from '@/Components/RichTextEditor'
+import Taka from '@/Components/Taka'
+
+// Constants
+const STATUS_OPTIONS = [
+    { label: 'Active', value: 'active' },
+    { label: 'Draft', value: 'draft' }
+]
+
+const MODEL_FEATURE_CATEGORIES = [
+    { label: 'Primary Features', value: 'primary' },
+    { label: 'Additional Features', value: 'additional' }
+]
+
+const INITIAL_FORM_DATA = {
+    name: '',
+    description: '',
+    short_description: '',
+    categories: [],
+    sku: '',
+    status: 'draft',
+    features: [],
+    technical_specs: [],
+    model_features: []
+}
+
+const INITIAL_FEATURE_FORM = {
+    name: '',
+    type: '',
+    icon: ''
+}
+
+const INITIAL_SPEC_FORM = {
+    key: '',
+    value: ''
+}
+
+const INITIAL_MODEL_FEATURE_FORM = {
+    name: '',
+    category: ''
+}
+
+const INITIAL_VARIANT_FORM = {
+    title: '',
+    sku: '',
+    size: '',
+    color: '',
+    material: '',
+    image: null,
+    price: '',
+    compare_at_price: '',
+    quantity: '',
+    status: 'active'
+}
+
+// Utility functions
+const generateId = () => Math.random().toString(36).substr(2, 9)
+
+const createImageObject = file => ({
+    id: generateId(),
+    url: URL.createObjectURL(file),
+    file
+})
+
+// Custom hooks
+const useFormState = initialState => {
+    const [state, setState] = useState(initialState)
+
+    const updateField = useCallback((field, value) => {
+        setState(prev => ({ ...prev, [field]: value }))
+    }, [])
+
+    const resetForm = useCallback(() => {
+        setState(initialState)
+    }, [initialState])
+
+    return [state, setState, updateField, resetForm]
+}
+
+const useImageUpload = () => {
+    const [images, setImages] = useState([])
+    const [dragActive, setDragActive] = useState(false)
+
+    const handleImageUpload = useCallback(files => {
+        if (!files) return
+
+        const newImages = Array.from(files).map(createImageObject)
+        setImages(prev => [...prev, ...newImages])
+    }, [])
+
+    const removeImage = useCallback(id => {
+        setImages(prev => prev.filter(img => img.id !== id))
+    }, [])
+
+    const handleDrag = useCallback(e => {
+        e.preventDefault()
+        e.stopPropagation()
+        if (e.type === 'dragenter' || e.type === 'dragover') {
+            setDragActive(true)
+        } else if (e.type === 'dragleave') {
+            setDragActive(false)
+        }
+    }, [])
+
+    const handleDrop = useCallback(
+        e => {
+            e.preventDefault()
+            e.stopPropagation()
+            setDragActive(false)
+
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                handleImageUpload(e.dataTransfer.files)
+            }
+        },
+        [handleImageUpload]
+    )
+
+    return {
+        images,
+        setImages,
+        dragActive,
+        handleImageUpload,
+        removeImage,
+        handleDrag,
+        handleDrop
+    }
+}
+
+// Components
+const StatusSelector = ({ status, onStatusChange }) => (
+    <div className='space-y-3'>
+        {STATUS_OPTIONS.map(option => (
+            <button
+                key={option.value}
+                type='button'
+                onClick={() => onStatusChange(option.value)}
+                className={cn(
+                    'w-full p-4 rounded-lg border-2 transition-all duration-200 text-left',
+                    status === option.value
+                        ? `border-${option.value === 'active' ? 'emerald' : 'amber'}-500 bg-${option.value === 'active' ? 'emerald' : 'amber'}-500/10`
+                        : 'border-border hover:border-emerald-500/50'
+                )}>
+                <div className='flex items-center gap-3'>
+                    <div
+                        className={cn(
+                            'w-4 h-4 rounded-full border-2 flex items-center justify-center',
+                            status === option.value ? `border-${option.value === 'active' ? 'emerald' : 'amber'}-500` : 'border-muted-foreground'
+                        )}>
+                        {status === option.value && <div className={`w-2 h-2 rounded-full bg-${option.value === 'active' ? 'emerald' : 'amber'}-500`} />}
+                    </div>
+                    <div>
+                        <p className='font-medium text-text-primary capitalize'>{option.label}</p>
+                        <p className='text-xs text-muted-foreground'>{option.value === 'active' ? 'Product is live and visible' : 'Product is hidden'}</p>
+                    </div>
+                </div>
+            </button>
+        ))}
+    </div>
+)
+
+const ImageUploadArea = ({ dragActive, onDrag, onDrop, onFileSelect }) => (
+    <div
+        className={cn(
+            'border-2 border-dashed rounded-xl p-8 transition-all duration-200',
+            dragActive ? 'border-emerald-500 bg-emerald-500/5' : 'border-border hover:border-emerald-500/50 hover:bg-muted/50'
+        )}
+        onDragEnter={onDrag}
+        onDragLeave={onDrag}
+        onDragOver={onDrag}
+        onDrop={onDrop}>
+        <div className='flex flex-col items-center justify-center gap-4 text-center'>
+            <div className='w-16 h-16 bg-muted rounded-full flex items-center justify-center'>
+                <Upload className='w-8 h-8 text-muted-foreground' />
+            </div>
+            <div>
+                <p className='text-sm font-medium text-foreground mb-1'>Drag and drop images here, or click to browse</p>
+                <p className='text-xs text-muted-foreground'>PNG, JPG, GIF up to 10MB</p>
+            </div>
+            <Button type='button' variant='outline' onClick={() => onFileSelect()} className='gap-2'>
+                <ImageIcon className='w-4 h-4' />
+                Choose Files
+            </Button>
+            <input id='file-upload' type='file' multiple accept='image/*' className='hidden' onChange={e => onFileSelect(e.target.files)} />
+        </div>
+    </div>
+)
+
+const ImageGrid = ({ images, onRemoveImage }) => (
+    <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
+        {images.map((image, index) => (
+            <div key={image.id} className='relative group'>
+                <img
+                    src={image.url || '/placeholder.svg'}
+                    alt={`Product ${index + 1}`}
+                    className='w-full h-32 object-cover rounded-lg border border-border'
+                />
+                {index === 0 && <Badge className='absolute top-2 left-2 bg-emerald-500 text-white'>Primary</Badge>}
+                <Button
+                    type='button'
+                    variant='destructive'
+                    size='icon'
+                    className='absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity'
+                    onClick={() => onRemoveImage(image.id)}>
+                    <X className='w-4 h-4' />
+                </Button>
+            </div>
+        ))}
+    </div>
+)
+
+const FeatureItem = ({ feature, onRemove }) => (
+    <div className='flex items-center justify-between p-3 bg-muted/20 rounded-lg border border-border'>
+        <div>
+            <p className='font-medium text-foreground'>{feature.name}</p>
+            <p className='text-sm text-muted-foreground'>{feature.type}</p>
+            {feature.icon && <p className='text-xs text-muted-foreground'>Icon: {feature.icon}</p>}
+        </div>
+        <Button size='small' variant='destructive' onClick={() => onRemove(feature.id)} className='h-8 w-8 p-0'>
+            <X className='w-3 h-3' />
+        </Button>
+    </div>
+)
+
+const SpecItem = ({ spec, onRemove }) => (
+    <div className='flex items-center justify-between p-3 bg-muted/20 rounded-lg border border-border'>
+        <div className='flex items-center gap-4'>
+            <span className='font-medium text-foreground min-w-[120px]'>{spec.key}:</span>
+            <span className='text-foreground'>{spec.value}</span>
+        </div>
+        <Button size='small' variant='destructive' onClick={() => onRemove(spec.id)} className='h-8 w-8 p-0'>
+            <X className='w-3 h-3' />
+        </Button>
+    </div>
+)
+
+const ModelFeatureItem = ({ feature, onRemove }) => (
+    <div className='flex items-center justify-between p-3 bg-muted/20 rounded-lg border border-border'>
+        <span className='text-foreground'>{feature.name}</span>
+        <Button size='small' variant='destructive' onClick={() => onRemove(feature.id)} className='h-8 w-8 p-0'>
+            <X className='w-3 h-3' />
+        </Button>
+    </div>
+)
+
+const VariantImagePreview = ({ image, onRemove }) => (
+    <div className='relative w-20 h-20'>
+        <img src={image.url} alt='Variant preview' className='w-full h-full object-cover rounded border' />
+        <Button type='button' variant='destructive' size='icon' className='absolute -top-2 -right-2 h-6 w-6' onClick={onRemove}>
+            <X className='w-3 h-3' />
+        </Button>
+    </div>
+)
+
+const VariantTable = ({ variants, onEdit, onRemove }) => (
+    <TableContainer component={Paper} className='bg-card border border-border'>
+        <Table>
+            <TableHead>
+                <TableRow>
+                    <TableCell>Image</TableCell>
+                    <TableCell>Title</TableCell>
+                    <TableCell>SKU</TableCell>
+                    <TableCell>Size</TableCell>
+                    <TableCell>Color</TableCell>
+                    <TableCell>Material</TableCell>
+                    <TableCell>Price</TableCell>
+                    <TableCell>Compare Price</TableCell>
+                    <TableCell>Quantity</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Actions</TableCell>
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                {variants.map(variant => (
+                    <TableRow key={variant.id}>
+                        <TableCell>
+                            {variant.image ? (
+                                <img src={variant.image.url} alt={variant.title} className='w-12 h-12 object-cover rounded border' />
+                            ) : (
+                                <div className='w-12 h-12 bg-muted rounded border flex items-center justify-center'>
+                                    <ImageIcon className='w-4 h-4 text-muted-foreground' />
+                                </div>
+                            )}
+                        </TableCell>
+                        <TableCell>{variant.title}</TableCell>
+                        <TableCell>{variant.sku}</TableCell>
+                        <TableCell>{variant.size || '-'}</TableCell>
+                        <TableCell>{variant.color || '-'}</TableCell>
+                        <TableCell>{variant.material || '-'}</TableCell>
+                        <TableCell>
+                            <div className="flex items-center gap-1">
+                                <Taka color='text-black dark:text-white' className='text-base' />
+                                <span className="text-base">{variant.price}</span>
+                            </div>
+                        </TableCell>
+                        <TableCell>
+                            {variant.compare_at_price ?
+                                <div className="flex items-center gap-1">
+                                    <Taka color='text-black dark:text-white' className='text-base' />
+                                    <span className="text-base">{variant.compare_at_price}</span>
+                                </div>
+                                : <span className="text-base">-</span>}
+                        </TableCell>
+                        <TableCell>{variant.quantity}</TableCell>
+                        <TableCell>
+                            <Badge className={cn('text-xs py-1 px-2 rounded-md', variant.status === 'active' ? 'bg-emerald-500' : 'bg-amber-500')}>{variant.status}</Badge>
+                        </TableCell>
+                        <TableCell>
+                            <div className='flex gap-1'>
+                                <Button size='small' variant='outline' onClick={() => onEdit(variant)} className='h-8 w-8 p-0'>
+                                    <Edit className='w-3 h-3' />
+                                </Button>
+                                <Button size='small' variant='destructive' onClick={() => onRemove(variant.id)} className='h-8 w-8 p-0'>
+                                    <Trash2 className='w-3 h-3' />
+                                </Button>
+                            </div>
+                        </TableCell>
+                    </TableRow>
+                ))}
+            </TableBody>
+        </Table>
+    </TableContainer>
+)
+
+function ProductEditFields({ productId, product, categories }) {
+    const { isDark } = useThemeContext()
+    const { errors = {} } = usePage().props
+    // Main form state
+    const [formData, setFormData, updateFormField] = useFormState(INITIAL_FORM_DATA)
+
+    // Feature forms
+    const [featureForm, setFeatureForm] = useFormState(INITIAL_FEATURE_FORM)
+    const [specForm, setSpecForm] = useFormState(INITIAL_SPEC_FORM)
+    const [modelFeatureForm, setModelFeatureForm] = useFormState(INITIAL_MODEL_FEATURE_FORM)
+
+    // Variant state
+    const [variants, setVariants] = useState([])
+    const [deletedVariantIds, setDeletedVariantIds] = useState([])
+    const [showVariantForm, setShowVariantForm] = useState(false)
+    const [variantForm, setVariantForm] = useFormState(INITIAL_VARIANT_FORM)
+    const [editingVariantId, setEditingVariantId] = useState(null)
+
+    // Image upload
+    const { images, setImages, dragActive, handleImageUpload, removeImage, handleDrag, handleDrop } = useImageUpload()
+
+    // Saving state
+    const [saving, setSaving] = useState(false)
+
+    // Load product data on mount
+    useEffect(() => {
+        if (product) {
+            setFormData({
+                name: product.name || '',
+                description: product.description || '',
+                short_description: product.short_description || '',
+                categories:
+                    Array.isArray(product.categories)
+                        ? (product.categories.length > 0 && typeof product.categories[0] === 'object'
+                            ? product.categories.map(c => c.id)
+                            : product.categories)
+                        : (product.category ? [product.category] : []),
+                sku: product.sku || '',
+                status: product.status || 'draft',
+                features: product.features || [],
+                technical_specs: product.technical_specs || [],
+                model_features: product.model_features || []
+            })
+
+            // Load existing images
+            if (product.images) {
+                setImages(
+                    product.images.map(img => ({
+                        id: img.id || generateId(),
+                        url: img.url || img.image_path,
+                        file: null // Existing images don't have file objects
+                    }))
+                )
+            }
+
+            // Load existing variants
+            if (product.variants) {
+                setVariants(
+                    product.variants.map(variant => ({
+                        id: variant.id || generateId(),
+                        title: variant.title || variant.variant_name || '',
+                        sku: variant.sku || '',
+                        size: variant.size || '',
+                        color: variant.color || '',
+                        material: variant.material || '',
+                        price: variant.price || '',
+                        compare_at_price: variant.compare_at_price || '',
+                        quantity: variant.quantity || variant.stock_quantity || '',
+                        status: variant.status || 'active',
+                        image: variant.image
+                            ? {
+                                id: variant.image.id || generateId(),
+                                url: variant.image.url || variant.image.image_path,
+                                file: null
+                            }
+                            : null
+                    }))
+                )
+            }
+        }
+    }, [product])
+
+    // Feature handlers
+    const addFeature = useCallback(() => {
+        if (!featureForm.name || !featureForm.type) {
+            alert('Please fill in feature name and type')
+            return
+        }
+
+        const newFeature = {
+            id: generateId(),
+            name: featureForm.name,
+            type: featureForm.type,
+            icon: featureForm.icon
+        }
+
+        setFormData(prev => ({ ...prev, features: [...prev.features, newFeature] }))
+        setFeatureForm(INITIAL_FEATURE_FORM)
+    }, [featureForm, setFormData, setFeatureForm])
+
+    const removeFeature = useCallback(
+        id => {
+            setFormData(prev => ({ ...prev, features: prev.features.filter(feature => feature.id !== id) }))
+        },
+        [setFormData]
+    )
+
+    // Technical specs handlers
+    const addTechnicalSpec = useCallback(() => {
+        if (!specForm.key || !specForm.value) {
+            alert('Please fill in both key and value')
+            return
+        }
+
+        const newSpec = {
+            id: generateId(),
+            key: specForm.key,
+            value: specForm.value
+        }
+
+        setFormData(prev => ({ ...prev, technical_specs: [...prev.technical_specs, newSpec] }))
+        setSpecForm(INITIAL_SPEC_FORM)
+    }, [specForm, setFormData, setSpecForm])
+
+    const removeTechnicalSpec = useCallback(
+        id => {
+            setFormData(prev => ({ ...prev, technical_specs: prev.technical_specs.filter(spec => spec.id !== id) }))
+        },
+        [setFormData]
+    )
+
+    // Model features handlers
+    const addModelFeature = useCallback(() => {
+        if (!modelFeatureForm.name) {
+            alert('Please fill in feature name')
+            return
+        }
+
+        const newModelFeature = {
+            id: generateId(),
+            name: modelFeatureForm.name,
+            category: modelFeatureForm.category
+        }
+
+        setFormData(prev => ({ ...prev, model_features: [...prev.model_features, newModelFeature] }))
+        setModelFeatureForm(prev => ({ ...prev, name: '' }))
+    }, [modelFeatureForm, setFormData, setModelFeatureForm])
+
+    const removeModelFeature = useCallback(
+        id => {
+            setFormData(prev => ({ ...prev, model_features: prev.model_features.filter(feature => feature.id !== id) }))
+        },
+        [setFormData]
+    )
+
+    // Variant handlers
+    const handleVariantImageUpload = useCallback(
+        file => {
+            if (!file) return
+            setVariantForm(prev => ({ ...prev, image: createImageObject(file) }))
+        },
+        [setVariantForm]
+    )
+
+    const addVariant = useCallback(() => {
+        if (!variantForm.title || !variantForm.sku || !variantForm.price || !variantForm.quantity) {
+            alert('Please fill in required fields: Title, SKU, Price, and Quantity')
+            return
+        }
+
+        if (editingVariantId) {
+            // Update existing variant
+            setVariants(prev => prev.map(v => v.id === editingVariantId ? { ...variantForm, id: editingVariantId } : v))
+            setEditingVariantId(null)
+        } else {
+            // Create new variant
+            const newVariant = { id: generateId(), ...variantForm }
+            setVariants(prev => [...prev, newVariant])
+        }
+
+        setVariantForm(INITIAL_VARIANT_FORM)
+        setShowVariantForm(false)
+    }, [variantForm, setVariantForm, editingVariantId])
+
+    const removeVariant = useCallback(id => {
+        // Track deleted variant IDs (only for existing variants from database)
+        // New variants have generated IDs and don't need to be tracked
+        const variantToRemove = variants.find(v => v.id === id)
+
+        // Check if this is an existing variant from DB (typically numeric IDs for existing, string IDs for new)
+        if (variantToRemove && typeof id === 'number') {
+            setDeletedVariantIds(prev => [...prev, id])
+        }
+
+        // Remove from variants array
+        setVariants(prev => prev.filter(variant => variant.id !== id))
+    }, [variants])
+
+    const editVariant = useCallback(
+        variant => {
+            setVariantForm(variant)
+            setEditingVariantId(variant.id)
+            setShowVariantForm(true)
+        },
+        [setVariantForm]
+    )
+
+    // Event handlers
+    const handleFileSelect = useCallback(files => {
+        if (files) {
+            handleImageUpload(files)
+        } else {
+            document.getElementById('file-upload')?.click()
+        }
+    }, [handleImageUpload])
+
+    const handleVariantFileSelect = useCallback(() => {
+        document.getElementById('variant-image-upload')?.click()
+    }, [])
+
+    const handleVariantCancel = useCallback(() => {
+        setShowVariantForm(false)
+        setVariantForm(INITIAL_VARIANT_FORM)
+        setEditingVariantId(null)
+    }, [setVariantForm])
+
+    const handleVariantImageRemove = useCallback(() => {
+        setVariantForm(prev => ({ ...prev, image: null }))
+    }, [setVariantForm])
+
+    // Filter model features by category
+    const primaryFeatures = formData.model_features.filter(f => f.category === 'primary')
+    const additionalFeatures = formData.model_features.filter(f => f.category === 'additional')
+
+    return (
+        <div className='py-4'>
+            <div className='flex flex-col md:flex-row justify-between items-center mb-6'>
+                <h2 className='text-2xl leading-9 font-bold text-text-primary mb-6'>Edit Product</h2>
+                <div>
+                    <Link href='/admin/products'>
+                        <Button variant='ghost' size='sm' className='gap-2 text-gray-400 hover:text-white'>
+                            <ArrowLeft className='w-4 h-4' />
+                            Back to Products
+                        </Button>
+                    </Link>
+                </div>
+            </div>
+
+            <div className='flex-1 overflow-auto'>
+                <div className='max-w-6xl mx-auto space-y-6'>
+                    <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+                        {/* Main Form - Left Column */}
+                        <div className='lg:col-span-2 space-y-6'>
+                            {/* Basic Product Information */}
+                            <div className='bg-card border border-border rounded-xl p-6 space-y-4'>
+                                <h2 className='text-lg font-semibold text-foreground'>Basic Product Information</h2>
+
+                                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                                    <CustomTextField
+                                        id='name'
+                                        label='Product Name'
+                                        placeholder='Enter product name'
+                                        value={formData.name}
+                                        onChange={e => updateFormField('name', e.target.value)}
+                                    />
+
+                                    <CustomTextField
+                                        id='sku'
+                                        label='SKU'
+                                        placeholder='Enter SKU'
+                                        value={formData.sku}
+                                        onChange={e => updateFormField('sku', e.target.value)}
+                                    />
+
+                                    {Array.isArray(categories) && categories.length > 0 ? (
+                                        <CustomMultiSelect
+                                            id='categories'
+                                            label='Categories'
+                                            placeholder='Select categories'
+                                            options={categories.map(category => ({ label: category.name, value: category.id }))}
+                                            value={formData.categories}
+                                            onChange={values => updateFormField('categories', values)}
+                                            error={!!errors.categories}
+                                            helperText={errors.categories}
+                                        />
+                                    ) : (
+                                        <CustomTextField
+                                            id='categories_fallback'
+                                            label='Categories'
+                                            placeholder='Enter categories (comma separated)'
+                                            value={Array.isArray(formData.categories) ? formData.categories.join(',') : ''}
+                                            onChange={e => updateFormField('categories', e.target.value.split(',').map(v => v.trim()).filter(Boolean))}
+                                            error={!!errors.categories}
+                                            helperText={errors.categories}
+                                        />
+                                    )}
+
+                                    <CustomTextField
+                                        id='short_description'
+                                        label='Short Description'
+                                        placeholder='Enter short description'
+                                        value={formData.short_description}
+                                        onChange={e => updateFormField('short_description', e.target.value)}
+                                    />
+                                </div>
+
+                                <RichTextEditor
+                                    id='description'
+                                    label='Description'
+                                    placeholder='Enter product description'
+                                    value={formData.description}
+                                    onChange={e => updateFormField('description', e.target.value)}
+                                    error={false}
+                                    helperText=''
+                                />
+                            </div>
+
+                            {/* Product Features */}
+                            <div className='bg-card border border-border rounded-xl p-6 space-y-4'>
+                                <h2 className='text-lg font-semibold text-foreground'>Product Features</h2>
+
+                                <div className='space-y-4'>
+                                    <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                                        <CustomTextField
+                                            id='feature-name'
+                                            label='Feature Name *'
+                                            placeholder='e.g., Digital Display'
+                                            value={featureForm.name}
+                                            onChange={e => setFeatureForm(prev => ({ ...prev, name: e.target.value }))}
+                                        />
+
+                                        <CustomTextField
+                                            id='feature-type'
+                                            label='Type *'
+                                            placeholder='e.g., Display Type'
+                                            value={featureForm.type}
+                                            onChange={e => setFeatureForm(prev => ({ ...prev, type: e.target.value }))}
+                                        />
+
+                                        <CustomTextField
+                                            id='feature-icon'
+                                            label='Icon *'
+                                            placeholder='e.g., Clock, Battery, Water'
+                                            value={featureForm.icon}
+                                            onChange={e => setFeatureForm(prev => ({ ...prev, icon: e.target.value }))}
+                                        />
+                                    </div>
+
+                                    <Button variant='outlined' onClick={addFeature} className='gap-2 bg-emerald-600 hover:bg-emerald-700 text-white'
+                                        sx={{
+                                            color: isDark ? '#9CA3AF' : '#6B7280',
+                                            borderColor: isDark ? '#374151' : '#6B7280',
+                                            '&:hover': {
+                                                bgcolor: isDark ? 'rgba(55, 65, 81, 0.3)' : 'rgba(55, 65, 81, 0.3)',
+                                                borderColor: isDark ? '#6B7280' : '#6B7280'
+                                            }
+                                        }}>
+                                        <Plus className='w-4 h-4' />
+                                        Add Feature
+                                    </Button>
+
+                                    {formData.features.length > 0 && (
+                                        <div className='space-y-2'>
+                                            <h3 className='text-md font-medium text-foreground'>Added Features</h3>
+                                            <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
+                                                {formData.features.map(feature => (
+                                                    <FeatureItem key={feature.id} feature={feature} onRemove={removeFeature} />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Technical Specifications */}
+                            <div className='bg-card border border-border rounded-xl p-6 space-y-4'>
+                                <h2 className='text-lg font-semibold text-foreground'>Technical Specifications</h2>
+
+                                <div className='space-y-4'>
+                                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                                        <CustomTextField
+                                            id='spec-key'
+                                            label='Specification Key *'
+                                            value={specForm.key}
+                                            onChange={e => setSpecForm(prev => ({ ...prev, key: e.target.value }))}
+                                        />
+
+                                        <CustomTextField
+                                            id='spec-value'
+                                            label='Specification Value *'
+                                            value={specForm.value}
+                                            onChange={e => setSpecForm(prev => ({ ...prev, value: e.target.value }))}
+                                        />
+                                    </div>
+
+                                    <Button variant='outlined' onClick={addTechnicalSpec} className='gap-2 bg-emerald-600 hover:bg-emerald-700 text-white'
+                                        sx={{
+                                            color: isDark ? '#9CA3AF' : '#6B7280',
+                                            borderColor: isDark ? '#374151' : '#6B7280',
+                                            '&:hover': {
+                                                bgcolor: isDark ? 'rgba(55, 65, 81, 0.3)' : 'rgba(55, 65, 81, 0.3)',
+                                                borderColor: isDark ? '#6B7280' : '#6B7280'
+                                            }
+                                        }}>
+                                        <Plus className='w-4 h-4' />
+                                        Add Specification
+                                    </Button>
+
+                                    {formData.technical_specs.length > 0 && (
+                                        <div className='space-y-2'>
+                                            <h3 className='text-md font-medium text-foreground'>Added Specifications</h3>
+                                            <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
+                                                {formData.technical_specs.map(spec => (
+                                                    <SpecItem key={spec.id} spec={spec} onRemove={removeTechnicalSpec} />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Model Features */}
+                            <div className='bg-card border border-border rounded-xl p-6 space-y-4'>
+                                <h2 className='text-lg font-semibold text-foreground'>Model Features</h2>
+
+                                <div className='space-y-4'>
+                                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                                        <CustomTextField
+                                            id='model-feature-name'
+                                            label='Feature Name *'
+                                            placeholder='e.g., 19-inch wheels, LED headlights'
+                                            value={modelFeatureForm.name}
+                                            onChange={e => setModelFeatureForm(prev => ({ ...prev, name: e.target.value }))}
+                                        />
+
+                                        <CustomSelectField
+                                            id='model-feature-category'
+                                            label='Feature Category *'
+                                            placeholder='Select category'
+                                            options={MODEL_FEATURE_CATEGORIES}
+                                            value={modelFeatureForm.category}
+                                            onChange={e => setModelFeatureForm(prev => ({ ...prev, category: e.target.value }))}
+                                        />
+                                    </div>
+
+                                    <Button variant='outlined' onClick={addModelFeature} className='gap-2 bg-emerald-600 hover:bg-emerald-700 text-white'
+                                        sx={{
+                                            color: isDark ? '#9CA3AF' : '#6B7280',
+                                            borderColor: isDark ? '#374151' : '#6B7280',
+                                            '&:hover': {
+                                                bgcolor: isDark ? 'rgba(55, 65, 81, 0.3)' : 'rgba(55, 65, 81, 0.3)',
+                                                borderColor: isDark ? '#6B7280' : '#6B7280'
+                                            }
+                                        }}>
+                                        <Plus className='w-4 h-4' />
+                                        Add Model Feature
+                                    </Button>
+
+                                    {formData.model_features.length > 0 && (
+                                        <div className='space-y-4'>
+                                            <h3 className='text-md font-medium text-foreground'>Added Model Features</h3>
+
+                                            {primaryFeatures.length > 0 && (
+                                                <div className='space-y-2'>
+                                                    <h4 className='text-sm font-medium text-foreground'>Primary Features</h4>
+                                                    <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
+                                                        {primaryFeatures.map(feature => (
+                                                            <ModelFeatureItem key={feature.id} feature={feature} onRemove={removeModelFeature} />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {additionalFeatures.length > 0 && (
+                                                <div className='space-y-2'>
+                                                    <h4 className='text-sm font-medium text-foreground'>Additional Features</h4>
+                                                    <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
+                                                        {additionalFeatures.map(feature => (
+                                                            <ModelFeatureItem key={feature.id} feature={feature} onRemove={removeModelFeature} />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Product Images */}
+                            <div className='bg-card border border-border rounded-xl p-6 space-y-4'>
+                                <h2 className='text-lg font-semibold text-foreground'>Product Images</h2>
+
+                                {errors.images && (
+                                    <div className='text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3'>
+                                        {errors.images}
+                                    </div>
+                                )}
+
+                                <ImageUploadArea dragActive={dragActive} onDrag={handleDrag} onDrop={handleDrop} onFileSelect={handleFileSelect} />
+
+                                {images.length > 0 && <ImageGrid images={images} onRemoveImage={removeImage} />}
+                            </div>
+
+                            {/* Product Variants */}
+                            <div className='bg-card border border-border rounded-xl p-6 space-y-4'>
+                                <div className='flex items-center justify-between'>
+                                    <div>
+                                        <h2 className='text-lg font-semibold text-foreground'>Product Variants</h2>
+                                        <p className='text-sm text-muted-foreground'>Create different variations of your product</p>
+                                    </div>
+                                    <Button variant='outlined' onClick={() => setShowVariantForm(!showVariantForm)}
+                                        sx={{
+                                            color: isDark ? '#9CA3AF' : '#6B7280',
+                                            borderColor: isDark ? '#374151' : '#6B7280',
+                                            '&:hover': {
+                                                bgcolor: isDark ? 'rgba(55, 65, 81, 0.3)' : 'rgba(55, 65, 81, 0.3)',
+                                                borderColor: isDark ? '#6B7280' : '#6B7280'
+                                            }
+                                        }}>
+                                        <Plus className='w-4 h-4' />
+                                        Add Variant
+                                    </Button>
+                                </div>
+
+                                {/* Variant Creation Form */}
+                                {showVariantForm && (
+                                    <div className='border border-border rounded-lg p-4 space-y-4 bg-muted/20'>
+                                        <h3 className='text-md font-medium text-foreground'>{editingVariantId ? 'Edit Variant' : 'Create New Variant'}</h3>
+
+                                        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                                            <CustomTextField
+                                                id='variant-title'
+                                                label='Title *'
+                                                placeholder='e.g., Large Black Leather'
+                                                value={variantForm.title}
+                                                onChange={e => setVariantForm(prev => ({ ...prev, title: e.target.value }))}
+                                            />
+
+                                            <CustomTextField
+                                                id='variant-sku'
+                                                label='SKU *'
+                                                placeholder='e.g., SKU-001'
+                                                value={variantForm.sku}
+                                                onChange={e => setVariantForm(prev => ({ ...prev, sku: e.target.value }))}
+                                            />
+
+                                            <CustomTextField
+                                                id='variant-size'
+                                                label='Size'
+                                                placeholder='e.g., Large, XL'
+                                                value={variantForm.size}
+                                                onChange={e => setVariantForm(prev => ({ ...prev, size: e.target.value }))}
+                                            />
+
+                                            <CustomTextField
+                                                id='variant-color'
+                                                label='Color'
+                                                placeholder='e.g., Black, Red'
+                                                value={variantForm.color}
+                                                onChange={e => setVariantForm(prev => ({ ...prev, color: e.target.value }))}
+                                            />
+
+                                            <CustomTextField
+                                                id='variant-material'
+                                                label='Material'
+                                                placeholder='e.g., Leather, Steel'
+                                                value={variantForm.material}
+                                                onChange={e => setVariantForm(prev => ({ ...prev, material: e.target.value }))}
+                                            />
+
+                                            <CustomTextField
+                                                id='variant-price'
+                                                label='Price *'
+                                                type='number'
+                                                placeholder='0.00'
+                                                value={variantForm.price}
+                                                onChange={e => setVariantForm(prev => ({ ...prev, price: e.target.value }))}
+                                                InputProps={{
+                                                    startAdornment: <Taka color='text-gray-400 dark:text-gray-400' className='text-base mr-2' />
+                                                }}
+                                            />
+
+                                            <CustomTextField
+                                                id='variant-compare-price'
+                                                label='Compare at Price'
+                                                type='number'
+                                                placeholder='0.00'
+                                                value={variantForm.compare_at_price}
+                                                onChange={e => setVariantForm(prev => ({ ...prev, compare_at_price: e.target.value }))}
+                                                InputProps={{
+                                                    startAdornment: <Taka color='text-gray-400 dark:text-gray-400' className='text-base mr-2' />
+                                                }}
+                                            />
+
+                                            <CustomTextField
+                                                id='variant-quantity'
+                                                label='Quantity *'
+                                                type='number'
+                                                placeholder='0'
+                                                value={variantForm.quantity}
+                                                onChange={e => setVariantForm(prev => ({ ...prev, quantity: e.target.value }))}
+                                            />
+
+                                            <CustomSelectField
+                                                id='variant-status'
+                                                label='Status *'
+                                                placeholder='Select status'
+                                                options={STATUS_OPTIONS}
+                                                value={variantForm.status}
+                                                onChange={e => setVariantForm(prev => ({ ...prev, status: e.target.value }))}
+                                            />
+
+                                            <div className='space-y-2'>
+                                                <div className='flex items-center gap-2'>
+                                                    <input
+                                                        type='file'
+                                                        accept='image/*'
+                                                        onChange={e => handleVariantImageUpload(e.target.files[0])}
+                                                        className='hidden'
+                                                        id='variant-image-upload'
+                                                    />
+                                                    <Button type='button' variant='outline' onClick={handleVariantFileSelect} className='gap-2'>
+                                                        <ImageIcon className='w-4 h-4' />
+                                                        Upload Image
+                                                    </Button>
+                                                </div>
+                                                {variantForm.image && <VariantImagePreview image={variantForm.image} onRemove={handleVariantImageRemove} />}
+                                            </div>
+                                        </div>
+
+                                        <div className='flex gap-2'>
+                                            <Button variant='outlined' onClick={addVariant}>
+                                                {editingVariantId ? 'Update' : 'Add'}
+                                            </Button>
+                                            <Button variant='outline' onClick={handleVariantCancel}
+                                                sx={{
+                                                    color: '#9CA3AF',
+                                                    borderColor: '#374151',
+                                                    '&:hover': {
+                                                        bgcolor: 'rgba(55, 65, 81, 0.3)',
+                                                        borderColor: '#6B7280'
+                                                    }
+                                                }}>
+                                                Cancel
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Variants Table */}
+                                {variants.length > 0 && (
+                                    <div className='space-y-4'>
+                                        <h3 className='text-md font-medium text-foreground'>Created Variants</h3>
+                                        <VariantTable variants={variants} onEdit={editVariant} onRemove={removeVariant} />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Right Column - Status & Actions */}
+                        <div className='space-y-6'>
+                            {/* Status */}
+                            <div className='bg-card border border-border rounded-xl p-6 space-y-4'>
+                                <h2 className='text-lg font-semibold text-text-primary'>Product Status</h2>
+                                <StatusSelector status={formData.status} onStatusChange={status => updateFormField('status', status)} />
+                            </div>
+
+                            {/* Actions */}
+                            <div className='bg-card border border-border rounded-xl p-6 space-y-3'>
+                                <h2 className='text-lg font-semibold text-text-primary'>Actions</h2>
+                                <Button
+                                    className='w-full gap-2 !bg-black dark:!bg-white !text-white dark:!text-black'
+                                    variant='primary'
+                                    size='md'
+                                    disabled={saving}
+                                    onClick={() => {
+                                        const payload = new FormData()
+
+                                        // Basic fields
+                                        payload.append('name', formData.name)
+                                        payload.append('description', formData.description)
+                                        payload.append('short_description', formData.short_description)
+                                        payload.append('sku', formData.sku)
+                                        payload.append('status', formData.status)
+
+                                        // Categories
+                                        if (Array.isArray(formData.categories)) {
+                                            formData.categories.forEach(categoryId => {
+                                                payload.append('categories[]', categoryId)
+                                            })
+                                        }
+
+                                        // Features
+                                        formData.features.forEach((feature, index) => {
+                                            payload.append(`features[${index}][name]`, feature.name)
+                                            payload.append(`features[${index}][type]`, feature.type)
+                                            payload.append(`features[${index}][icon]`, feature.icon || '')
+                                        })
+
+                                        // Technical specs
+                                        formData.technical_specs.forEach((spec, index) => {
+                                            payload.append(`technical_specs[${index}][key]`, spec.key)
+                                            payload.append(`technical_specs[${index}][value]`, spec.value)
+                                        })
+
+                                        // Model features
+                                        formData.model_features.forEach((feature, index) => {
+                                            payload.append(`model_features[${index}][name]`, feature.name)
+                                            payload.append(`model_features[${index}][category]`, feature.category || '')
+                                        })
+
+                                        // Images: send new files; keep existing image ids
+                                        const existingImageIds = []
+                                        images.forEach(image => {
+                                            if (image.file) {
+                                                payload.append('images[]', image.file)
+                                            } else if (image.id) {
+                                                existingImageIds.push(image.id)
+                                            }
+                                        })
+                                        existingImageIds.forEach(id => payload.append('existing_image_ids[]', id))
+
+                                        // Variants
+                                        variants.forEach((variant, index) => {
+                                            // Only send numeric IDs (existing variants from DB), not string IDs (new variants)
+                                            if (variant.id && typeof variant.id === 'number') {
+                                                payload.append(`variants[${index}][id]`, String(variant.id))
+                                            }
+                                            payload.append(`variants[${index}][title]`, variant.title)
+                                            payload.append(`variants[${index}][sku]`, variant.sku)
+                                            payload.append(`variants[${index}][size]`, variant.size || '')
+                                            payload.append(`variants[${index}][color]`, variant.color || '')
+                                            payload.append(`variants[${index}][material]`, variant.material || '')
+                                            payload.append(`variants[${index}][price]`, variant.price)
+                                            payload.append(`variants[${index}][compare_at_price]`, variant.compare_at_price || '')
+                                            payload.append(`variants[${index}][quantity]`, variant.quantity)
+                                            payload.append(`variants[${index}][status]`, variant.status)
+
+                                            if (variant.image && variant.image.file) {
+                                                payload.append(`variants[${index}][image]`, variant.image.file)
+                                            } else if (variant.image && variant.image.id && typeof variant.image.id === 'number') {
+                                                payload.append(`variants[${index}][existing_image_id]`, String(variant.image.id))
+                                            }
+                                        })
+
+                                        // Deleted variant IDs
+                                        deletedVariantIds.forEach(id => {
+                                            payload.append('deleted_variant_ids[]', String(id))
+                                        })
+
+                                        setSaving(true)
+                                        payload.append('_method', 'PUT')
+                                        router.post(route('admin.products.update', { id: productId }), payload, {
+                                            forceFormData: true,
+                                            preserveScroll: true,
+                                            onSuccess: () => {
+                                                setSaving(false)
+                                                console.log('Product updated successfully')
+                                            },
+                                            onError: (errors) => {
+                                                setSaving(false)
+                                                console.error('Update failed:', errors)
+                                            },
+                                            onFinish: () => setSaving(false)
+                                        })
+                                    }}
+                                    startIcon={<Save className='w-4 h-4' />}>
+                                    {saving ? 'Saving Changes...' : 'Save Changes'}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default function ProductEdit({ productId, product, categories }) {
+    return (
+        <AuthenticatedLayout>
+            <Head title='Edit Product' />
+            <ProductEditFields productId={productId} product={product} categories={categories} />
+        </AuthenticatedLayout>
+    )
+}

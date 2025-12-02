@@ -1,94 +1,137 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm } from '@inertiajs/react';
+import GuestLayout from '@/Layouts/GuestLayout'
+import { Head, useForm } from '@inertiajs/react'
+import CustomTextField from '@/Components/CustomTextField'
+import { Alert, Box, Button, Divider, IconButton } from '@mui/material'
+import { ArrowRight, Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import { useState } from 'react'
 
 export default function ResetPassword({ token, email }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         token: token,
         email: email,
         password: '',
-        password_confirmation: '',
-    });
+        password_confirmation: ''
+    })
+    const [showPassword, setShowPassword] = useState(false)
+    const [showPassword2, setShowPassword2] = useState(false)
 
     const submit = (e) => {
-        e.preventDefault();
-
-        post(route('password.store'), {
-            onFinish: () => reset('password', 'password_confirmation'),
-        });
-    };
+        e.preventDefault()
+        post(route('password.store'), { onFinish: () => reset('password', 'password_confirmation') })
+    }
 
     return (
         <GuestLayout>
             <Head title="Reset Password" />
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
+            <div className="min-h-[70vh] w-full flex items-center justify-center px-4 py-12">
+                <div className="w-full max-w-5xl grid md:grid-cols-[1fr_520px] bg-card text-foreground border rounded-2xl overflow-hidden shadow-xl">
+                    {/* Visual / Brand side */}
+                    <div className="relative hidden md:flex flex-col justify-between p-10 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
+                        <div>
+                            <div className="flex items-center gap-3">
+                                <div className="size-10 rounded-lg bg-primary text-primary-foreground grid place-items-center font-bold">C</div>
+                                <div className="text-xl font-bold tracking-tight">Chronos</div>
+                            </div>
+                            <h2 className="mt-10 text-3xl font-bold leading-tight">Create a new password</h2>
+                            <p className="mt-2 text-sm text-muted-foreground max-w-sm">
+                                Choose a strong password that you haven't used elsewhere.
+                            </p>
+                        </div>
+                    </div>
 
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
-                    />
+                    {/* Form side */}
+                    <div className="p-6 sm:p-10">
+                        <div className="mb-6">
+                            <h1 className="text-2xl font-bold">Reset password</h1>
+                            <p className="text-sm text-muted-foreground mt-1">Enter your new password below</p>
+                        </div>
 
-                    <InputError message={errors.email} className="mt-2" />
+                        <form onSubmit={submit} className="space-y-4">
+                            <Box>
+                                <CustomTextField
+                                    id="email"
+                                    label="Email"
+                                    type="email"
+                                    name="email"
+                                    value={data.email}
+                                    onChange={(e) => setData('email', e.target.value)}
+                                    fullWidth
+                                    error={Boolean(errors.email)}
+                                    helperText={errors.email}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <span className="me-2 text-gray-400"><Mail size={18} /></span>
+                                        )
+                                    }}
+                                />
+                            </Box>
+
+                            <Box>
+                                <CustomTextField
+                                    id="password"
+                                    label="Password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    name="password"
+                                    required
+                                    value={data.password}
+                                    onChange={(e) => setData('password', e.target.value)}
+                                    fullWidth
+                                    error={Boolean(errors.password)}
+                                    helperText={errors.password}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <span className="me-2 text-gray-400"><Lock size={18} /></span>
+                                        ),
+                                        endAdornment: (
+                                            <IconButton type="button" onClick={() => setShowPassword(!showPassword)} edge="end" aria-label="toggle password visibility">
+                                                {showPassword ? <EyeOff className="text-gray-400" size={18} /> : <Eye className="text-gray-400" size={18} />}
+                                            </IconButton>
+                                        )
+                                    }}
+                                />
+                            </Box>
+
+                            <Box>
+                                <CustomTextField
+                                    id="password_confirmation"
+                                    label="Confirm password"
+                                    type={showPassword2 ? 'text' : 'password'}
+                                    name="password_confirmation"
+                                    required
+                                    value={data.password_confirmation}
+                                    onChange={(e) => setData('password_confirmation', e.target.value)}
+                                    fullWidth
+                                    error={Boolean(errors.password_confirmation)}
+                                    helperText={errors.password_confirmation}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <span className="me-2 text-gray-400"><Lock size={18} /></span>
+                                        ),
+                                        endAdornment: (
+                                            <IconButton type="button" onClick={() => setShowPassword2(!showPassword2)} edge="end" aria-label="toggle password visibility">
+                                                {showPassword2 ? <EyeOff className="text-gray-400" size={18} /> : <Eye className="text-gray-400" size={18} />}
+                                            </IconButton>
+                                        )
+                                    }}
+                                />
+                            </Box>
+
+                            <Button
+                                type="submit"
+                                fullWidth
+                                size="large"
+                                className="!mt-2 font-semibold"
+                                endIcon={<ArrowRight size={18} />}
+                                variant='outlined'
+                                disabled={processing}
+                            >
+                                Update password
+                            </Button>
+                        </form>
+                    </div>
                 </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        isFocused={true}
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirm Password"
-                    />
-
-                    <TextInput
-                        type="password"
-                        id="password_confirmation"
-                        name="password_confirmation"
-                        value={data.password_confirmation}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
-                    />
-
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
-                </div>
-
-                <div className="mt-4 flex items-center justify-end">
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Reset Password
-                    </PrimaryButton>
-                </div>
-            </form>
+            </div>
         </GuestLayout>
-    );
+    )
 }
