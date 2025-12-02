@@ -205,8 +205,175 @@ export default function Overview({ product }) {
                             </div>
                         </div>
 
+                        <div className="space-y-6 lg:hidden mt-16">
+                            {/* Title */}
+                            <div>
+                                <h1 className="text-3xl font-bold mb-4">{product?.name}</h1>
+                            </div>
+
+                            {/* Price Section */}
+                            <div className="">
+                                <div className="flex items-end gap-3">
+                                    <div className="flex items-center gap-1">
+                                        <Taka color="text-gray-900" className="font-bold text-2xl" />
+                                        <span className="text-3xl font-bold text-gray-900">{currentPrice}</span>
+                                    </div>
+                                    {comparePrice && (
+                                        <div className="flex items-center gap-1 text-gray-400 line-through">
+                                            <Taka color="text-gray-400" className="text-sm" />
+                                            <span className="text-sm">{comparePrice}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Variant Selection */}
+                            {variants.length > 0 && (
+                                <div className="">
+                                    <div className="flex items-center gap-2 text-sm font-semibold text-gray-900 mb-3">
+                                        <span className="font-semibold">Select a Variant:</span>
+                                        <span className="text-gray-600">{selectedVariant?.title ?? "Default"}</span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {variants.map((variant) => (
+                                            <button
+                                                key={variant.id}
+                                                onClick={() => handleVariantSelect(variant.id)}
+                                                className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 border-2 ${selectedVariantId === variant.id
+                                                    ? "bg-black text-white border-black"
+                                                    : "bg-white text-gray-800 border-gray-200 hover:border-gray-400"
+                                                    }`}
+                                            >
+                                                {variant.title}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Variant Specs */}
+                            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                    {selectedVariant?.sku && (
+                                        <div>
+                                            <p className="text-gray-600">SKU</p>
+                                            <p className="font-semibold text-gray-900">{selectedVariant.sku}</p>
+                                        </div>
+                                    )}
+                                    {selectedVariant?.size && (
+                                        <div>
+                                            <p className="text-gray-600">Size</p>
+                                            <p className="font-semibold text-gray-900">{selectedVariant.size}</p>
+                                        </div>
+                                    )}
+                                    {selectedVariant?.color && (
+                                        <div>
+                                            <p className="text-gray-600">Color</p>
+                                            <p className="font-semibold text-gray-900">{selectedVariant.color}</p>
+                                        </div>
+                                    )}
+                                    {selectedVariant?.material && (
+                                        <div>
+                                            <p className="text-gray-600">Material</p>
+                                            <p className="font-semibold text-gray-900">{selectedVariant.material}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Features */}
+                            <div>
+                                <h3 className="text-xl font-bold mb-4">Features</h3>
+                                <div className="grid gap-4">
+                                    {featureList.length > 0 ? (
+                                        featureList.map((feature, index) => (
+                                            <div key={index} className="flex items-start gap-3">
+                                                <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded text-sm font-semibold text-gray-600">
+                                                    {feature.icon ? (
+                                                        <LucideIcon name={feature.icon} className="w-5 h-5 text-gray-700" />
+                                                    ) : (
+                                                        <span>{feature.type?.[0] || feature.name?.[0] || "•"}</span>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <div className="font-bold text-gray-900">{feature.name}</div>
+                                                    {feature.type && <div className="text-sm text-gray-500">{feature.type}</div>}
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-gray-500">Feature details coming soon.</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Delivery */}
+                            <div className="flex item-center gap-3 mb-2">
+                                <div className="flex item-center gap-3">
+                                    <div className="text-sm font-base">Delivery Time:</div>
+                                    <div className="text-sm font-bold">3-5 Days</div>
+                                </div>
+
+                                <div className="h-full flex flex-row item-center">|</div>
+
+                                <div className="flex item-center gap-3">
+                                    <div className="text-sm font-base">Ship From:</div>
+                                    <div className="text-sm font-bold">Overseas</div>
+                                </div>
+                            </div>
+
+
+
+                            {/* Desktop: Quantity and Buttons Side by Side (Hidden on mobile) */}
+                            <div className="hidden lg:flex gap-3 items-end">
+                                {/* Quantity Controls - Only shown when item is in cart */}
+                                {itemInCart && cartItem && (
+                                    <div>
+                                        <div className="font-semibold mb-2 text-sm">QUANTITY</div>
+                                        <div className="flex items-center gap-2 border border-gray-300 rounded">
+                                            <button
+                                                onClick={decreaseQuantity}
+                                                className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                                            >
+                                                <Minus className="w-4 h-4" />
+                                            </button>
+                                            <span className="w-8 text-center font-semibold text-sm">{cartItem.quantity}</span>
+                                            <button
+                                                onClick={increaseQuantity}
+                                                className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                                            >
+                                                <Plus className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Add to Cart - Only when item is NOT in cart */}
+                                {!itemInCart && (
+                                    <button
+                                        onClick={handleAddToCart}
+                                        disabled={isAdding}
+                                        className={`flex-1 bg-black text-white py-3 px-6 rounded font-semibold transition-colors ${isAdding ? "opacity-75 cursor-not-allowed" : "hover:bg-gray-800"
+                                            }`}
+                                    >
+                                        {isAdding ? "Adding..." : "Add to Cart"}
+                                    </button>
+                                )}
+
+                                {/* Buy Now - Always visible */}
+                                <button
+                                    onClick={handleBuyNow}
+                                    disabled={isBuying}
+                                    className={`flex-1 bg-red-600 text-white py-3 px-6 rounded font-semibold transition-colors ${isBuying ? "opacity-75 cursor-not-allowed" : "hover:bg-red-700"
+                                        }`}
+                                >
+                                    {isBuying ? "Redirecting..." : "Buy Now"}
+                                </button>
+                            </div>
+                        </div>
+
                         <div className="py-4">
-                            {/* <h2 className="text-2xl font-bold mb-4">Overview</h2> */}
+                            <h2 className="text-2xl font-bold mb-4">Overview</h2>
                             {product?.short_description ? (
                                 <p className="text-gray-600 leading-relaxed">{product.short_description}</p>
                             ) : (
@@ -217,7 +384,7 @@ export default function Overview({ product }) {
                         <TechnicalSpecs specs={technicalSpecs} modelFeatures={modelFeatures} />
 
                         <div>
-                            <h2 className="text-2xl font-bold mb-4">Overview</h2>
+                            <h2 className="text-2xl font-bold mb-4">Description</h2>
                             {product?.description ? (
                                 <div className="space-y-4 text-gray-600 leading-relaxed" dangerouslySetInnerHTML={{ __html: product.description }} />
                             ) : (
@@ -227,7 +394,7 @@ export default function Overview({ product }) {
                     </div>
 
                     {/* Right Column - Product Details */}
-                    <div className="space-y-6 lg:sticky lg:top-16 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
+                    <div className="hidden lg:block space-y-6 lg:sticky lg:top-16 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
                         {/* Title */}
                         <div>
                             <h1 className="text-3xl font-bold mb-4">{product?.name}</h1>
@@ -346,52 +513,52 @@ export default function Overview({ product }) {
 
 
 
-                    {/* Desktop: Quantity and Buttons Side by Side (Hidden on mobile) */}
-                    <div className="hidden lg:flex gap-3 items-end">
-                        {/* Quantity Controls - Only shown when item is in cart */}
-                        {itemInCart && cartItem && (
-                            <div>
-                                <div className="font-semibold mb-2 text-sm">QUANTITY</div>
-                                <div className="flex items-center gap-2 border border-gray-300 rounded">
-                                    <button
-                                        onClick={decreaseQuantity}
-                                        className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors"
-                                    >
-                                        <Minus className="w-4 h-4" />
-                                    </button>
-                                    <span className="w-8 text-center font-semibold text-sm">{cartItem.quantity}</span>
-                                    <button
-                                        onClick={increaseQuantity}
-                                        className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors"
-                                    >
-                                        <Plus className="w-4 h-4" />
-                                    </button>
+                        {/* Desktop: Quantity and Buttons Side by Side (Hidden on mobile) */}
+                        <div className="hidden lg:flex gap-3 items-end">
+                            {/* Quantity Controls - Only shown when item is in cart */}
+                            {itemInCart && cartItem && (
+                                <div>
+                                    <div className="font-semibold mb-2 text-sm">QUANTITY</div>
+                                    <div className="flex items-center gap-2 border border-gray-300 rounded">
+                                        <button
+                                            onClick={decreaseQuantity}
+                                            className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                                        >
+                                            <Minus className="w-4 h-4" />
+                                        </button>
+                                        <span className="w-8 text-center font-semibold text-sm">{cartItem.quantity}</span>
+                                        <button
+                                            onClick={increaseQuantity}
+                                            className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        {/* Add to Cart - Only when item is NOT in cart */}
-                        {!itemInCart && (
+                            {/* Add to Cart - Only when item is NOT in cart */}
+                            {!itemInCart && (
+                                <button
+                                    onClick={handleAddToCart}
+                                    disabled={isAdding}
+                                    className={`flex-1 bg-black text-white py-3 px-6 rounded font-semibold transition-colors ${isAdding ? "opacity-75 cursor-not-allowed" : "hover:bg-gray-800"
+                                        }`}
+                                >
+                                    {isAdding ? "Adding..." : "Add to Cart"}
+                                </button>
+                            )}
+
+                            {/* Buy Now - Always visible */}
                             <button
-                                onClick={handleAddToCart}
-                                disabled={isAdding}
-                                className={`flex-1 bg-black text-white py-3 px-6 rounded font-semibold transition-colors ${isAdding ? "opacity-75 cursor-not-allowed" : "hover:bg-gray-800"
+                                onClick={handleBuyNow}
+                                disabled={isBuying}
+                                className={`flex-1 bg-red-600 text-white py-3 px-6 rounded font-semibold transition-colors ${isBuying ? "opacity-75 cursor-not-allowed" : "hover:bg-red-700"
                                     }`}
                             >
-                                {isAdding ? "Adding..." : "Add to Cart"}
+                                {isBuying ? "Redirecting..." : "Buy Now"}
                             </button>
-                        )}
-
-                        {/* Buy Now - Always visible */}
-                        <button
-                            onClick={handleBuyNow}
-                            disabled={isBuying}
-                            className={`flex-1 bg-red-600 text-white py-3 px-6 rounded font-semibold transition-colors ${isBuying ? "opacity-75 cursor-not-allowed" : "hover:bg-red-700"
-                                }`}
-                        >
-                            {isBuying ? "Redirecting..." : "Buy Now"}
-                        </button>
-                    </div>
+                        </div>
                     </div>
                 </div>
             </section>
