@@ -65,8 +65,8 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#" className="font-bold hover:text-gray-400 transition-colors">
-                                    Coming Soon
+                                <Link href="/about" className="font-bold hover:text-gray-400 transition-colors">
+                                    About Us
                                 </Link>
                             </li>
                             <li>
@@ -82,8 +82,8 @@ export default function Footer() {
                         <h3 className="text-sm font-semibold mb-4 text-gray-400">Listings</h3>
                         <ul className="space-y-3">
                             <li>
-                                <Link href="#" className="font-bold hover:text-gray-400 transition-colors">
-                                    Watch List
+                                <Link href="/watches" className="font-bold hover:text-gray-400 transition-colors">
+                                    Watches
                                 </Link>
                             </li>
                         </ul>
