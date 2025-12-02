@@ -60,7 +60,7 @@ export function CartProvider({ children }) {
 
                 syncCart(data.cart)
                 setIsOpen(true)
-                toast.success("Added to cart")
+                // toast.success("Added to cart")
 
                 return data.cart
             } catch (error) {
