@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Zap, Award, Users, Heart } from "lucide-react"
-import { Head } from "@inertiajs/react"
+import { Head, Link } from "@inertiajs/react"
 import GuestLayout from "@/Layouts/GuestLayout"
 
 export default function AboutPage() {
@@ -11,34 +11,34 @@ export default function AboutPage() {
             icon: Zap,
             title: "Innovation",
             description:
-                "We blend cutting-edge technology with timeless craftsmanship to create watches that transcend time.",
+                "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
         },
         {
             icon: Award,
             title: "Excellence",
             description:
-                "Every timepiece is meticulously crafted with attention to detail and the finest materials available.",
+                "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
         },
         {
             icon: Users,
             title: "Community",
-            description: "We build lasting relationships with our customers, treating each as part of the RavenHour family.",
+            description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
         },
         {
             icon: Heart,
             title: "Passion",
-            description: "Our founders dedicated their lives to the art of horology and continue that legacy today.",
+            description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
         },
     ]
 
     const milestones = [
-        { year: "1985", title: "Founded", description: "RavenHour was established in the heart of Switzerland." },
-        { year: "1992", title: "First Collection", description: "Launched our signature Diamond Collection." },
-        { year: "2005", title: "Global Expansion", description: "Expanded to 45 countries across the world." },
+        { year: "2010", title: "Founded", description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry." },
+        { year: "2015", title: "First Collection", description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry." },
+        { year: "2020", title: "Global Expansion", description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry." },
         {
-            year: "2020",
+            year: "2025",
             title: "Digital Innovation",
-            description: "Introduced sustainable practices and digital platforms.",
+            description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
         },
     ]
 
@@ -54,13 +54,12 @@ export default function AboutPage() {
                             About Us
                         </h1>
                         <p className="text-center text-gray-600 text-lg max-w-2xl mx-auto mb-8">
-                            RavenHour has been crafting luxury timepieces that blend Swiss precision with
-                            innovative design.
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry.
                         </p>
                         <div className="flex justify-center">
-                            <button className="bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors text-sm lg:text-base">
+                            <Link href={route('contact')} className="bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors text-sm lg:text-base">
                                 Contact Us
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 </section>
@@ -87,9 +86,7 @@ export default function AboutPage() {
                                 <div className="absolute top-0 right-0 w-40 h-40 bg-black/5 rounded-full -mr-20 -mt-20 transition-transform duration-500 group-hover:scale-150" />
                                 <h2 className="text-3xl lg:text-4xl font-bold mb-4 relative z-10">Our Vision</h2>
                                 <p className="text-gray-700 text-lg leading-relaxed relative z-10">
-                                    To be the world's most trusted luxury watch brand, known for innovation, sustainability, and timeless
-                                    design. We envision a future where every RavenHour watch represents not just precision, but a symbol of
-                                    success and refined taste.
+                                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
                                 </p>
                             </div>
                         </div>
@@ -154,7 +151,7 @@ export default function AboutPage() {
                                 </div>
                                 <div className="relative h-80 lg:h-96 bg-gradient-to-br from-gray-300 to-gray-400 rounded-3xl overflow-hidden group">
                                     <img
-                                        src="/placeholder.svg?height=400&width=400"
+                                        src="https://www.bubbalogistics.com/hs-fs/hubfs/0297859_0297859_shutterstock.jpg?width=1110&height=580&name=0297859_0297859_shutterstock.jpg"
                                         alt="Watchmaking craftsmanship"
                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                     />
@@ -167,7 +164,7 @@ export default function AboutPage() {
                 <section className="max-w-full mx-auto py-12">
                     <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
                         <div className="text-center mb-16 lg:mb-20">
-                            <p className="text-gray-500 text-sm font-medium mb-4">Since 1985</p>
+                            <p className="text-gray-500 text-sm font-medium mb-4">Since 2010</p>
                             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-light text-black leading-tight">
                                 Our Journey
                             </h2>

@@ -15,6 +15,7 @@ export default function Navbar() {
 
     const mainNavItems = [
         { label: "All Watches", href: route('watches-list') },
+        { label: "About Us", href: route('about') },
         { label: "Contact Us", href: route('contact') },
         { label: "Terms", href: route('terms') },
     ];
