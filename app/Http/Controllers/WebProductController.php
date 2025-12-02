@@ -6,6 +6,8 @@ use App\Models\Category;
 use Inertia\Inertia;
 use App\Models\Product;
 use App\Models\Banner;
+use App\Services\MetaConversionApiService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -59,7 +61,7 @@ class WebProductController extends Controller
         ]);
     }
 
-    public function singleProduct(string $slug)
+    public function singleProduct(Request $request, string $slug)
     {
         $product = Product::with([
             'categories:id,name',
@@ -223,6 +225,8 @@ class WebProductController extends Controller
         $banner = Banner::where('position', 'Homepage Hero')
             ->where('status', true)
             ->first();
+
+        MetaConversionApiService::trackViewContent($product, $request);
 
         return Inertia::render('Web/SingleProduct', [
             'product' => $payload,

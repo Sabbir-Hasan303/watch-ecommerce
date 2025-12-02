@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CheckoutOrderRequest;
 use App\Models\Order;
 use App\Services\CartService;
+use App\Services\MetaConversionApiService;
 use App\Services\OptionService;
 use App\Services\OrderService;
 use Illuminate\Http\RedirectResponse;
@@ -41,6 +42,8 @@ class CheckoutController extends Controller
                 'fullAddress' => $defaultAddress?->address_line ?? '',
             ];
         }
+
+        MetaConversionApiService::trackInitiateCheckout($cart, $request);
 
         return Inertia::render('Web/Checkout', [
             'shippingOptions' => $shippingOptions,
@@ -140,9 +143,11 @@ class CheckoutController extends Controller
         ];
 
         try {
-            $order = DB::transaction(function () use ($orderPayload, $cart) {
+            $order = DB::transaction(function () use ($orderPayload, $cart, $request) {
                 $order = OrderService::createOrder($orderPayload);
                 CartService::clearCart($cart);
+
+                MetaConversionApiService::trackPurchase($order, $request);
 
                 return $order;
             });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Services\CartService;
+use App\Services\MetaConversionApiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -78,6 +79,8 @@ class CartController extends Controller
         }
 
         $cart->refresh();
+
+        MetaConversionApiService::trackAddToCart($product, (int) $data['quantity'], $request);
 
         return response()->json([
             'cart' => CartService::transformCart($cart),
