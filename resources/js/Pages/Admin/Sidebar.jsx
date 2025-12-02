@@ -13,7 +13,8 @@ import {
     ImageIcon,
     Settings,
     UserCheck,
-    FileText
+    FileText,
+    BarChart3
 } from 'lucide-react'
 import { Button } from '@mui/material'
 import Ripple from '@/Components/RippleButton'
@@ -108,6 +109,15 @@ export default function Sidebar({ collapsed, onToggle, user }) {
                 { label: 'Contact List', href: route('admin.contents.contact-list') },
                 { label: 'Banners', href: route('admin.contents.banners.index') }
                 // { label: 'FAQs', href: '/faqs' }
+            ]
+        },
+        {
+            icon: BarChart3,
+            label: 'Marketing',
+            subItems: [
+                { label: 'Meta', href: route('admin.marketing.meta') },
+                { label: 'Google', href: route('admin.marketing.google') },
+                { label: 'TikTok', href: route('admin.marketing.tiktok') }
             ]
         },
         // {
