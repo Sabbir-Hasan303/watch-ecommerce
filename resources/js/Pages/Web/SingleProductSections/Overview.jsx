@@ -205,7 +205,7 @@ export default function Overview({ product }) {
                             </div>
                         </div>
 
-                        <div>
+                        <div className="py-4">
                             {/* <h2 className="text-2xl font-bold mb-4">Overview</h2> */}
                             {product?.short_description ? (
                                 <p className="text-gray-600 leading-relaxed">{product.short_description}</p>
@@ -397,7 +397,7 @@ export default function Overview({ product }) {
             </section>
 
             {/* Mobile Sticky Bottom Bar */}
-            <div className="fixed bottom-0 left-0 right-0 lg:hidden bg-white border-t border-gray-200 px-4 py-3 z-40 shadow-lg">
+            <div className="fixed bottom-0 left-0 right-0 lg:hidden bg-white border-t border-gray-200 px-5 py-5 z-40 shadow-lg">
                 <div className="flex gap-3 items-center">
                     {/* Quantity Controls (when item is in cart) */}
                     {itemInCart && cartItem && (
