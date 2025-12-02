@@ -1,0 +1,1 @@
+import{j as s,p as a}from"./mui-BKRBi9c6.js";const e=({color:e="text-text-primary",size:t="text-2xl",className:r=""})=>s.jsx(a,{children:s.jsx("span",{className:`${e} ${t} ${r}`,children:"৳"})});export{e as T};
